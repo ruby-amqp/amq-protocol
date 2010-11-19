@@ -1,0 +1,11 @@
+h1. About
+
+This is an AMQP parser for AMQP 0.9.1. It isn't an AMQP client, just the parser, so if you want to write your own AMQP client without digging into the protocol, this gem can help you with that.
+
+h1. Usage
+
+<pre>
+gem install amqp-parser
+</pre>
+
+Check the @examples@ directory for some examples.
