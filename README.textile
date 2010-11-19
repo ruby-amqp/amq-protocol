@@ -10,6 +10,10 @@ gem install amqp-parser
 
 Check the @examples@ directory for some examples.
 
+h1. Development
+
+If you want to change some code, don't do so in @lib/amqp/protocol.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
+
 h1. Links
 
 * "RDoc.info API Docs":http://rdoc.info/github/botanicus/amqp-protocol/master/frames
