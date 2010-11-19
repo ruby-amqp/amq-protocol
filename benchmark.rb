@@ -10,6 +10,10 @@ end
 require "benchmark"
 
 Benchmark.bmbm do |bm|
+  bm.report("Raw binary") do
+    # TODO
+  end
+
   bm.report("AMQP Gem") do
     # TODO
   end
