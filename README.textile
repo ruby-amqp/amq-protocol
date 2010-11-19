@@ -9,3 +9,9 @@ gem install amqp-parser
 </pre>
 
 Check the @examples@ directory for some examples.
+
+h1. Links
+
+* "RDoc.info API Docs":http://rdoc.info/github/botanicus/amqp-protocol/master/frames
+* "Examples":https://github.com/botanicus/amqp-protocol/tree/master/examples/
+* "Bug reporting":http://github.com/botanicus/amqp-protocol/issues
