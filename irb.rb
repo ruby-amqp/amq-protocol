@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# encoding: ascii-8bit
+# encoding: utf-8
 
 require "irb"
 require_relative "lib/amqp/protocol.rb"
