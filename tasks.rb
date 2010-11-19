@@ -4,7 +4,7 @@
 Task.new(:generate) do |task|
   task.description = "Generate lib/amqp/protocol.rb"
   task.define do |opts, spec = "vendor/rabbitmq-codegen/amqp-rabbitmq-0.9.1.json"|
-    sh "./codgen.py spec #{spec} lib/amqp/protocol.rb"
+    sh "./codegen.py spec #{spec} lib/amqp/protocol.rb"
   end
 end
 
