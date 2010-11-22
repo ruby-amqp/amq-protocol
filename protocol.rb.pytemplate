@@ -6,6 +6,9 @@
 
 module AMQP
   module Protocol
+    PROTOCOL_VERSION = "{{ spec.major }}.{{ spec.minor }}.{{ spec.revision }}"
+    DEFAULT_PORT = {{ spec.port }}
+
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQP::Protocol::Class.
     def self.classes
@@ -36,7 +39,22 @@ module AMQP
     end
 
     {% for class in classes %}
-    module {{ class }}
+    module {{ class.constant_name }}
+      {% for method in class.methods %}
+      class {{ method.constant_name }} < Class
+        @@name = "{{ class.name }}.{{ method.name }}"
+        @@method = {{ method.index }}
+        {% if method.accepted_by("client") %}
+        # @return
+        def self.decode(data)
+        end
+        {% elif method.accepted_by("server") %}
+        # @return
+        def self.encode(*args)
+        end
+        {% endif %}
+      end
+      {% endfor %}
     end
     {% endfor %}
   end

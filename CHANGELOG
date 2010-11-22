@@ -1,0 +1,3 @@
+= Version 0.0.1
+  * [FEATURE] Basic code generation.
+  * [FEATURE] Generate only methods which are actually required by the client.
