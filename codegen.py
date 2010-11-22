@@ -56,17 +56,16 @@ def accepted_by(self, *receivers):
         except KeyError:
             return ["server", "client"]
 
-    def list_include(list, item):
-        try:
-            list.index(item)
-            return True
-        except ValueError:
-            return None
-
     actual_receivers = get_accepted_by(self)
-    return all(map(lambda receiver: list_include(actual_receivers, receiver), receivers))
+    return all(map(lambda receiver: receiver in actual_receivers, receivers))
 
 AmqpMethod.accepted_by = accepted_by
+
+def binary(self):
+    method_id = self.klass.index << 16 | self.index
+    return "0x%08X # %i, %i, %i" % (method_id, self.klass.index, self.index, method_id)
+
+AmqpMethod.binary = binary
 
 # helpers
 def render(path, **context):
@@ -77,7 +76,7 @@ def render(path, **context):
 def main(json_spec_path):
     spec = AmqpSpecObject(json_spec_path)
     classes = spec.classes
-    print render("protocol.rb.pytemplate", spec = spec, classes = classes)
+    print render("protocol.rb.pytemplate", spec = spec)
 
 if __name__ == "__main__":
     do_main_dict({"spec": main})
