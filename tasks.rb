@@ -12,6 +12,7 @@ Task.new(:generate) do |task|
       end
     end
     sh "./codegen.py spec #{spec} lib/amqp/protocol.rb"
+    sh "ruby -c lib/amqp/protocol.rb"
   end
 end
 
