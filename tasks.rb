@@ -11,8 +11,11 @@ Task.new(:generate) do |task|
         sh "git submodule update"
       end
     end
-    sh "./codegen.py spec #{spec} lib/amqp/protocol.rb"
-    sh "ruby -c lib/amqp/protocol.rb"
+    output = "lib/amqp/protocol.rb"
+    sh "./codegen.py spec #{spec} #{output}"
+    if File.file?(output)
+      sh "ruby -c #{output}"
+    end
   end
 end
 
