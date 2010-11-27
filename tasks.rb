@@ -13,6 +13,7 @@ Task.new(:generate) do |task|
     end
     output = "lib/amqp/protocol.rb"
     sh "./codegen.py spec #{spec} #{output}"
+    sh "./post-processing.rb #{output}"
     if File.file?(output)
       sh "ruby -c #{output}"
     end
