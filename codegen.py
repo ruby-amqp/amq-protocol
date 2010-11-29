@@ -7,9 +7,9 @@ sys.path.append(os.path.join("vendor", "rabbitmq-codegen"))
 
 from amqp_codegen import *
 try:
-    from jinja2 import Template
+    from mako.template import Template
 except ImportError:
-    print "Jinja2 isn't installed. Run easy_install Jinja2 or pip install Jinja2."
+    print "Mako isn't installed. Run easy_install mako."
     sys.exit(1)
 
 # main class

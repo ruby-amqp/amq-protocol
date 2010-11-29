@@ -6,9 +6,9 @@
 
 module AMQP
   module Protocol
-    PROTOCOL_VERSION = "{{ spec.major }}.{{ spec.minor }}.{{ spec.revision }}"
-    PREAMBLE = "{{ 'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision) }}"
-    DEFAULT_PORT = {{ spec.port }}
+    PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}"
+    PREAMBLE = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}"
+    DEFAULT_PORT = ${spec.port}
 
     # caching
     EMPTY_STRING = "".freeze
@@ -133,28 +133,34 @@ module AMQP
       end
     end
 
-    {% for class in spec.classes %}
-    class {{ class.constant_name }} < Class
-      @name = "{{ class.name }}"
-      @method = {{ class.index }}
+    % for klass in spec.classes :
+    class ${klass.constant_name} < Class
+      @name = "${klass.name}"
+      @method = ${klass.index}
 
-      {% if class.fields %}{# only the Basic class has fields (refered as properties in the JSON) #}
+      % if klass.fields: ## only the Basic class has fields (refered as properties in the JSON)
       PROPERTIES = [
-        {% for field in class.fields %}:{{ field.ruby_name }}, # {{ spec.resolveDomain(field.domain) }}
-        {% endfor %}
+      % for field in klass.fields:
+        :${field.ruby_name}, # ${spec.resolveDomain(field.domain)}
+        % endfor
       ]
 
-      {% for f in class.fields %}
-      def self.encode_{{ f.ruby_name }}(value){% set i = class.fields.index(f) %}
-        f = "0x%04x" % [1 << {{ 15-i }}, {{ 15-i }}] # (1 << {{ i }}){# TODO: do this in Python (unfortunatelly Jinja2 can't deal with <<) #}
-        result = [].pack("!{{ {"octet": "B", "shortstr": "B", "longlong": "Q", "timestamp": "Q"}[f.type] }}")
-        [{{ i }}, f, result]
+      % for f in klass.fields :
+      def self.encode_${f.ruby_name}(value)<% i = klass.fields.index(f) %>
+        f = ${"0x%04x, # (1 << %i)" % ( 1 << (15-i), 15-i,)}
+        % if f.type == "octet" or f.type == "shortstr":
+        result = [].pack("!B")
+        % elif f.type == "longlong" or f.type == "timestamp":
+        result = [].pack("!Q")
+        % endif
+        [${i}, f, result]
       end
-      {% endfor %}
 
-      {% endif %}
+      % endfor
 
-      {% if class.name == "basic" %}{# TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
+      % endif
+
+      % if klass.name == "basic" : ## TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
       def self.encode_properties(body_size, properties)
         pieces = Array.new(14) { AMQP::Protocol::EMPTY_STRING }
         flags = 0
@@ -182,27 +188,28 @@ module AMQP
       #      fields.do_print(" "*8, "props['%s']")
       #  print "    return props, offset"
       #end
-      {% endif %}
+      % endif
 
-      {% for method in class.methods %}
-      class {{ method.constant_name }} < Method
-        @name = "{{ class.name }}.{{ method.name }}"
-        @method = {{ method.index }}
-        {{ method.binary() }}
+      % for method in klass.methods :
+      class ${method.constant_name} < Method
+        @name = "${klass.name}.${method.name}"
+        @method = ${method.index}
+        ${method.binary()}
 
-        {% if method.accepted_by("client") %}
+        % if method.accepted_by("client") :
         # @return
         def self.decode(data)
         end
-        {% elif method.accepted_by("server") %}
+        % elif method.accepted_by("server"):
         # @return
         def self.encode(*args)
         end
-        {% endif %}
+        % endif
 
       end
-      {% endfor %}
+
+      % endfor
     end
-    {% endfor %}
+    % endfor
   end
 end
