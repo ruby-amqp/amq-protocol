@@ -10,6 +10,9 @@ module AMQP
     PREAMBLE = "AMQP\x00\x00\x09\x01"
     DEFAULT_PORT = 5672
 
+    # caching
+    EMPTY_STRING = "".freeze
+
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQP::Protocol::Class.
     def self.classes
@@ -88,695 +91,711 @@ module AMQP
         @@methods
       end
 
-      # def self.encode_basic_properties(body_size, props)
-      #   pieces = Array.new(14) { String.new }
-      #   flags = 0
-      #   enc = ENCODE_PROPS_BASIC
-      #
-      #   for key in BASIC_PROPS_SET & set(props.iterkeys()):
-      #       i, f, fun = enc[key]
-      #       flags |= f
-      #       pieces[i] = fun(props[key])
-      #
-      #   return (0x02, ''.join((
-      #       struct.pack('!HHQH',
-      #                   CLASS_BASIC, 0, body_size, flags),
-      #       ''.join(pieces),
-      #       ))
-      #       )
-      # end
-      #
-      # def self.split_headers(user_headers, properties_set)
-      #   properties, headers = {}, {}
-      #   user_headers.iteritems.each do |key, value|
-      #     if properties_set.has_key?(key)
-      #       properties[key] = value
-      #     else
-      #       headers[key] = value
-      #     end
-      #   end
-      #
-      #   return props, headers
-      # end
-      #
-      # def self.encode_body(body, frame_size)
-      #   # Spec is broken: Our errata says that it does define
-      #   # something, but it just doesn't relate do method and
-      #   # properties frames. Which makes it, well, suboptimal.
-      #   # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
-      #   limit = frame_size - 7 - 1
-      #
-      #   Array.new.tap do |array|
-      #     while body
-      #       payload, body = body[:limit], body[limit:] # TODO: how to port this to Ruby??
-      #       array << [0x03, payload]
-      #     end
-      #   end
-      # end
+      def self.split_headers(user_headers, properties_set)
+        properties, headers = {}, {}
+        user_headers.iteritems.each do |key, value|
+          if properties_set.has_key?(key)
+            properties[key] = value
+          else
+            headers[key] = value
+          end
+        end
+
+        return props, headers
+      end
+
+      def self.encode_body(body, frame_size)
+        # Spec is broken: Our errata says that it does define
+        # something, but it just doesn't relate do method and
+        # properties frames. Which makes it, well, suboptimal.
+        # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
+        limit = frame_size - 7 - 1
+
+        Array.new.tap do |array|
+          while body
+            payload, body = body[0..limit], body[limit..-1]
+            array << [0x03, payload]
+          end
+        end
+      end
+
+      # We can return different:
+      # - instantiate given subclass of Method
+      # - create an OpenStruct object
+      # - create a hash
+      # - yield params into the block rather than just return
+      # @api plugin
+      def self.instantiate(*args, &block)
+        self.new(*args, &block)
+        # or OpenStruct.new(args.first)
+        # or args.first
+        # or block.call(*args)
+      end
     end
 
-    
     class Connection < Class
       @name = "connection"
       @method = 10
-      
+
       class Start < Method
         @name = "connection.start"
         @method = 10
         0x000A000A # 10, 10, 655370
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class StartOk < Method
         @name = "connection.start-ok"
         @method = 11
         0x000A000B # 10, 11, 655371
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class Secure < Method
         @name = "connection.secure"
         @method = 20
         0x000A0014 # 10, 20, 655380
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class SecureOk < Method
         @name = "connection.secure-ok"
         @method = 21
         0x000A0015 # 10, 21, 655381
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class Tune < Method
         @name = "connection.tune"
         @method = 30
         0x000A001E # 10, 30, 655390
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class TuneOk < Method
         @name = "connection.tune-ok"
         @method = 31
         0x000A001F # 10, 31, 655391
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class Open < Method
         @name = "connection.open"
         @method = 40
         0x000A0028 # 10, 40, 655400
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class OpenOk < Method
         @name = "connection.open-ok"
         @method = 41
         0x000A0029 # 10, 41, 655401
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Close < Method
         @name = "connection.close"
         @method = 50
         0x000A0032 # 10, 50, 655410
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class CloseOk < Method
         @name = "connection.close-ok"
         @method = 51
         0x000A0033 # 10, 51, 655411
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
     end
-    
+
     class Channel < Class
       @name = "channel"
       @method = 20
-      
+
       class Open < Method
         @name = "channel.open"
         @method = 10
         0x0014000A # 20, 10, 1310730
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class OpenOk < Method
         @name = "channel.open-ok"
         @method = 11
         0x0014000B # 20, 11, 1310731
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Flow < Method
         @name = "channel.flow"
         @method = 20
         0x00140014 # 20, 20, 1310740
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class FlowOk < Method
         @name = "channel.flow-ok"
         @method = 21
         0x00140015 # 20, 21, 1310741
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Close < Method
         @name = "channel.close"
         @method = 40
         0x00140028 # 20, 40, 1310760
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class CloseOk < Method
         @name = "channel.close-ok"
         @method = 41
         0x00140029 # 20, 41, 1310761
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
     end
-    
+
     class Exchange < Class
       @name = "exchange"
       @method = 40
-      
+
       class Declare < Method
         @name = "exchange.declare"
         @method = 10
         0x0028000A # 40, 10, 2621450
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class DeclareOk < Method
         @name = "exchange.declare-ok"
         @method = 11
         0x0028000B # 40, 11, 2621451
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Delete < Method
         @name = "exchange.delete"
         @method = 20
         0x00280014 # 40, 20, 2621460
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class DeleteOk < Method
         @name = "exchange.delete-ok"
         @method = 21
         0x00280015 # 40, 21, 2621461
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Bind < Method
         @name = "exchange.bind"
         @method = 30
         0x0028001E # 40, 30, 2621470
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class BindOk < Method
         @name = "exchange.bind-ok"
         @method = 31
         0x0028001F # 40, 31, 2621471
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Unbind < Method
         @name = "exchange.unbind"
         @method = 40
         0x00280028 # 40, 40, 2621480
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class UnbindOk < Method
         @name = "exchange.unbind-ok"
         @method = 51
         0x00280033 # 40, 51, 2621491
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
     end
-    
+
     class Queue < Class
       @name = "queue"
       @method = 50
-      
+
       class Declare < Method
         @name = "queue.declare"
         @method = 10
         0x0032000A # 50, 10, 3276810
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class DeclareOk < Method
         @name = "queue.declare-ok"
         @method = 11
         0x0032000B # 50, 11, 3276811
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Bind < Method
         @name = "queue.bind"
         @method = 20
         0x00320014 # 50, 20, 3276820
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class BindOk < Method
         @name = "queue.bind-ok"
         @method = 21
         0x00320015 # 50, 21, 3276821
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Purge < Method
         @name = "queue.purge"
         @method = 30
         0x0032001E # 50, 30, 3276830
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class PurgeOk < Method
         @name = "queue.purge-ok"
         @method = 31
         0x0032001F # 50, 31, 3276831
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Delete < Method
         @name = "queue.delete"
         @method = 40
         0x00320028 # 50, 40, 3276840
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class DeleteOk < Method
         @name = "queue.delete-ok"
         @method = 41
         0x00320029 # 50, 41, 3276841
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Unbind < Method
         @name = "queue.unbind"
         @method = 50
         0x00320032 # 50, 50, 3276850
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class UnbindOk < Method
         @name = "queue.unbind-ok"
         @method = 51
         0x00320033 # 50, 51, 3276851
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
     end
-    
+
     class Basic < Class
       @name = "basic"
       @method = 60
-      
+
+      PROPERTIES = [
+        :content_type, # shortstr
+        :content_encoding, # shortstr
+        :headers, # table
+        :delivery_mode, # octet
+        :priority, # octet
+        :correlation_id, # shortstr
+        :reply_to, # shortstr
+        :expiration, # shortstr
+        :message_id, # shortstr
+        :timestamp, # timestamp
+        :type, # shortstr
+        :user_id, # shortstr
+        :app_id, # shortstr
+        :cluster_id, # shortstr
+
+      ]
+
+      def self.encode_content_type(value)
+        f = "0x%04x" % [1 << 15, 15] # (1 << 0)
+        result = [].pack("!B")
+        [0, f, result]
+      end
+
+      def self.encode_content_encoding(value)
+        f = "0x%04x" % [1 << 14, 14] # (1 << 1)
+        result = [].pack("!B")
+        [1, f, result]
+      end
+
+      def self.encode_headers(value)
+        f = "0x%04x" % [1 << 13, 13] # (1 << 2)
+        result = [].pack("!")
+        [2, f, result]
+      end
+
+      def self.encode_delivery_mode(value)
+        f = "0x%04x" % [1 << 12, 12] # (1 << 3)
+        result = [].pack("!B")
+        [3, f, result]
+      end
+
+      def self.encode_priority(value)
+        f = "0x%04x" % [1 << 11, 11] # (1 << 4)
+        result = [].pack("!B")
+        [4, f, result]
+      end
+
+      def self.encode_correlation_id(value)
+        f = "0x%04x" % [1 << 10, 10] # (1 << 5)
+        result = [].pack("!B")
+        [5, f, result]
+      end
+
+      def self.encode_reply_to(value)
+        f = "0x%04x" % [1 << 9, 9] # (1 << 6)
+        result = [].pack("!B")
+        [6, f, result]
+      end
+
+      def self.encode_expiration(value)
+        f = "0x%04x" % [1 << 8, 8] # (1 << 7)
+        result = [].pack("!B")
+        [7, f, result]
+      end
+
+      def self.encode_message_id(value)
+        f = "0x%04x" % [1 << 7, 7] # (1 << 8)
+        result = [].pack("!B")
+        [8, f, result]
+      end
+
+      def self.encode_timestamp(value)
+        f = "0x%04x" % [1 << 6, 6] # (1 << 9)
+        result = [].pack("!Q")
+        [9, f, result]
+      end
+
+      def self.encode_type(value)
+        f = "0x%04x" % [1 << 5, 5] # (1 << 10)
+        result = [].pack("!B")
+        [10, f, result]
+      end
+
+      def self.encode_user_id(value)
+        f = "0x%04x" % [1 << 4, 4] # (1 << 11)
+        result = [].pack("!B")
+        [11, f, result]
+      end
+
+      def self.encode_app_id(value)
+        f = "0x%04x" % [1 << 3, 3] # (1 << 12)
+        result = [].pack("!B")
+        [12, f, result]
+      end
+
+      def self.encode_cluster_id(value)
+        f = "0x%04x" % [1 << 2, 2] # (1 << 13)
+        result = [].pack("!B")
+        [13, f, result]
+      end
+
+      def self.encode_properties(body_size, properties)
+        pieces = Array.new(14) { AMQP::Protocol::EMPTY_STRING }
+        flags = 0
+
+        properties.each do |key, value|
+          i, f, callable = self.send(:"encode_#{key}")
+          flags |= f
+          pieces[i] = callable.call(value)
+        end
+
+        result = [CLASS_BASIC, 0, body_size, flags].pack("!HHQH")
+        [0x02, result, pieces.join("")].join("")
+      end
+
+      #def self.decode_properties
+      #  print "def %s(data, offset):" % (c.decode,)
+      #  print "    props = {}"
+      #  print "    flags, = struct.unpack_from('!H', data, offset)"
+      #  print "    offset += 2"
+      #  print "    assert (flags & 0x01) == 0"
+      #  for i, f in enumerate(c.fields):
+      #      print "    if (flags & 0x%04x): # 1 << %i" % (1 << (15-i), 15-i)
+      #      fields = codegen_helpers.UnpackWrapper()
+      #      fields.add(f.n, f.t)
+      #      fields.do_print(" "*8, "props['%s']")
+      #  print "    return props, offset"
+      #end
+
       class Qos < Method
         @name = "basic.qos"
         @method = 10
         0x003C000A # 60, 10, 3932170
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class QosOk < Method
         @name = "basic.qos-ok"
         @method = 11
         0x003C000B # 60, 11, 3932171
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Consume < Method
         @name = "basic.consume"
         @method = 20
         0x003C0014 # 60, 20, 3932180
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class ConsumeOk < Method
         @name = "basic.consume-ok"
         @method = 21
         0x003C0015 # 60, 21, 3932181
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Cancel < Method
         @name = "basic.cancel"
         @method = 30
         0x003C001E # 60, 30, 3932190
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class CancelOk < Method
         @name = "basic.cancel-ok"
         @method = 31
         0x003C001F # 60, 31, 3932191
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Publish < Method
         @name = "basic.publish"
         @method = 40
         0x003C0028 # 60, 40, 3932200
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class Return < Method
         @name = "basic.return"
         @method = 50
         0x003C0032 # 60, 50, 3932210
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Deliver < Method
         @name = "basic.deliver"
         @method = 60
         0x003C003C # 60, 60, 3932220
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Get < Method
         @name = "basic.get"
         @method = 70
         0x003C0046 # 60, 70, 3932230
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class GetOk < Method
         @name = "basic.get-ok"
         @method = 71
         0x003C0047 # 60, 71, 3932231
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class GetEmpty < Method
         @name = "basic.get-empty"
         @method = 72
         0x003C0048 # 60, 72, 3932232
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
+
       class Ack < Method
         @name = "basic.ack"
         @method = 80
         0x003C0050 # 60, 80, 3932240
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class Reject < Method
         @name = "basic.reject"
         @method = 90
         0x003C005A # 60, 90, 3932250
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class RecoverAsync < Method
         @name = "basic.recover-async"
         @method = 100
         0x003C0064 # 60, 100, 3932260
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class Recover < Method
         @name = "basic.recover"
         @method = 110
         0x003C006E # 60, 110, 3932270
 
-        
         # @return
         def self.encode(*args)
         end
-        
       end
-      
+
       class RecoverOk < Method
         @name = "basic.recover-ok"
         @method = 111
         0x003C006F # 60, 111, 3932271
 
-        
         # @return
         def self.decode(data)
         end
-        
       end
-      
     end
-    
   end
 end

@@ -10,6 +10,9 @@ module AMQP
     PREAMBLE = "{{ 'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision) }}"
     DEFAULT_PORT = {{ spec.port }}
 
+    # caching
+    EMPTY_STRING = "".freeze
+
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQP::Protocol::Class.
     def self.classes
@@ -88,57 +91,99 @@ module AMQP
         @@methods
       end
 
-      # def self.encode_basic_properties(body_size, props)
-      #   pieces = Array.new(14) { String.new }
-      #   flags = 0
-      #   enc = ENCODE_PROPS_BASIC
-      #
-      #   for key in BASIC_PROPS_SET & set(props.iterkeys()):
-      #       i, f, fun = enc[key]
-      #       flags |= f
-      #       pieces[i] = fun(props[key])
-      #
-      #   return (0x02, ''.join((
-      #       struct.pack('!HHQH',
-      #                   CLASS_BASIC, 0, body_size, flags),
-      #       ''.join(pieces),
-      #       ))
-      #       )
-      # end
-      #
-      # def self.split_headers(user_headers, properties_set)
-      #   properties, headers = {}, {}
-      #   user_headers.iteritems.each do |key, value|
-      #     if properties_set.has_key?(key)
-      #       properties[key] = value
-      #     else
-      #       headers[key] = value
-      #     end
-      #   end
-      #
-      #   return props, headers
-      # end
-      #
-      # def self.encode_body(body, frame_size)
-      #   # Spec is broken: Our errata says that it does define
-      #   # something, but it just doesn't relate do method and
-      #   # properties frames. Which makes it, well, suboptimal.
-      #   # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
-      #   limit = frame_size - 7 - 1
-      #
-      #   Array.new.tap do |array|
-      #     while body
-      #       payload, body = body[:limit], body[limit:] # TODO: how to port this to Ruby??
-      #       array << [0x03, payload]
-      #     end
-      #   end
-      # end
+      def self.split_headers(user_headers, properties_set)
+        properties, headers = {}, {}
+        user_headers.iteritems.each do |key, value|
+          if properties_set.has_key?(key)
+            properties[key] = value
+          else
+            headers[key] = value
+          end
+        end
+
+        return props, headers
+      end
+
+      def self.encode_body(body, frame_size)
+        # Spec is broken: Our errata says that it does define
+        # something, but it just doesn't relate do method and
+        # properties frames. Which makes it, well, suboptimal.
+        # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
+        limit = frame_size - 7 - 1
+
+        Array.new.tap do |array|
+          while body
+            payload, body = body[0..limit], body[limit..-1]
+            array << [0x03, payload]
+          end
+        end
+      end
+
+      # We can return different:
+      # - instantiate given subclass of Method
+      # - create an OpenStruct object
+      # - create a hash
+      # - yield params into the block rather than just return
+      # @api plugin
+      def self.instantiate(*args, &block)
+        self.new(*args, &block)
+        # or OpenStruct.new(args.first)
+        # or args.first
+        # or block.call(*args)
+      end
     end
 
     {% for class in spec.classes %}
     class {{ class.constant_name }} < Class
       @name = "{{ class.name }}"
       @method = {{ class.index }}
+
+      {% if class.fields %}{# only the Basic class has fields (refered as properties in the JSON) #}
+      PROPERTIES = [
+        {% for field in class.fields %}:{{ field.ruby_name }}, # {{ spec.resolveDomain(field.domain) }}
+        {% endfor %}
+      ]
+
+      {% for f in class.fields %}
+      def self.encode_{{ f.ruby_name }}(value){% set i = class.fields.index(f) %}
+        f = "0x%04x" % [1 << {{ 15-i }}, {{ 15-i }}] # (1 << {{ i }}){# TODO: do this in Python (unfortunatelly Jinja2 can't deal with <<) #}
+        result = [].pack("!{{ {"octet": "B", "shortstr": "B", "longlong": "Q", "timestamp": "Q"}[f.type] }}")
+        [{{ i }}, f, result]
+      end
+      {% endfor %}
+
+      {% endif %}
+
+      {% if class.name == "basic" %}{# TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
+      def self.encode_properties(body_size, properties)
+        pieces = Array.new(14) { AMQP::Protocol::EMPTY_STRING }
+        flags = 0
+
+        properties.each do |key, value|
+          i, f, callable = self.send(:"encode_#{key}")
+          flags |= f
+          pieces[i] = callable.call(value)
+        end
+
+        result = [CLASS_BASIC, 0, body_size, flags].pack("!HHQH")
+        [0x02, result, pieces.join("")].join("")
+      end
+
+      #def self.decode_properties
+      #  print "def %s(data, offset):" % (c.decode,)
+      #  print "    props = {}"
+      #  print "    flags, = struct.unpack_from('!H', data, offset)"
+      #  print "    offset += 2"
+      #  print "    assert (flags & 0x01) == 0"
+      #  for i, f in enumerate(c.fields):
+      #      print "    if (flags & 0x%04x): # 1 << %i" % (1 << (15-i), 15-i)
+      #      fields = codegen_helpers.UnpackWrapper()
+      #      fields.add(f.n, f.t)
+      #      fields.do_print(" "*8, "props['%s']")
+      #  print "    return props, offset"
+      #end
+      {% endif %}
+
       {% for method in class.methods %}
       class {{ method.constant_name }} < Method
         @name = "{{ class.name }}.{{ method.name }}"
@@ -154,6 +199,7 @@ module AMQP
         def self.encode(*args)
         end
         {% endif %}
+
       end
       {% endfor %}
     end

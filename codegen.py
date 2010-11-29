@@ -30,6 +30,11 @@ class AmqpSpecObject(AmqpSpec):
         for item in self.classes:
             item.banned = bool(item.name in self.__class__.IGNORED_CLASSES)
 
+            for field in item.fields:
+                field.ruby_name = re.sub("-", "_", field.name)
+                field.type = self.resolveDomain(field.domain)
+                field.banned = bool(field.name in self.__class__.IGNORED_FIELDS)
+
         self.classes = filter(lambda item: not item.banned, self.classes)
 
 # I know, I'm a bad, bad boy, but come on guys,
@@ -75,7 +80,6 @@ def render(path, **context):
 
 def main(json_spec_path):
     spec = AmqpSpecObject(json_spec_path)
-    classes = spec.classes
     print render("protocol.rb.pytemplate", spec = spec)
 
 if __name__ == "__main__":
