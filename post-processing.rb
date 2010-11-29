@@ -4,14 +4,16 @@
 # helpers
 def pass; end
 
+# main
 buffer = ARGF.inject(String.new) do |buffer, line|
-  # filters
+  # line filters
   line.gsub!(/\s*\n$/, "\n")
 
   buffer += line
 end
 
-buffer.gsub!(/\n{2,}/m, "\n\n") # TODO
+# buffer filters
+buffer.gsub!(/\n{2,}/m, "\n\n")
 pass while buffer.gsub!(/(\n( *)  end)\n{2,}(\2end)/m, "\\1\n\\3")
 
 puts buffer
