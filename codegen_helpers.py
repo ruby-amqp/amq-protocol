@@ -22,7 +22,7 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':
-        buffer.append("self.encode_table(pieces, %s) # TODO" % (cValue,))
+        buffer.append("AMQP::Protocol::Table.encode(pieces, %s) # TODO" % (cValue,))
     else:
         raise "Illegal domain in genSingleEncode", type
 

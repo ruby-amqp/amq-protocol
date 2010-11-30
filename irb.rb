@@ -4,4 +4,6 @@
 require "irb"
 require_relative "lib/amqp/protocol.rb"
 
+include AMQP::Protocol
+
 IRB.start(__FILE__)

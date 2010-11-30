@@ -84,7 +84,7 @@ def convert_to_ruby(field):
     else:
         return "%s = %r" % (name, field.defaultvalue)
 
-def args(self):
+def params(self):
     buffer = []
     for f in self.arguments:
         buffer.append(convert_to_ruby(f))
@@ -93,6 +93,11 @@ def args(self):
         buffer.append("payload = \"\"")
         buffer.append("frame_size = nil")
     return buffer
+
+AmqpMethod.params = params
+
+def args(self):
+    return map(lambda item: item.split(" ")[0], self.params())
 
 AmqpMethod.args = args
 

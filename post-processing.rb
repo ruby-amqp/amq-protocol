@@ -8,6 +8,7 @@ def pass; end
 buffer = ARGF.inject(String.new) do |buffer, line|
   # line filters
   line.gsub!(/\s*\n$/, "\n")
+  line.gsub!("'", '"')
 
   buffer += line
 end
