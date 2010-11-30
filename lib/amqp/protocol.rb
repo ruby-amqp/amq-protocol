@@ -154,13 +154,13 @@ module AMQP
         # @return
         def self.encode(client_properties = nil, mechanism = 'PLAIN', response = nil, locale = 'en_US')
           pieces = []
-          pika.table.encode_table(pieces, client_properties)
-          pieces.append(struct.pack('B', len(mechanism)))
-          pieces.append(mechanism)
-          pieces.append(struct.pack('>I', len(response)))
-          pieces.append(response)
-          pieces.append(struct.pack('B', len(locale)))
-          pieces.append(locale)
+          self.encode_table(pieces, client_properties) # TODO
+          pieces << [mechanism.length].pack('B')
+          pieces << mechanism
+          pieces << [response.length].pack('>I')
+          pieces << response
+          pieces << [locale.length].pack('B')
+          pieces << locale
           return pieces
         end
       end
@@ -183,8 +183,8 @@ module AMQP
         # @return
         def self.encode(response = nil)
           pieces = []
-          pieces.append(struct.pack('>I', len(response)))
-          pieces.append(response)
+          pieces << [response.length].pack('>I')
+          pieces << response
           return pieces
         end
       end
@@ -207,9 +207,9 @@ module AMQP
         # @return
         def self.encode(channel_max = false, frame_max = false, heartbeat = false)
           pieces = []
-          pieces.append(struct.pack('>H', channel_max))
-          pieces.append(struct.pack('>I', frame_max))
-          pieces.append(struct.pack('>H', heartbeat))
+          pieces << [channel_max].pack('>H')
+          pieces << [frame_max].pack('>I')
+          pieces << [heartbeat].pack('>H')
           return pieces
         end
       end
@@ -222,10 +222,10 @@ module AMQP
         # @return
         def self.encode(virtual_host = '/', capabilities = '', insist = false)
           pieces = []
-          pieces.append(struct.pack('B', len(virtual_host)))
-          pieces.append(virtual_host)
-          pieces.append(struct.pack('B', len(capabilities)))
-          pieces.append(capabilities)
+          pieces << [virtual_host.length].pack('B')
+          pieces << virtual_host
+          pieces << [capabilities.length].pack('B')
+          pieces << capabilities
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if insist
           return pieces
@@ -275,8 +275,8 @@ module AMQP
         # @return
         def self.encode(out_of_band = '')
           pieces = []
-          pieces.append(struct.pack('B', len(out_of_band)))
-          pieces.append(out_of_band)
+          pieces << [out_of_band.length].pack('B')
+          pieces << out_of_band
           return pieces
         end
       end
@@ -344,18 +344,18 @@ module AMQP
         # @return
         def self.encode(ticket = false, exchange = nil, type = 'direct', passive = false, durable = false, auto_delete = false, internal = false, nowait = false, arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(exchange)))
-          pieces.append(exchange)
-          pieces.append(struct.pack('B', len(type)))
-          pieces.append(type)
+          pieces << [ticket].pack('>H')
+          pieces << [exchange.length].pack('B')
+          pieces << exchange
+          pieces << [type.length].pack('B')
+          pieces << type
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if passive
           bit_buffer = bit_buffer | (1 << 1) if durable
           bit_buffer = bit_buffer | (1 << 2) if auto_delete
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pika.table.encode_table(pieces, arguments)
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -378,9 +378,9 @@ module AMQP
         # @return
         def self.encode(ticket = false, exchange = nil, if_unused = false, nowait = false)
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(exchange)))
-          pieces.append(exchange)
+          pieces << [ticket].pack('>H')
+          pieces << [exchange.length].pack('B')
+          pieces << exchange
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if nowait
@@ -406,16 +406,16 @@ module AMQP
         # @return
         def self.encode(ticket = false, destination = nil, source = nil, routing_key = '', nowait = false, arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(destination)))
-          pieces.append(destination)
-          pieces.append(struct.pack('B', len(source)))
-          pieces.append(source)
-          pieces.append(struct.pack('B', len(routing_key)))
-          pieces.append(routing_key)
+          pieces << [ticket].pack('>H')
+          pieces << [destination.length].pack('B')
+          pieces << destination
+          pieces << [source.length].pack('B')
+          pieces << source
+          pieces << [routing_key.length].pack('B')
+          pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pika.table.encode_table(pieces, arguments)
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -438,16 +438,16 @@ module AMQP
         # @return
         def self.encode(ticket = false, destination = nil, source = nil, routing_key = '', nowait = false, arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(destination)))
-          pieces.append(destination)
-          pieces.append(struct.pack('B', len(source)))
-          pieces.append(source)
-          pieces.append(struct.pack('B', len(routing_key)))
-          pieces.append(routing_key)
+          pieces << [ticket].pack('>H')
+          pieces << [destination.length].pack('B')
+          pieces << destination
+          pieces << [source.length].pack('B')
+          pieces << source
+          pieces << [routing_key.length].pack('B')
+          pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pika.table.encode_table(pieces, arguments)
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -475,16 +475,16 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = '', passive = false, durable = false, exclusive = false, auto_delete = false, nowait = false, arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if passive
           bit_buffer = bit_buffer | (1 << 1) if durable
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pika.table.encode_table(pieces, arguments)
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -507,16 +507,16 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = nil, exchange = nil, routing_key = '', nowait = false, arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
-          pieces.append(struct.pack('B', len(exchange)))
-          pieces.append(exchange)
-          pieces.append(struct.pack('B', len(routing_key)))
-          pieces.append(routing_key)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
+          pieces << [exchange.length].pack('B')
+          pieces << exchange
+          pieces << [routing_key.length].pack('B')
+          pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pika.table.encode_table(pieces, arguments)
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -539,9 +539,9 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = nil, nowait = false)
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           return pieces
@@ -566,9 +566,9 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = nil, if_unused = false, if_empty = false, nowait = false)
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if if_empty
@@ -595,14 +595,14 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = nil, exchange = nil, routing_key = '', arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
-          pieces.append(struct.pack('B', len(exchange)))
-          pieces.append(exchange)
-          pieces.append(struct.pack('B', len(routing_key)))
-          pieces.append(routing_key)
-          pika.table.encode_table(pieces, arguments)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
+          pieces << [exchange.length].pack('B')
+          pieces << exchange
+          pieces << [routing_key.length].pack('B')
+          pieces << routing_key
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -642,108 +642,108 @@ module AMQP
       # 1 << 15
       def self.encode_content_type(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [0, 0x8000, result]
       end
 
       # 1 << 14
       def self.encode_content_encoding(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [1, 0x4000, result]
       end
 
       # 1 << 13
       def self.encode_headers(value)
         pieces = []
-        pika.table.encode_table(pieces, result)
+        self.encode_table(pieces, result) # TODO
         [2, 0x2000, result]
       end
 
       # 1 << 12
       def self.encode_delivery_mode(value)
         pieces = []
-        pieces.append(struct.pack('B', result))
+        pieces << [result].pack('B')
         [3, 0x1000, result]
       end
 
       # 1 << 11
       def self.encode_priority(value)
         pieces = []
-        pieces.append(struct.pack('B', result))
+        pieces << [result].pack('B')
         [4, 0x0800, result]
       end
 
       # 1 << 10
       def self.encode_correlation_id(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [5, 0x0400, result]
       end
 
       # 1 << 9
       def self.encode_reply_to(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [6, 0x0200, result]
       end
 
       # 1 << 8
       def self.encode_expiration(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [7, 0x0100, result]
       end
 
       # 1 << 7
       def self.encode_message_id(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [8, 0x0080, result]
       end
 
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
-        pieces.append(struct.pack('>Q', result))
+        pieces << [result].pack('>Q')
         [9, 0x0040, result]
       end
 
       # 1 << 5
       def self.encode_type(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [10, 0x0020, result]
       end
 
       # 1 << 4
       def self.encode_user_id(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [11, 0x0010, result]
       end
 
       # 1 << 3
       def self.encode_app_id(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [12, 0x0008, result]
       end
 
       # 1 << 2
       def self.encode_cluster_id(value)
         pieces = []
-        pieces.append(struct.pack('B', len(result)))
-        pieces.append(result)
+        pieces << [result.length].pack('B')
+        pieces << result
         [13, 0x0004, result]
       end
 
@@ -783,8 +783,8 @@ module AMQP
         # @return
         def self.encode(prefetch_size = false, prefetch_count = false, global = false)
           pieces = []
-          pieces.append(struct.pack('>I', prefetch_size))
-          pieces.append(struct.pack('>H', prefetch_count))
+          pieces << [prefetch_size].pack('>I')
+          pieces << [prefetch_count].pack('>H')
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if global
           return pieces
@@ -809,17 +809,17 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = nil, consumer_tag = '', no_local = false, no_ack = false, exclusive = false, nowait = false, arguments = {})
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
-          pieces.append(struct.pack('B', len(consumer_tag)))
-          pieces.append(consumer_tag)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
+          pieces << [consumer_tag.length].pack('B')
+          pieces << consumer_tag
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if no_local
           bit_buffer = bit_buffer | (1 << 1) if no_ack
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
-          pika.table.encode_table(pieces, arguments)
+          self.encode_table(pieces, arguments) # TODO
           return pieces
         end
       end
@@ -842,8 +842,8 @@ module AMQP
         # @return
         def self.encode(consumer_tag = nil, nowait = false)
           pieces = []
-          pieces.append(struct.pack('B', len(consumer_tag)))
-          pieces.append(consumer_tag)
+          pieces << [consumer_tag.length].pack('B')
+          pieces << consumer_tag
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           return pieces
@@ -868,11 +868,11 @@ module AMQP
         # @return
         def self.encode(ticket = false, exchange = '', routing_key = '', mandatory = false, immediate = false, user_headers = nil, payload = "", frame_size = nil)
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(exchange)))
-          pieces.append(exchange)
-          pieces.append(struct.pack('B', len(routing_key)))
-          pieces.append(routing_key)
+          pieces << [ticket].pack('>H')
+          pieces << [exchange.length].pack('B')
+          pieces << exchange
+          pieces << [routing_key.length].pack('B')
+          pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if mandatory
           bit_buffer = bit_buffer | (1 << 1) if immediate
@@ -908,9 +908,9 @@ module AMQP
         # @return
         def self.encode(ticket = false, queue = nil, no_ack = false)
           pieces = []
-          pieces.append(struct.pack('>H', ticket))
-          pieces.append(struct.pack('B', len(queue)))
-          pieces.append(queue)
+          pieces << [ticket].pack('>H')
+          pieces << [queue.length].pack('B')
+          pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if no_ack
           return pieces
@@ -945,7 +945,7 @@ module AMQP
         # @return
         def self.encode(delivery_tag = false, multiple = false)
           pieces = []
-          pieces.append(struct.pack('>Q', delivery_tag))
+          pieces << [delivery_tag].pack('>Q')
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
           return pieces
@@ -960,7 +960,7 @@ module AMQP
         # @return
         def self.encode(delivery_tag = nil, requeue = true)
           pieces = []
-          pieces.append(struct.pack('>Q', delivery_tag))
+          pieces << [delivery_tag].pack('>Q')
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
           return pieces
