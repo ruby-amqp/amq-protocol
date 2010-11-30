@@ -27,15 +27,22 @@ class AmqpSpecObject(AmqpSpec):
     def __init__(self, path):
         AmqpSpec.__init__(self, path)
 
-        for item in self.classes:
-            item.banned = bool(item.name in self.__class__.IGNORED_CLASSES)
+        def extend_field(field):
+            field.ruby_name = re.sub("-", "_", field.name)
+            field.type = self.resolveDomain(field.domain)
+            field.banned = bool(field.name in self.__class__.IGNORED_FIELDS)
 
-            for field in item.fields:
-                field.ruby_name = re.sub("-", "_", field.name)
-                field.type = self.resolveDomain(field.domain)
-                field.banned = bool(field.name in self.__class__.IGNORED_FIELDS)
+        for klass in self.classes:
+            klass.banned = bool(klass.name in self.__class__.IGNORED_CLASSES)
 
-        self.classes = filter(lambda item: not item.banned, self.classes)
+            for field in klass.fields:
+                extend_field(field)
+
+            for method in klass.methods:
+                for field in method.arguments:
+                    extend_field(field)
+
+        self.classes = filter(lambda klass: not klass.banned, self.classes)
 
 # I know, I'm a bad, bad boy, but come on guys,
 # monkey-patching is just handy for this case.
@@ -65,6 +72,29 @@ def accepted_by(self, *receivers):
     return all(map(lambda receiver: receiver in actual_receivers, receivers))
 
 AmqpMethod.accepted_by = accepted_by
+
+def convert_to_ruby(field):
+    name = re.sub("-", "_", field.name) # TODO: use ruby_name
+    if field.defaultvalue == None:
+        return "%s = nil" % (name,)
+    elif field.defaultvalue == False:
+        return "%s = false" % (name,)
+    elif field.defaultvalue == True:
+        return "%s = true" % (name,)
+    else:
+        return "%s = %r" % (name, field.defaultvalue)
+
+def args(self):
+    buffer = []
+    for f in self.arguments:
+        buffer.append(convert_to_ruby(f))
+    if self.hasContent:
+        buffer.append("user_headers = nil")
+        buffer.append("payload = \"\"")
+        buffer.append("frame_size = nil")
+    return buffer
+
+AmqpMethod.args = args
 
 def binary(self):
     method_id = self.klass.index << 16 | self.index

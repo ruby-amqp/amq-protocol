@@ -16,4 +16,8 @@ end
 buffer.gsub!(/\n{2,}/m, "\n\n")
 pass while buffer.gsub!(/(\n( *)  end)\n{2,}(\2end)/m, "\\1\n\\3")
 
+# Make sure there's only one \n at the end
+pass while buffer.chomp!
+buffer += "\n"
+
 puts buffer
