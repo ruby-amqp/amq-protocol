@@ -5,7 +5,12 @@ require_relative "../lib/amqp/protocol.rb"
 
 socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0 )
 sockaddr = Socket.pack_sockaddr_in(5672, "127.0.0.1") # NOTE: this doesn't work with "localhost", I don't know why.
-socket.connect(sockaddr)
+
+begin
+  socket.connect(sockaddr)
+rescue Errno::ECONNREFUSED
+  abort "Don't forget to start an AMQP broker first!"
+end
 
 # socket.puts "Hello from script 2."
 # puts "The server said, '#{socket.readline.chomp}'"

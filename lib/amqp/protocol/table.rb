@@ -1,4 +1,4 @@
-# encoding: utf-8
+# encoding: ascii-8bit
 
 module AMQP
   module Protocol
@@ -15,21 +15,29 @@ module AMQP
         pieces << nil # placeholder
         tablesize = 0
         table.each do |key, value|
-          pieces << [key.to_s.length].pack("B")
-          pieces << key
-          tablesize = tablesize + 1 + key.length
+          key = key.to_s # it can be a symbol as well
+          # pieces << [key.bytesize.to_s(2)].pack("B*")
+          pieces << key.bytesize.chr << key
+          tablesize = tablesize + 1 + key.bytesize
 
           case value
           when String
-            pieces << ["S", value.length].pack(">cI")
+            pieces << ["S".ord, value.bytesize].pack(">cI")
             pieces << value
-            tablesize = tablesize + 5 + value.length
+            tablesize = tablesize + 5 + value.bytesize
           when Integer
-            pieces << ["I", value].pack(">cI")
+            pieces << ["I".ord, value].pack(">cI")
+            tablesize = tablesize + 5
+          when TrueClass, FalseClass
+            value = value ? 1 : 0
+            pieces << ["I".ord, value].pack(">cI")
             tablesize = tablesize + 5
           when Hash
-            pieces << ["F"].pack(">c")
-            tablesize = tablesize + 1 + self.encode(pieces, value)
+            pieces << "F" # it will work as long as the encoding is ASCII-8BIT
+            # tablesize = tablesize + 1 + self.encode(pieces, value).first
+            int, pieces2 = self.encode(Array.new, value)
+            tablesize = tablesize + 1 + int
+            pieces.push(*pieces2)
           else
             # We don't want to require these libraries.
             if const_defined?(:BigDecimal) && value.is_a?(BigDecimal)
