@@ -210,7 +210,7 @@ module AMQP
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
-          return pieces
+          return pieces.join("")
         end
         % endif
 

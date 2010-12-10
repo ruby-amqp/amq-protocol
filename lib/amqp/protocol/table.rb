@@ -22,22 +22,21 @@ module AMQP
 
           case value
           when String
-            pieces << ["S".ord, value.bytesize].pack(">cI")
+            pieces << ["S".ord, value.bytesize].pack(">cN")
             pieces << value
             tablesize = tablesize + 5 + value.bytesize
           when Integer
-            pieces << ["I".ord, value].pack(">cI")
+            pieces << ["I".ord, value].pack(">cN")
             tablesize = tablesize + 5
           when TrueClass, FalseClass
             value = value ? 1 : 0
-            pieces << ["I".ord, value].pack(">cI")
+            pieces << ["I".ord, value].pack(">cN")
             tablesize = tablesize + 5
           when Hash
             pieces << "F" # it will work as long as the encoding is ASCII-8BIT
             # tablesize = tablesize + 1 + self.encode(pieces, value).first
-            int, pieces2 = self.encode(Array.new, value)
+            int, _ = self.encode(pieces, value)
             tablesize = tablesize + 1 + int
-            pieces.push(*pieces2)
           else
             # We don't want to require these libraries.
             if const_defined?(:BigDecimal) && value.is_a?(BigDecimal)
@@ -61,7 +60,7 @@ module AMQP
           end
         end
 
-        pieces[length_index] = [tablesize].pack(">I")
+        pieces[length_index] = [tablesize].pack(">N")
         [tablesize + 4, pieces]
       end
 

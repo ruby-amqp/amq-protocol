@@ -4,7 +4,7 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     buffer = []
     type = spec.resolveDomain(unresolved_domain)
     if type == 'shortstr':
-        buffer.append("pieces << [%s.length].pack('B')" % (cValue,))
+        buffer.append("pieces << %s.bytesize.chr" % (cValue,))
         buffer.append("pieces << %s" % (cValue,))
     elif type == 'longstr':
         buffer.append("pieces << [%s.length].pack('>I')" % (cValue,))
@@ -12,7 +12,7 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'octet':
         buffer.append("pieces << [%s].pack('B')" % (cValue,))
     elif type == 'short':
-        buffer.append("pieces << [%s].pack('>H')" % (cValue,))
+        buffer.append("pieces << [%s.to_s].pack('>H')" % (cValue,))
     elif type == 'long':
         buffer.append("pieces << [%s].pack('>I')" % (cValue,))
     elif type == 'longlong':
