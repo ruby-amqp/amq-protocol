@@ -6,7 +6,7 @@ require_relative "../lib/amqp/protocol.rb"
 include AMQP::Protocol
 
 socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
-sockaddr = Socket.pack_sockaddr_in(5672, "127.0.0.1") # NOTE: this doesn't work with "localhost", I don't know why.
+sockaddr = Socket.pack_sockaddr_in(ARGV.first.to_i || 5672, "127.0.0.1") # NOTE: this doesn't work with "localhost", I don't know why.
 
 begin
   socket.connect(sockaddr)
@@ -40,5 +40,8 @@ socket.encode Connection::StartOk, {client: "AMQP Protocol"}, "PLAIN", "LOGINSgu
 # Tune/Tune-Ok
 socket.decode Connection::Tune
 socket.encode Connection::TuneOk, 0, 131072, 0
+
+# Close
+socket.encode Connection::Close
 
 socket.close

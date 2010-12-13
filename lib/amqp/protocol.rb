@@ -158,10 +158,10 @@ module AMQP
         # ["client_properties = nil", "mechanism = "PLAIN"", "response = nil", "locale = "en_US""]
         def self.encode(client_properties, mechanism, response, locale)
           pieces = []
-          AMQP::Protocol::Table.encode(pieces, client_properties) # TODO
+          AMQP::Protocol::Table.encode(pieces, client_properties)
           pieces << mechanism.bytesize.chr
           pieces << mechanism
-          pieces << [response.length].pack(">N")
+          pieces << [response.bytesize].pack("N")
           pieces << response
           pieces << locale.bytesize.chr
           pieces << locale
@@ -188,7 +188,7 @@ module AMQP
         # ["response = nil"]
         def self.encode(response)
           pieces = []
-          pieces << [response.length].pack(">N")
+          pieces << [response.bytesize].pack("N")
           pieces << response
           return pieces.join("")
         end
@@ -213,9 +213,9 @@ module AMQP
         # ["channel_max = false", "frame_max = false", "heartbeat = false"]
         def self.encode(channel_max, frame_max, heartbeat)
           pieces = []
-          pieces << [channel_max.to_s].pack(">H")
-          pieces << [frame_max].pack(">N")
-          pieces << [heartbeat.to_s].pack(">H")
+          pieces << [channel_max].pack("n")
+          pieces << [frame_max].pack("N")
+          pieces << [heartbeat].pack("n")
           return pieces.join("")
         end
       end
@@ -257,6 +257,18 @@ module AMQP
         # @return
         def self.decode(data)
         end
+
+        # @return
+        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        def self.encode(reply_code, reply_text, class_id, method_id)
+          pieces = []
+          pieces << [reply_code].pack("n")
+          pieces << reply_text.bytesize.chr
+          pieces << reply_text
+          pieces << [class_id].pack("n")
+          pieces << [method_id].pack("n")
+          return pieces.join("")
+        end
       end
 
       class CloseOk < Method
@@ -266,6 +278,13 @@ module AMQP
 
         # @return
         def self.decode(data)
+        end
+
+        # @return
+        # []
+        def self.encode()
+          pieces = []
+          return pieces.join("")
         end
       end
     end
@@ -307,6 +326,15 @@ module AMQP
         # @return
         def self.decode(data)
         end
+
+        # @return
+        # ["active = nil"]
+        def self.encode(active)
+          pieces = []
+          bit_buffer = 0
+          bit_buffer = bit_buffer | (1 << 0) if active
+          return pieces.join("")
+        end
       end
 
       class FlowOk < Method
@@ -316,6 +344,15 @@ module AMQP
 
         # @return
         def self.decode(data)
+        end
+
+        # @return
+        # ["active = nil"]
+        def self.encode(active)
+          pieces = []
+          bit_buffer = 0
+          bit_buffer = bit_buffer | (1 << 0) if active
+          return pieces.join("")
         end
       end
 
@@ -327,6 +364,18 @@ module AMQP
         # @return
         def self.decode(data)
         end
+
+        # @return
+        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        def self.encode(reply_code, reply_text, class_id, method_id)
+          pieces = []
+          pieces << [reply_code].pack("n")
+          pieces << reply_text.bytesize.chr
+          pieces << reply_text
+          pieces << [class_id].pack("n")
+          pieces << [method_id].pack("n")
+          return pieces.join("")
+        end
       end
 
       class CloseOk < Method
@@ -336,6 +385,13 @@ module AMQP
 
         # @return
         def self.decode(data)
+        end
+
+        # @return
+        # []
+        def self.encode()
+          pieces = []
+          return pieces.join("")
         end
       end
     end
@@ -353,7 +409,7 @@ module AMQP
         # ["ticket = false", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
         def self.encode(ticket, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << type.bytesize.chr
@@ -364,7 +420,7 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 2) if auto_delete
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -388,7 +444,7 @@ module AMQP
         # ["ticket = false", "exchange = nil", "if_unused = false", "nowait = false"]
         def self.encode(ticket, exchange, if_unused, nowait)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << exchange.bytesize.chr
           pieces << exchange
           bit_buffer = 0
@@ -417,7 +473,7 @@ module AMQP
         # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
         def self.encode(ticket, destination, source, routing_key, nowait, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << destination.bytesize.chr
           pieces << destination
           pieces << source.bytesize.chr
@@ -426,7 +482,7 @@ module AMQP
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -450,7 +506,7 @@ module AMQP
         # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
         def self.encode(ticket, destination, source, routing_key, nowait, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << destination.bytesize.chr
           pieces << destination
           pieces << source.bytesize.chr
@@ -459,7 +515,7 @@ module AMQP
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -488,7 +544,7 @@ module AMQP
         # ["ticket = false", "queue = """, "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
         def self.encode(ticket, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           bit_buffer = 0
@@ -497,7 +553,7 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -521,7 +577,7 @@ module AMQP
         # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "nowait = false", "arguments = {}"]
         def self.encode(ticket, queue, exchange, routing_key, nowait, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           pieces << exchange.bytesize.chr
@@ -530,7 +586,7 @@ module AMQP
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -554,7 +610,7 @@ module AMQP
         # ["ticket = false", "queue = nil", "nowait = false"]
         def self.encode(ticket, queue, nowait)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           bit_buffer = 0
@@ -582,7 +638,7 @@ module AMQP
         # ["ticket = false", "queue = nil", "if_unused = false", "if_empty = false", "nowait = false"]
         def self.encode(ticket, queue, if_unused, if_empty, nowait)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           bit_buffer = 0
@@ -612,14 +668,14 @@ module AMQP
         # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "arguments = {}"]
         def self.encode(ticket, queue, exchange, routing_key, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
           pieces << routing_key
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -675,7 +731,7 @@ module AMQP
       # 1 << 13
       def self.encode_headers(value)
         pieces = []
-        AMQP::Protocol::Table.encode(pieces, result) # TODO
+        AMQP::Protocol::Table.encode(pieces, result)
         [2, 0x2000, result]
       end
 
@@ -801,8 +857,8 @@ module AMQP
         # ["prefetch_size = false", "prefetch_count = false", "global = false"]
         def self.encode(prefetch_size, prefetch_count, global)
           pieces = []
-          pieces << [prefetch_size].pack(">N")
-          pieces << [prefetch_count.to_s].pack(">H")
+          pieces << [prefetch_size].pack("N")
+          pieces << [prefetch_count].pack("n")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if global
           return pieces.join("")
@@ -828,7 +884,7 @@ module AMQP
         # ["ticket = false", "queue = nil", "consumer_tag = """, "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
         def self.encode(ticket, queue, consumer_tag, no_local, no_ack, exclusive, nowait, arguments)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           pieces << consumer_tag.bytesize.chr
@@ -838,7 +894,7 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 1) if no_ack
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
-          AMQP::Protocol::Table.encode(pieces, arguments) # TODO
+          AMQP::Protocol::Table.encode(pieces, arguments)
           return pieces.join("")
         end
       end
@@ -889,7 +945,7 @@ module AMQP
         # ["ticket = false", "exchange = """, "routing_key = """, "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(ticket, exchange, routing_key, mandatory, immediate, user_headers, payload, frame_size)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
@@ -930,7 +986,7 @@ module AMQP
         # ["ticket = false", "queue = nil", "no_ack = false"]
         def self.encode(ticket, queue, no_ack)
           pieces = []
-          pieces << [ticket.to_s].pack(">H")
+          pieces << [ticket].pack("n")
           pieces << queue.bytesize.chr
           pieces << queue
           bit_buffer = 0

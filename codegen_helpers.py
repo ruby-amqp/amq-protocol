@@ -7,14 +7,14 @@ def genSingleEncode(spec, cValue, unresolved_domain):
         buffer.append("pieces << %s.bytesize.chr" % (cValue,))
         buffer.append("pieces << %s" % (cValue,))
     elif type == 'longstr':
-        buffer.append("pieces << [%s.length].pack('>I')" % (cValue,))
+        buffer.append("pieces << [%s.bytesize].pack('N')" % (cValue,))
         buffer.append("pieces << %s" % (cValue,))
     elif type == 'octet':
         buffer.append("pieces << [%s].pack('B')" % (cValue,))
     elif type == 'short':
-        buffer.append("pieces << [%s.to_s].pack('>H')" % (cValue,))
+        buffer.append("pieces << [%s].pack('n')" % (cValue,))
     elif type == 'long':
-        buffer.append("pieces << [%s].pack('>I')" % (cValue,))
+        buffer.append("pieces << [%s].pack('N')" % (cValue,))
     elif type == 'longlong':
         buffer.append("pieces << [%s].pack('>Q')" % (cValue,))
     elif type == 'timestamp':
@@ -22,7 +22,7 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':
-        buffer.append("AMQP::Protocol::Table.encode(pieces, %s) # TODO" % (cValue,))
+        buffer.append("AMQP::Protocol::Table.encode(pieces, %s)" % (cValue,))
     else:
         raise "Illegal domain in genSingleEncode", type
 

@@ -202,7 +202,9 @@ module AMQP
         # @return
         def self.decode(data)
         end
-        % elif method.accepted_by("server"):
+        % endif
+
+        % if method.accepted_by("server"):
         # @return
         # ${method.params()}
         def self.encode(${(", ").join(method.args())})
