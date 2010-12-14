@@ -1,4 +1,4 @@
-# encoding: ascii-8bit
+# encoding: binary
 
 module AMQP
   module Protocol

@@ -1,4 +1,4 @@
-# encoding: utf-8
+# encoding: binary
 
 require "socket"
 require_relative "../lib/amqp/protocol.rb"

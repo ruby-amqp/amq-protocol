@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# encoding: utf-8
+# encoding: binary
 
 begin
   require "amqp/spec"
