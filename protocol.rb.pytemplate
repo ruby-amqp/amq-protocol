@@ -202,6 +202,11 @@ module AMQP
         % if method.accepted_by("client") :
         # @return
         def self.decode(data)
+          buffer = String.new
+          % for line in helpers.genDecodeMethodDefinition(spec, method):
+          ${line}
+          % endfor
+          buffer
         end
         % endif
 
@@ -214,7 +219,7 @@ module AMQP
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
-          return pieces.join("")
+          pieces.join("")
         end
         % endif
 

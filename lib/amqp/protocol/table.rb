@@ -52,8 +52,38 @@ module AMQP
         [buffer.bytesize].pack(">N") + buffer
       end
 
-      def self.decode(data, offset)
-        # TODO
+      def self.decode(data)
+        table = Hash.new
+        size = data.unpack("N").first
+        offset = 4
+        while offset < size
+          key_length = data[offset].unpack("c").first
+          offset += 1
+          key = data[offset...(offset += key_length)]
+          type = data[offset]
+          offset += 1
+          case type
+          when "S"
+            length = data[offset...(offset + 4)].unpack("N").first
+            offset += 4
+            value = data[offset..(offset + length)]
+            offset += length
+          when "I"
+            value = data[offset...(offset + 4)].unpack("N").first
+            offset += 4
+          when "D"
+            # TODO: decimal
+          when "T"
+            # TODO: timestamp
+          when "F"
+            value = self.decode(data[offset..-1])
+          else
+            raise
+          end
+          table[key] = value
+        end
+
+        table
       end
     end
   end
