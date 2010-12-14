@@ -78,10 +78,10 @@ describe Protocol do
         Protocol::Connection::StartOk.method.should eql("TODO")
       end
 
-      describe "#encode" do
+      describe ".encode" do
         it do
           result = Protocol::Connection::StartOk.encode({client: "AMQP Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
-          result.should eql("\x00\x00\x00\x19\x06clientS\x00\x00\x00\rAMQP Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
+          result.should eql("\x00\n\x00\v\x00\x00\x00\x19\x06clientS\x00\x00\x00\rAMQP Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
         end
       end
     end
@@ -145,10 +145,10 @@ describe Protocol do
         Protocol::Connection::TuneOk.method.should eql("TODO")
       end
 
-      describe "#encode" do
+      describe ".encode" do
         it do
           result = Protocol::Connection::TuneOk.encode(0, 131072, 0)
-          result.should eql("\x00\x00\x00\x02\x00\x00\x00\x00")
+          result.should eql("\x00\n\x00\x1F\x00\x00\x00\x02\x00\x00\x00\x00")
         end
       end
     end

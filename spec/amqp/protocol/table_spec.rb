@@ -6,22 +6,17 @@ describe AMQP::Protocol::Table do
   describe ".encode" do
     # TODO: which endian should be used, does it matter? http://pastie.org/1362275
     DATA = {
-      nil                                  => ["\x00\x00\x00\x00"],
-      Hash.new                             => ["\x00\x00\x00\x00"],
-      {test: true}                         => ["\x00\x00\x00\n",   "\x04", "test", "I\x00\x00\x00\x01"],
-      {test: 1}                            => ["\x00\x00\x00\n",   "\x04", "test", "I\x00\x00\x00\x01"],
-      {test: "string"}                     => ["\x00\x00\x00\x10", "\x04", "test", "S\x00\x00\x00\x06", "string"],
-      {test: Hash.new}                     => ["\x00\x00\x00\n",   "\x04", "test", "F", "\x00\x00\x00\x00"],
-      # {test: true}                         => ["\x00\x00\x00\n",   "\x04", "test", "I\x00\x00\x00\x01"],
-      # {test: 1}                            => ["\x00\x00\x00\n",   "\x04", "test", "I\x00\x00\x00\x01"],
-      # {test: "string"}                     => ["\x00\x00\x00\x10", "\x04", "test", "S\x00\x00\x00\x06", "string"],
-      # {test: Hash.new}                     => ["\x00\x00\x00\n",   "\x04", "test", "F", "\x00\x00\x00\x00"],
-      # {a: 1, c: true, d: "x", e: Hash.new} => ["\x00\x00\x00\x1d", "\x01", "a", "I\x00\x00\x00\x01", "\x01", "c", "I\x00\x00\x00\x01", "\x01", "e", "F", "\x00\x00\x00\x00", "\x01", "d", "S\x00\x00\x00\x01", "x"]
+      nil               => "\x00\x00\x00\x00",
+      Hash.new          => "\x00\x00\x00\x00",
+      {test: true}      => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",
+      {test: 1}         => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",
+      {test: "string"}  => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
+      {test: Hash.new}  => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
     }
 
     DATA.each do |data, encoded|
       it "should return #{encoded.inspect} for #{data.inspect}" do
-        AMQP::Protocol::Table.encode(Array.new, data).last.should eql(encoded)
+        AMQP::Protocol::Table.encode(data).should eql(encoded)
       end
     end
   end
