@@ -84,6 +84,10 @@ module AMQP
         @name
       end
 
+      def self.index
+        @index
+      end
+
       def self.inherited(base)
         if self == Method
           @@methods << base
@@ -143,17 +147,42 @@ module AMQP
       class Start < Method
         @name = "connection.start"
         @method = 10
-        0x000A000A # 10, 10, 655370
+        @index = 0x000A000A # 10, 10, 655370
 
         # @return
         def self.decode(data)
+          offset = 0
+          version_major = data[offset...(offset + 1)].unpack("c").first
+          offset += 1
+          version_minor = data[offset...(offset + 1)].unpack("c").first
+          offset += 1
+          table_length = Table.length(data[offset..(offset + 4)])
+          server_properties = Table.decode(data[offset..table_length])
+          length = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          mechanisms = data[offset..(offset + length)]
+          offset += length
+          length = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          locales = data[offset..(offset + length)]
+          offset += length
+          self.new(version_major, version_minor, server_properties, mechanisms, locales)
+        end
+
+        attr_reader :version_major, :version_minor, :server_properties, :mechanisms, :locales
+        def initialize(version_major, version_minor, server_properties, mechanisms, locales)
+          @version_major = version_major
+          @version_minor = version_minor
+          @server_properties = server_properties
+          @mechanisms = mechanisms
+          @locales = locales
         end
       end
 
       class StartOk < Method
         @name = "connection.start-ok"
         @method = 11
-        0x000A000B # 10, 11, 655371
+        @index = 0x000A000B # 10, 11, 655371
 
         # @return
         # ["client_properties = nil", "mechanism = "PLAIN"", "response = nil", "locale = "en_US""]
@@ -167,24 +196,35 @@ module AMQP
           pieces << response
           pieces << locale.bytesize.chr
           pieces << locale
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Secure < Method
         @name = "connection.secure"
         @method = 20
-        0x000A0014 # 10, 20, 655380
+        @index = 0x000A0014 # 10, 20, 655380
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          challenge = data[offset..(offset + length)]
+          offset += length
+          self.new(challenge)
+        end
+
+        attr_reader :challenge
+        def initialize(challenge)
+          @challenge = challenge
         end
       end
 
       class SecureOk < Method
         @name = "connection.secure-ok"
         @method = 21
-        0x000A0015 # 10, 21, 655381
+        @index = 0x000A0015 # 10, 21, 655381
 
         # @return
         # ["response = nil"]
@@ -193,24 +233,39 @@ module AMQP
           pieces << [10, 21].pack("n2")
           pieces << [response.bytesize].pack("N")
           pieces << response
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Tune < Method
         @name = "connection.tune"
         @method = 30
-        0x000A001E # 10, 30, 655390
+        @index = 0x000A001E # 10, 30, 655390
 
         # @return
         def self.decode(data)
+          offset = 0
+          channel_max = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          frame_max = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          heartbeat = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          self.new(channel_max, frame_max, heartbeat)
+        end
+
+        attr_reader :channel_max, :frame_max, :heartbeat
+        def initialize(channel_max, frame_max, heartbeat)
+          @channel_max = channel_max
+          @frame_max = frame_max
+          @heartbeat = heartbeat
         end
       end
 
       class TuneOk < Method
         @name = "connection.tune-ok"
         @method = 31
-        0x000A001F # 10, 31, 655391
+        @index = 0x000A001F # 10, 31, 655391
 
         # @return
         # ["channel_max = false", "frame_max = false", "heartbeat = false"]
@@ -220,14 +275,14 @@ module AMQP
           pieces << [channel_max].pack("n")
           pieces << [frame_max].pack("N")
           pieces << [heartbeat].pack("n")
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Open < Method
         @name = "connection.open"
         @method = 40
-        0x000A0028 # 10, 40, 655400
+        @index = 0x000A0028 # 10, 40, 655400
 
         # @return
         # ["virtual_host = "/"", "capabilities = """, "insist = false"]
@@ -240,27 +295,58 @@ module AMQP
           pieces << capabilities
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if insist
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class OpenOk < Method
         @name = "connection.open-ok"
         @method = 41
-        0x000A0029 # 10, 41, 655401
+        @index = 0x000A0029 # 10, 41, 655401
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          known_hosts = data[offset..(offset + length)]
+          offset += length
+          self.new(known_hosts)
+        end
+
+        attr_reader :known_hosts
+        def initialize(known_hosts)
+          @known_hosts = known_hosts
         end
       end
 
       class Close < Method
         @name = "connection.close"
         @method = 50
-        0x000A0032 # 10, 50, 655410
+        @index = 0x000A0032 # 10, 50, 655410
 
         # @return
         def self.decode(data)
+          offset = 0
+          reply_code = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          reply_text = data[offset..(offset + length)]
+          offset += length
+          class_id = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          method_id = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          self.new(reply_code, reply_text, class_id, method_id)
+        end
+
+        attr_reader :reply_code, :reply_text, :class_id, :method_id
+        def initialize(reply_code, reply_text, class_id, method_id)
+          @reply_code = reply_code
+          @reply_text = reply_text
+          @class_id = class_id
+          @method_id = method_id
         end
 
         # @return
@@ -273,17 +359,23 @@ module AMQP
           pieces << reply_text
           pieces << [class_id].pack("n")
           pieces << [method_id].pack("n")
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class CloseOk < Method
         @name = "connection.close-ok"
         @method = 51
-        0x000A0033 # 10, 51, 655411
+        @index = 0x000A0033 # 10, 51, 655411
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
 
         # @return
@@ -291,7 +383,7 @@ module AMQP
         def self.encode()
           pieces = []
           pieces << [10, 51].pack("n2")
-          return pieces.join("")
+          pieces.join("")
         end
       end
     end
@@ -303,7 +395,7 @@ module AMQP
       class Open < Method
         @name = "channel.open"
         @method = 10
-        0x0014000A # 20, 10, 1310730
+        @index = 0x0014000A # 20, 10, 1310730
 
         # @return
         # ["out_of_band = """]
@@ -312,27 +404,48 @@ module AMQP
           pieces << [20, 10].pack("n2")
           pieces << out_of_band.bytesize.chr
           pieces << out_of_band
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class OpenOk < Method
         @name = "channel.open-ok"
         @method = 11
-        0x0014000B # 20, 11, 1310731
+        @index = 0x0014000B # 20, 11, 1310731
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          channel_id = data[offset..(offset + length)]
+          offset += length
+          self.new(channel_id)
+        end
+
+        attr_reader :channel_id
+        def initialize(channel_id)
+          @channel_id = channel_id
         end
       end
 
       class Flow < Method
         @name = "channel.flow"
         @method = 20
-        0x00140014 # 20, 20, 1310740
+        @index = 0x00140014 # 20, 20, 1310740
 
         # @return
         def self.decode(data)
+          offset = 0
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          offset += 1
+          active = (bit_buffer & (1 << 0)) != 0
+          self.new(active)
+        end
+
+        attr_reader :active
+        def initialize(active)
+          @active = active
         end
 
         # @return
@@ -342,17 +455,27 @@ module AMQP
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class FlowOk < Method
         @name = "channel.flow-ok"
         @method = 21
-        0x00140015 # 20, 21, 1310741
+        @index = 0x00140015 # 20, 21, 1310741
 
         # @return
         def self.decode(data)
+          offset = 0
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          offset += 1
+          active = (bit_buffer & (1 << 0)) != 0
+          self.new(active)
+        end
+
+        attr_reader :active
+        def initialize(active)
+          @active = active
         end
 
         # @return
@@ -362,17 +485,37 @@ module AMQP
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Close < Method
         @name = "channel.close"
         @method = 40
-        0x00140028 # 20, 40, 1310760
+        @index = 0x00140028 # 20, 40, 1310760
 
         # @return
         def self.decode(data)
+          offset = 0
+          reply_code = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          reply_text = data[offset..(offset + length)]
+          offset += length
+          class_id = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          method_id = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          self.new(reply_code, reply_text, class_id, method_id)
+        end
+
+        attr_reader :reply_code, :reply_text, :class_id, :method_id
+        def initialize(reply_code, reply_text, class_id, method_id)
+          @reply_code = reply_code
+          @reply_text = reply_text
+          @class_id = class_id
+          @method_id = method_id
         end
 
         # @return
@@ -385,17 +528,23 @@ module AMQP
           pieces << reply_text
           pieces << [class_id].pack("n")
           pieces << [method_id].pack("n")
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class CloseOk < Method
         @name = "channel.close-ok"
         @method = 41
-        0x00140029 # 20, 41, 1310761
+        @index = 0x00140029 # 20, 41, 1310761
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
 
         # @return
@@ -403,7 +552,7 @@ module AMQP
         def self.encode()
           pieces = []
           pieces << [20, 41].pack("n2")
-          return pieces.join("")
+          pieces.join("")
         end
       end
     end
@@ -415,7 +564,7 @@ module AMQP
       class Declare < Method
         @name = "exchange.declare"
         @method = 10
-        0x0028000A # 40, 10, 2621450
+        @index = 0x0028000A # 40, 10, 2621450
 
         # @return
         # ["ticket = false", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
@@ -434,24 +583,30 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class DeclareOk < Method
         @name = "exchange.declare-ok"
         @method = 11
-        0x0028000B # 40, 11, 2621451
+        @index = 0x0028000B # 40, 11, 2621451
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
 
       class Delete < Method
         @name = "exchange.delete"
         @method = 20
-        0x00280014 # 40, 20, 2621460
+        @index = 0x00280014 # 40, 20, 2621460
 
         # @return
         # ["ticket = false", "exchange = nil", "if_unused = false", "nowait = false"]
@@ -464,24 +619,30 @@ module AMQP
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if nowait
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class DeleteOk < Method
         @name = "exchange.delete-ok"
         @method = 21
-        0x00280015 # 40, 21, 2621461
+        @index = 0x00280015 # 40, 21, 2621461
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
 
       class Bind < Method
         @name = "exchange.bind"
         @method = 30
-        0x0028001E # 40, 30, 2621470
+        @index = 0x0028001E # 40, 30, 2621470
 
         # @return
         # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
@@ -498,24 +659,30 @@ module AMQP
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class BindOk < Method
         @name = "exchange.bind-ok"
         @method = 31
-        0x0028001F # 40, 31, 2621471
+        @index = 0x0028001F # 40, 31, 2621471
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
 
       class Unbind < Method
         @name = "exchange.unbind"
         @method = 40
-        0x00280028 # 40, 40, 2621480
+        @index = 0x00280028 # 40, 40, 2621480
 
         # @return
         # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
@@ -532,17 +699,23 @@ module AMQP
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class UnbindOk < Method
         @name = "exchange.unbind-ok"
         @method = 51
-        0x00280033 # 40, 51, 2621491
+        @index = 0x00280033 # 40, 51, 2621491
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
     end
@@ -554,7 +727,7 @@ module AMQP
       class Declare < Method
         @name = "queue.declare"
         @method = 10
-        0x0032000A # 50, 10, 3276810
+        @index = 0x0032000A # 50, 10, 3276810
 
         # @return
         # ["ticket = false", "queue = """, "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
@@ -571,24 +744,41 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class DeclareOk < Method
         @name = "queue.declare-ok"
         @method = 11
-        0x0032000B # 50, 11, 3276811
+        @index = 0x0032000B # 50, 11, 3276811
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          queue = data[offset..(offset + length)]
+          offset += length
+          message_count = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          consumer_count = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          self.new(queue, message_count, consumer_count)
+        end
+
+        attr_reader :queue, :message_count, :consumer_count
+        def initialize(queue, message_count, consumer_count)
+          @queue = queue
+          @message_count = message_count
+          @consumer_count = consumer_count
         end
       end
 
       class Bind < Method
         @name = "queue.bind"
         @method = 20
-        0x00320014 # 50, 20, 3276820
+        @index = 0x00320014 # 50, 20, 3276820
 
         # @return
         # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "nowait = false", "arguments = {}"]
@@ -605,24 +795,30 @@ module AMQP
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class BindOk < Method
         @name = "queue.bind-ok"
         @method = 21
-        0x00320015 # 50, 21, 3276821
+        @index = 0x00320015 # 50, 21, 3276821
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
 
       class Purge < Method
         @name = "queue.purge"
         @method = 30
-        0x0032001E # 50, 30, 3276830
+        @index = 0x0032001E # 50, 30, 3276830
 
         # @return
         # ["ticket = false", "queue = nil", "nowait = false"]
@@ -634,24 +830,33 @@ module AMQP
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class PurgeOk < Method
         @name = "queue.purge-ok"
         @method = 31
-        0x0032001F # 50, 31, 3276831
+        @index = 0x0032001F # 50, 31, 3276831
 
         # @return
         def self.decode(data)
+          offset = 0
+          message_count = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          self.new(message_count)
+        end
+
+        attr_reader :message_count
+        def initialize(message_count)
+          @message_count = message_count
         end
       end
 
       class Delete < Method
         @name = "queue.delete"
         @method = 40
-        0x00320028 # 50, 40, 3276840
+        @index = 0x00320028 # 50, 40, 3276840
 
         # @return
         # ["ticket = false", "queue = nil", "if_unused = false", "if_empty = false", "nowait = false"]
@@ -665,24 +870,33 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if if_empty
           bit_buffer = bit_buffer | (1 << 2) if nowait
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class DeleteOk < Method
         @name = "queue.delete-ok"
         @method = 41
-        0x00320029 # 50, 41, 3276841
+        @index = 0x00320029 # 50, 41, 3276841
 
         # @return
         def self.decode(data)
+          offset = 0
+          message_count = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          self.new(message_count)
+        end
+
+        attr_reader :message_count
+        def initialize(message_count)
+          @message_count = message_count
         end
       end
 
       class Unbind < Method
         @name = "queue.unbind"
         @method = 50
-        0x00320032 # 50, 50, 3276850
+        @index = 0x00320032 # 50, 50, 3276850
 
         # @return
         # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "arguments = {}"]
@@ -697,17 +911,23 @@ module AMQP
           pieces << routing_key.bytesize.chr
           pieces << routing_key
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class UnbindOk < Method
         @name = "queue.unbind-ok"
         @method = 51
-        0x00320033 # 50, 51, 3276851
+        @index = 0x00320033 # 50, 51, 3276851
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
     end
@@ -872,7 +1092,7 @@ module AMQP
       class Qos < Method
         @name = "basic.qos"
         @method = 10
-        0x003C000A # 60, 10, 3932170
+        @index = 0x003C000A # 60, 10, 3932170
 
         # @return
         # ["prefetch_size = false", "prefetch_count = false", "global = false"]
@@ -883,24 +1103,30 @@ module AMQP
           pieces << [prefetch_count].pack("n")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if global
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class QosOk < Method
         @name = "basic.qos-ok"
         @method = 11
-        0x003C000B # 60, 11, 3932171
+        @index = 0x003C000B # 60, 11, 3932171
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        attr_reader
+        def initialize()
         end
       end
 
       class Consume < Method
         @name = "basic.consume"
         @method = 20
-        0x003C0014 # 60, 20, 3932180
+        @index = 0x003C0014 # 60, 20, 3932180
 
         # @return
         # ["ticket = false", "queue = nil", "consumer_tag = """, "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
@@ -918,24 +1144,35 @@ module AMQP
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
           pieces << AMQP::Protocol::Table.encode(arguments)
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class ConsumeOk < Method
         @name = "basic.consume-ok"
         @method = 21
-        0x003C0015 # 60, 21, 3932181
+        @index = 0x003C0015 # 60, 21, 3932181
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          consumer_tag = data[offset..(offset + length)]
+          offset += length
+          self.new(consumer_tag)
+        end
+
+        attr_reader :consumer_tag
+        def initialize(consumer_tag)
+          @consumer_tag = consumer_tag
         end
       end
 
       class Cancel < Method
         @name = "basic.cancel"
         @method = 30
-        0x003C001E # 60, 30, 3932190
+        @index = 0x003C001E # 60, 30, 3932190
 
         # @return
         # ["consumer_tag = nil", "nowait = false"]
@@ -946,24 +1183,35 @@ module AMQP
           pieces << consumer_tag
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class CancelOk < Method
         @name = "basic.cancel-ok"
         @method = 31
-        0x003C001F # 60, 31, 3932191
+        @index = 0x003C001F # 60, 31, 3932191
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          consumer_tag = data[offset..(offset + length)]
+          offset += length
+          self.new(consumer_tag)
+        end
+
+        attr_reader :consumer_tag
+        def initialize(consumer_tag)
+          @consumer_tag = consumer_tag
         end
       end
 
       class Publish < Method
         @name = "basic.publish"
         @method = 40
-        0x003C0028 # 60, 40, 3932200
+        @index = 0x003C0028 # 60, 40, 3932200
 
         # @return
         # ["ticket = false", "exchange = """, "routing_key = """, "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
@@ -978,34 +1226,86 @@ module AMQP
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if mandatory
           bit_buffer = bit_buffer | (1 << 1) if immediate
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Return < Method
         @name = "basic.return"
         @method = 50
-        0x003C0032 # 60, 50, 3932210
+        @index = 0x003C0032 # 60, 50, 3932210
 
         # @return
         def self.decode(data)
+          offset = 0
+          reply_code = data[offset..(offset + 2)].unpack("n").first
+          offset += 2
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          reply_text = data[offset..(offset + length)]
+          offset += length
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          exchange = data[offset..(offset + length)]
+          offset += length
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          routing_key = data[offset..(offset + length)]
+          offset += length
+          self.new(reply_code, reply_text, exchange, routing_key)
+        end
+
+        attr_reader :reply_code, :reply_text, :exchange, :routing_key
+        def initialize(reply_code, reply_text, exchange, routing_key)
+          @reply_code = reply_code
+          @reply_text = reply_text
+          @exchange = exchange
+          @routing_key = routing_key
         end
       end
 
       class Deliver < Method
         @name = "basic.deliver"
         @method = 60
-        0x003C003C # 60, 60, 3932220
+        @index = 0x003C003C # 60, 60, 3932220
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          consumer_tag = data[offset..(offset + length)]
+          offset += length
+          delivery_tag = data[offset..(offset + 8)].unpack("N2").first
+          offset += 8
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          offset += 1
+          redelivered = (bit_buffer & (1 << 0)) != 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          exchange = data[offset..(offset + length)]
+          offset += length
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          routing_key = data[offset..(offset + length)]
+          offset += length
+          self.new(consumer_tag, delivery_tag, redelivered, exchange, routing_key)
+        end
+
+        attr_reader :consumer_tag, :delivery_tag, :redelivered, :exchange, :routing_key
+        def initialize(consumer_tag, delivery_tag, redelivered, exchange, routing_key)
+          @consumer_tag = consumer_tag
+          @delivery_tag = delivery_tag
+          @redelivered = redelivered
+          @exchange = exchange
+          @routing_key = routing_key
         end
       end
 
       class Get < Method
         @name = "basic.get"
         @method = 70
-        0x003C0046 # 60, 70, 3932230
+        @index = 0x003C0046 # 60, 70, 3932230
 
         # @return
         # ["ticket = false", "queue = nil", "no_ack = false"]
@@ -1017,34 +1317,71 @@ module AMQP
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if no_ack
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class GetOk < Method
         @name = "basic.get-ok"
         @method = 71
-        0x003C0047 # 60, 71, 3932231
+        @index = 0x003C0047 # 60, 71, 3932231
 
         # @return
         def self.decode(data)
+          offset = 0
+          delivery_tag = data[offset..(offset + 8)].unpack("N2").first
+          offset += 8
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          offset += 1
+          redelivered = (bit_buffer & (1 << 0)) != 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          exchange = data[offset..(offset + length)]
+          offset += length
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          routing_key = data[offset..(offset + length)]
+          offset += length
+          message_count = data[offset..(offset + 4)].unpack("N").first
+          offset += 4
+          self.new(delivery_tag, redelivered, exchange, routing_key, message_count)
+        end
+
+        attr_reader :delivery_tag, :redelivered, :exchange, :routing_key, :message_count
+        def initialize(delivery_tag, redelivered, exchange, routing_key, message_count)
+          @delivery_tag = delivery_tag
+          @redelivered = redelivered
+          @exchange = exchange
+          @routing_key = routing_key
+          @message_count = message_count
         end
       end
 
       class GetEmpty < Method
         @name = "basic.get-empty"
         @method = 72
-        0x003C0048 # 60, 72, 3932232
+        @index = 0x003C0048 # 60, 72, 3932232
 
         # @return
         def self.decode(data)
+          offset = 0
+          length = data[offset..(offset + 1)].unpack("N")[0]
+          offset += 1
+          cluster_id = data[offset..(offset + length)]
+          offset += length
+          self.new(cluster_id)
+        end
+
+        attr_reader :cluster_id
+        def initialize(cluster_id)
+          @cluster_id = cluster_id
         end
       end
 
       class Ack < Method
         @name = "basic.ack"
         @method = 80
-        0x003C0050 # 60, 80, 3932240
+        @index = 0x003C0050 # 60, 80, 3932240
 
         # @return
         # ["delivery_tag = false", "multiple = false"]
@@ -1054,14 +1391,14 @@ module AMQP
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Reject < Method
         @name = "basic.reject"
         @method = 90
-        0x003C005A # 60, 90, 3932250
+        @index = 0x003C005A # 60, 90, 3932250
 
         # @return
         # ["delivery_tag = nil", "requeue = true"]
@@ -1071,14 +1408,14 @@ module AMQP
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class RecoverAsync < Method
         @name = "basic.recover-async"
         @method = 100
-        0x003C0064 # 60, 100, 3932260
+        @index = 0x003C0064 # 60, 100, 3932260
 
         # @return
         # ["requeue = false"]
@@ -1087,14 +1424,14 @@ module AMQP
           pieces << [60, 100].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class Recover < Method
         @name = "basic.recover"
         @method = 110
-        0x003C006E # 60, 110, 3932270
+        @index = 0x003C006E # 60, 110, 3932270
 
         # @return
         # ["requeue = false"]
@@ -1103,18 +1440,30 @@ module AMQP
           pieces << [60, 110].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          return pieces.join("")
+          pieces.join("")
         end
       end
 
       class RecoverOk < Method
         @name = "basic.recover-ok"
         @method = 111
-        0x003C006F # 60, 111, 3932271
+        @index = 0x003C006F # 60, 111, 3932271
 
         # @return
         def self.decode(data)
+          offset = 0
+          self.new()
         end
+
+        attr_reader
+        def initialize()
+        end
+      end
+    end
+
+    METHODS = begin
+      Method.methods.inject(Hash.new) do |hash, klass|
+        hash.merge!(klass.index => klass)
       end
     end
   end

@@ -49,19 +49,19 @@ describe AMQP::Protocol::Frame do
     end
 
     it "should decode type" do
-      Frame.new(@readable).type.should eql(:body)
+      Frame.decode(@readable).type.should eql(:body)
     end
 
     it "should decode size" do
-      Frame.new(@readable).size.should eql(4)
+      Frame.decode(@readable).size.should eql(4)
     end
 
     it "should decode channel" do
-      Frame.new(@readable).channel.should eql(5)
+      Frame.decode(@readable).channel.should eql(5)
     end
 
     it "should decode payload" do
-      Frame.new(@readable).payload.should eql("test")
+      Frame.decode(@readable).payload.should eql("test")
     end
 
     it "should raise RuntimeError if the size is bigger than the actual size" do
@@ -69,14 +69,14 @@ describe AMQP::Protocol::Frame do
       invalid_data = @data.dup
       invalid_data[3..6] = [5].pack("N")
       readable = StringIO.new(invalid_data)
-      -> { Frame.new(readable) }.should raise_error(RuntimeError, "Frame doesn't end with \xCE as it must, which means the size is miscalculated.")
+      -> { Frame.decode(readable) }.should raise_error(RuntimeError, "Frame doesn't end with \xCE as it must, which means the size is miscalculated.")
     end
 
     it "should raise RuntimeError if the size is smaller than the actual size" do
       invalid_data = @data.dup
       invalid_data[3..6] = [3].pack("N")
       readable = StringIO.new(invalid_data)
-      -> { Frame.new(readable) }.should raise_error(RuntimeError, "Frame doesn't end with \xCE as it must, which means the size is miscalculated.")
+      -> { Frame.decode(readable) }.should raise_error(RuntimeError, "Frame doesn't end with \xCE as it must, which means the size is miscalculated.")
     end
   end
 end

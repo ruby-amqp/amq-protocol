@@ -85,6 +85,10 @@ module AMQP
         @name
       end
 
+      def self.index
+        @index
+      end
+
       def self.inherited(base)
         if self == Method
           @@methods << base
@@ -197,16 +201,23 @@ module AMQP
       class ${method.constant_name} < Method
         @name = "${klass.name}.${method.name}"
         @method = ${method.index}
-        ${method.binary()}
+        @index = ${method.binary()}
 
         % if method.accepted_by("client") :
         # @return
         def self.decode(data)
-          buffer = String.new
+          offset = 0
           % for line in helpers.genDecodeMethodDefinition(spec, method):
           ${line}
           % endfor
-          buffer
+          self.new(${', '.join([f.ruby_name for f in method.arguments])})
+        end
+
+        attr_reader ${', '.join([":" + f.ruby_name for f in method.arguments])}
+        def initialize(${', '.join([f.ruby_name for f in method.arguments])})
+          % for f in method.arguments:
+          @${f.ruby_name} = ${f.ruby_name}
+          % endfor
         end
         % endif
 
@@ -229,5 +240,11 @@ module AMQP
     end
 
     % endfor
+
+    METHODS = begin
+      Method.methods.inject(Hash.new) do |hash, klass|
+        hash.merge!(klass.index => klass)
+      end
+    end
   end
 end

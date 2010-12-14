@@ -19,15 +19,30 @@ module AMQP
         [TYPES[type], channel, payload.bytesize].pack("cnN") + payload + FINAL_OCTET
       end
 
-      attr_reader :payload, :type, :size, :channel
-      def initialize(readable)
+      def self.decode(readable)
         header = readable.read(7)
-        type_id, @channel, @size = header.unpack("cnN")
-        @type = TYPES_REVERSE[type_id]
-        data = readable.read(@size + 1)
-        @payload, frame_end = data[0..-2], data[-1]
+        type_id, channel, size = header.unpack("cnN")
+        type = TYPES_REVERSE[type_id]
+        data = readable.read(size + 1)
+        payload, frame_end = data[0..-2], data[-1]
         raise RuntimeError.new("Frame doesn't end with #{FINAL_OCTET} as it must, which means the size is miscalculated.") unless frame_end == FINAL_OCTET
         # raise RuntimeError.new("invalid size: is #{payload.bytesize}, expected #{size}") if @payload.bytesize != size # We obviously can't test that, because we used read(size), so it's pointless.
+        self.new(type, channel, size, payload)
+      end
+
+      attr_reader :type, :channel, :size, :payload
+      def initialize(type, channel, size, payload)
+        @type, @channel, @size, @payload = type, channel, size, payload
+      end
+
+      def first_method
+        klass_id, method_id = self.payload.unpack("n2")
+        index = klass_id << 16 | method_id
+        AMQP::Protocol::METHODS[index]
+      end
+
+      def decode_first_method
+        self.first_method.decode(self.payload[4..-1])
       end
 
       def decode

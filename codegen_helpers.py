@@ -28,6 +28,43 @@ def genSingleEncode(spec, cValue, unresolved_domain):
 
     return buffer
 
+def genSingleDecode(spec, cLvalue, unresolved_domain):
+    type = spec.resolveDomain(unresolved_domain)
+    buffer = []
+    if type == 'shortstr':
+        buffer.append("length = data[offset..(offset + 1)].unpack('N')[0]")
+        buffer.append("offset += 1")
+        buffer.append("%s = data[offset..(offset + length)]" % (cLvalue,))
+        buffer.append("offset += length")
+    elif type == 'longstr':
+        buffer.append("length = data[offset..(offset + 4)].unpack('N').first")
+        buffer.append("offset += 4")
+        buffer.append("%s = data[offset..(offset + length)]" % (cLvalue,))
+        buffer.append("offset += length")
+    elif type == 'octet':
+        buffer.append("%s = data[offset...(offset + 1)].unpack('c').first" % (cLvalue,))
+        buffer.append("offset += 1")
+    elif type == 'short':
+        buffer.append("%s = data[offset..(offset + 2)].unpack('n').first" % (cLvalue,))
+        buffer.append("offset += 2")
+    elif type == 'long':
+        buffer.append("%s = data[offset..(offset + 4)].unpack('N').first" % (cLvalue,))
+        buffer.append("offset += 4")
+    elif type == 'longlong':
+        buffer.append("%s = data[offset..(offset + 8)].unpack('N2').first" % (cLvalue,))
+        buffer.append("offset += 8")
+    elif type == 'timestamp':
+        buffer.append("%s = data[offset..(offset + 8)].unpack('N2').first" % (cLvalue,))
+        buffer.append("offset += 8")
+    elif type == 'bit':
+        raise "Can't decode bit in genSingleDecode"
+    elif type == 'table':
+        buffer.append("table_length = Table.length(data[offset..(offset + 4)])")
+        buffer.append("%s = Table.decode(data[offset..table_length])" % (cLvalue,))
+    else:
+        raise "Illegal domain in genSingleDecode", type
+
+    return buffer
 
 def genEncodeMethodDefinition(spec, m):
     def finishBits():
@@ -54,4 +91,23 @@ def genEncodeMethodDefinition(spec, m):
             buffer += genSingleEncode(spec, f.ruby_name, f.domain)
 
     finishBits()
+    return buffer
+
+def genDecodeMethodDefinition(spec, m):
+    buffer = []
+    bitindex = None
+    for f in m.arguments:
+        if spec.resolveDomain(f.domain) == 'bit':
+            if bitindex is None:
+                bitindex = 0
+            if bitindex >= 8:
+                bitindex = 0
+            if bitindex == 0:
+                buffer.append("bit_buffer = data[offset..(offset + 1)].unpack('c').first")
+                buffer.append("offset += 1")
+                buffer.append("%s = (bit_buffer & (1 << %d)) != 0" % (f.ruby_name, bitindex))
+            bitindex = bitindex + 1
+        else:
+            bitindex = None
+            buffer += genSingleDecode(spec, f.ruby_name, f.domain)
     return buffer

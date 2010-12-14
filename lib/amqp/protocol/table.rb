@@ -52,6 +52,10 @@ module AMQP
         [buffer.bytesize].pack(">N") + buffer
       end
 
+      def self.length(data)
+        data.unpack("N").first
+      end
+
       def self.decode(data)
         table = Hash.new
         size = data.unpack("N").first
@@ -78,7 +82,7 @@ module AMQP
           when "F"
             value = self.decode(data[offset..-1])
           else
-            raise
+            raise "Not a valid type: #{type.inspect}"
           end
           table[key] = value
         end

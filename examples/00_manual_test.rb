@@ -23,30 +23,30 @@ def socket.encode(klass, *args)
     STDERR.puts "=> #{result.inspect}"
     STDERR.puts "Frame.encode(:method, 0, #{result.inspect})"
     STDERR.puts "=> #{Frame.encode(:method, 0, result).inspect}\n\n"
-    self.puts(result)
+    self.write(Frame.encode(:method, 0, result))
   end
 end
 
 def socket.decode
-  frame = Frame.new(self)
-  STDERR.puts "Frame.new(#{self.inspect})"
+  frame = Frame.decode(self)
+  STDERR.puts "Frame.decode(#{self.inspect})"
   STDERR.puts "=> #{frame.inspect}\n\n"
 end
 
 # AMQP preamble
 puts "Sending AMQP preamble (#{AMQP::Protocol::PREAMBLE.inspect})\n\n"
-socket.puts AMQP::Protocol::PREAMBLE
+socket.write AMQP::Protocol::PREAMBLE
 
 # Start/Start-Ok
 socket.decode
-socket.encode Connection::StartOk, {client: "AMQP Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB"
+socket.encode Connection::StartOk, {client: "AMQP Protocol"}, "PLAIN", "guest\0guest\0", "en_GB"
 
 # Tune/Tune-Ok
+socket.decode
 socket.encode Connection::TuneOk, 0, 131072, 0
-# socket.decode
 
 # Close
-socket.encode Connection::Close
-socket.decode
+# socket.encode Connection::Close
+# socket.decode
 
 socket.close

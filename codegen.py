@@ -28,7 +28,7 @@ class AmqpSpecObject(AmqpSpec):
         AmqpSpec.__init__(self, path)
 
         def extend_field(field):
-            field.ruby_name = re.sub("-", "_", field.name)
+            field.ruby_name = re.sub("[- ]", "_", field.name)
             field.type = self.resolveDomain(field.domain)
             field.banned = bool(field.name in self.__class__.IGNORED_FIELDS)
 
