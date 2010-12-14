@@ -4,7 +4,6 @@ require_relative "../../spec_helper.rb"
 
 describe AMQP::Protocol::Table do
   describe ".encode" do
-    # TODO: which endian should be used, does it matter? http://pastie.org/1362275
     DATA = {
       nil               => "\x00\x00\x00\x00",
       Hash.new          => "\x00\x00\x00\x00",
@@ -16,7 +15,7 @@ describe AMQP::Protocol::Table do
 
     DATA.each do |data, encoded|
       it "should return #{encoded.inspect} for #{data.inspect}" do
-        AMQP::Protocol::Table.encode(data).should eql(encoded)
+        Table.encode(data).should eql(encoded)
       end
     end
   end

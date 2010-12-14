@@ -4,8 +4,6 @@ require_relative "../../spec_helper.rb"
 require "stringio"
 
 describe AMQP::Protocol::Frame do
-  include AMQP::Protocol
-
   describe ".encode" do
     it "should raise RuntimeError if type isn't one of: [:method, :header, :body, :heartbeat]" do
       -> { Frame.encode(nil, 0, "") }.should raise_error(RuntimeError, "Must be one of [:method, :header, :body, :heartbeat]")

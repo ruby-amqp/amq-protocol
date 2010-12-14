@@ -2,888 +2,886 @@
 
 require_relative "../spec_helper.rb"
 
-include AMQP
-
-describe Protocol do
+describe AMQP::Protocol do
   it "should have PROTOCOL_VERSION constant" do
-    Protocol::PROTOCOL_VERSION.should match(/^\d+\.\d+\.\d$/)
+    AMQP::Protocol::PROTOCOL_VERSION.should match(/^\d+\.\d+\.\d$/)
   end
 
   it "should have DEFAULT_PORT constant" do
-    Protocol::DEFAULT_PORT.should be_kind_of(Integer)
+    AMQP::Protocol::DEFAULT_PORT.should be_kind_of(Integer)
   end
 
   it "should have PREAMBLE constant" do
-    Protocol::PREAMBLE.should be_kind_of(String)
+    AMQP::Protocol::PREAMBLE.should be_kind_of(String)
   end
 
   describe ".classes" do
     it "should include all the AMQP classes" do
-      Protocol.classes.should include(Protocol::Queue)
+      AMQP::Protocol.classes.should include(Queue)
     end
   end
 
   describe ".methods" do
     it "should include all the AMQP methods" do
-      Protocol.methods.should include(Protocol::Queue::DeclareOk)
+      AMQP::Protocol.methods.should include(Queue::DeclareOk)
     end
   end
 
-  describe Protocol::Error do
+  describe AMQP::Protocol::Error do
     it "should be an exception class" do
-      Protocol::Error.should < Exception
+      AMQP::Protocol::Error.should < Exception
     end
   end
 
-  describe Protocol::Connection do
-    it "should be a subclass of Protocol::Class" do
-      Protocol::Connection.should < Protocol::Class
+  describe AMQP::Protocol::Connection do
+    it "should be a subclass of Class" do
+      Connection.should < Class
     end
 
     it "should have name equal to connection" do
-      Protocol::Connection.name.should eql("connection")
+      Connection.name.should eql("connection")
     end
 
     it "should have method equal to TODO" do
       pending
-      Protocol::Connection.method.should eql("TODO")
+      Connection.method.should eql("TODO")
     end
 
-    describe Protocol::Connection::Start do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::Start.should < Protocol::Method
+    describe AMQP::Protocol::Connection::Start do
+      it "should be a subclass of Method" do
+        Connection::Start.should < Method
       end
 
       it "should have method name equal to connection.start" do
-        Protocol::Connection::Start.name.should eql("connection.start")
+        Connection::Start.name.should eql("connection.start")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::Start.method.should eql("TODO")
+        Connection::Start.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::StartOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::StartOk.should < Protocol::Method
+    describe AMQP::Protocol::Connection::StartOk do
+      it "should be a subclass of Method" do
+        Connection::StartOk.should < Method
       end
 
       it "should have method name equal to connection.start-ok" do
-        Protocol::Connection::StartOk.name.should eql("connection.start-ok")
+        Connection::StartOk.name.should eql("connection.start-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::StartOk.method.should eql("TODO")
+        Connection::StartOk.method.should eql("TODO")
       end
 
       describe ".encode" do
         it do
-          result = Protocol::Connection::StartOk.encode({client: "AMQP Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
+          result = Connection::StartOk.encode({client: "AMQP Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
           result.should eql("\x00\n\x00\v\x00\x00\x00\x19\x06clientS\x00\x00\x00\rAMQP Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
         end
       end
     end
 
-    describe Protocol::Connection::Secure do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::Secure.should < Protocol::Method
+    describe AMQP::Protocol::Connection::Secure do
+      it "should be a subclass of Method" do
+        Connection::Secure.should < Method
       end
 
       it "should have method name equal to connection.secure" do
-        Protocol::Connection::Secure.name.should eql("connection.secure")
+        Connection::Secure.name.should eql("connection.secure")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::Secure.method.should eql("TODO")
+        Connection::Secure.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::SecureOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::SecureOk.should < Protocol::Method
+    describe AMQP::Protocol::Connection::SecureOk do
+      it "should be a subclass of Method" do
+        Connection::SecureOk.should < Method
       end
 
       it "should have method name equal to connection.secure-ok" do
-        Protocol::Connection::SecureOk.name.should eql("connection.secure-ok")
+        Connection::SecureOk.name.should eql("connection.secure-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::SecureOk.method.should eql("TODO")
+        Connection::SecureOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::Tune do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::Tune.should < Protocol::Method
+    describe AMQP::Protocol::Connection::Tune do
+      it "should be a subclass of Method" do
+        Connection::Tune.should < Method
       end
 
       it "should have method name equal to connection.tune" do
-        Protocol::Connection::Tune.name.should eql("connection.tune")
+        Connection::Tune.name.should eql("connection.tune")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::Tune.method.should eql("TODO")
+        Connection::Tune.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::TuneOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::TuneOk.should < Protocol::Method
+    describe AMQP::Protocol::Connection::TuneOk do
+      it "should be a subclass of Method" do
+        Connection::TuneOk.should < Method
       end
 
       it "should have method name equal to connection.tune-ok" do
-        Protocol::Connection::TuneOk.name.should eql("connection.tune-ok")
+        Connection::TuneOk.name.should eql("connection.tune-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::TuneOk.method.should eql("TODO")
+        Connection::TuneOk.method.should eql("TODO")
       end
 
       describe ".encode" do
         it do
-          result = Protocol::Connection::TuneOk.encode(0, 131072, 0)
+          result = Connection::TuneOk.encode(0, 131072, 0)
           result.should eql("\x00\n\x00\x1F\x00\x00\x00\x02\x00\x00\x00\x00")
         end
       end
     end
 
-    describe Protocol::Connection::Open do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::Open.should < Protocol::Method
+    describe AMQP::Protocol::Connection::Open do
+      it "should be a subclass of Method" do
+        Connection::Open.should < Method
       end
 
       it "should have method name equal to connection.open" do
-        Protocol::Connection::Open.name.should eql("connection.open")
+        Connection::Open.name.should eql("connection.open")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::Open.method.should eql("TODO")
+        Connection::Open.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::OpenOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::OpenOk.should < Protocol::Method
+    describe AMQP::Protocol::Connection::OpenOk do
+      it "should be a subclass of Method" do
+        Connection::OpenOk.should < Method
       end
 
       it "should have method name equal to connection.open-ok" do
-        Protocol::Connection::OpenOk.name.should eql("connection.open-ok")
+        Connection::OpenOk.name.should eql("connection.open-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::OpenOk.method.should eql("TODO")
+        Connection::OpenOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::Close do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::Close.should < Protocol::Method
+    describe AMQP::Protocol::Connection::Close do
+      it "should be a subclass of Method" do
+        Connection::Close.should < Method
       end
 
       it "should have method name equal to connection.close" do
-        Protocol::Connection::Close.name.should eql("connection.close")
+        Connection::Close.name.should eql("connection.close")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::Close.method.should eql("TODO")
+        Connection::Close.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Connection::CloseOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Connection::CloseOk.should < Protocol::Method
+    describe AMQP::Protocol::Connection::CloseOk do
+      it "should be a subclass of Method" do
+        Connection::CloseOk.should < Method
       end
 
       it "should have method name equal to connection.close-ok" do
-        Protocol::Connection::CloseOk.name.should eql("connection.close-ok")
+        Connection::CloseOk.name.should eql("connection.close-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Connection::CloseOk.method.should eql("TODO")
+        Connection::CloseOk.method.should eql("TODO")
       end
     end
   end
 
-  describe Protocol::Channel do
-    it "should be a subclass of Protocol::Class" do
-      Protocol::Channel.should < Protocol::Class
+  describe AMQP::Protocol::Channel do
+    it "should be a subclass of Class" do
+      Channel.should < Class
     end
 
     it "should have name equal to channel" do
-      Protocol::Channel.name.should eql("channel")
+      Channel.name.should eql("channel")
     end
 
     it "should have method equal to TODO" do
       pending
-      Protocol::Channel.method.should eql("TODO")
+      Channel.method.should eql("TODO")
     end
 
-    describe Protocol::Channel::Open do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Channel::Open.should < Protocol::Method
+    describe AMQP::Protocol::Channel::Open do
+      it "should be a subclass of Method" do
+        Channel::Open.should < Method
       end
 
       it "should have method name equal to channel.open" do
-        Protocol::Channel::Open.name.should eql("channel.open")
+        Channel::Open.name.should eql("channel.open")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Channel::Open.method.should eql("TODO")
+        Channel::Open.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Channel::OpenOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Channel::OpenOk.should < Protocol::Method
+    describe AMQP::Protocol::Channel::OpenOk do
+      it "should be a subclass of Method" do
+        Channel::OpenOk.should < Method
       end
 
       it "should have method name equal to channel.open-ok" do
-        Protocol::Channel::OpenOk.name.should eql("channel.open-ok")
+        Channel::OpenOk.name.should eql("channel.open-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Channel::OpenOk.method.should eql("TODO")
+        Channel::OpenOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Channel::Flow do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Channel::Flow.should < Protocol::Method
+    describe AMQP::Protocol::Channel::Flow do
+      it "should be a subclass of Method" do
+        Channel::Flow.should < Method
       end
 
       it "should have method name equal to channel.flow" do
-        Protocol::Channel::Flow.name.should eql("channel.flow")
+        Channel::Flow.name.should eql("channel.flow")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Channel::Flow.method.should eql("TODO")
+        Channel::Flow.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Channel::FlowOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Channel::FlowOk.should < Protocol::Method
+    describe AMQP::Protocol::Channel::FlowOk do
+      it "should be a subclass of Method" do
+        Channel::FlowOk.should < Method
       end
 
       it "should have method name equal to channel.flow-ok" do
-        Protocol::Channel::FlowOk.name.should eql("channel.flow-ok")
+        Channel::FlowOk.name.should eql("channel.flow-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Channel::FlowOk.method.should eql("TODO")
+        Channel::FlowOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Channel::Close do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Channel::Close.should < Protocol::Method
+    describe AMQP::Protocol::Channel::Close do
+      it "should be a subclass of Method" do
+        Channel::Close.should < Method
       end
 
       it "should have method name equal to channel.close" do
-        Protocol::Channel::Close.name.should eql("channel.close")
+        Channel::Close.name.should eql("channel.close")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Channel::Close.method.should eql("TODO")
+        Channel::Close.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Channel::CloseOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Channel::CloseOk.should < Protocol::Method
+    describe AMQP::Protocol::Channel::CloseOk do
+      it "should be a subclass of Method" do
+        Channel::CloseOk.should < Method
       end
 
       it "should have method name equal to channel.close-ok" do
-        Protocol::Channel::CloseOk.name.should eql("channel.close-ok")
+        Channel::CloseOk.name.should eql("channel.close-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Channel::CloseOk.method.should eql("TODO")
+        Channel::CloseOk.method.should eql("TODO")
       end
     end
   end
 
-  describe Protocol::Exchange do
-    it "should be a subclass of Protocol::Class" do
-      Protocol::Exchange.should < Protocol::Class
+  describe AMQP::Protocol::Exchange do
+    it "should be a subclass of Class" do
+      Exchange.should < Class
     end
 
     it "should have name equal to exchange" do
-      Protocol::Exchange.name.should eql("exchange")
+      Exchange.name.should eql("exchange")
     end
 
     it "should have method equal to TODO" do
       pending
-      Protocol::Exchange.method.should eql("TODO")
+      Exchange.method.should eql("TODO")
     end
 
-    describe Protocol::Exchange::Declare do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::Declare.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::Declare do
+      it "should be a subclass of Method" do
+        Exchange::Declare.should < Method
       end
 
       it "should have method name equal to exchange.declare" do
-        Protocol::Exchange::Declare.name.should eql("exchange.declare")
+        Exchange::Declare.name.should eql("exchange.declare")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::Declare.method.should eql("TODO")
+        Exchange::Declare.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::DeclareOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::DeclareOk.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::DeclareOk do
+      it "should be a subclass of Method" do
+        Exchange::DeclareOk.should < Method
       end
 
       it "should have method name equal to exchange.declare-ok" do
-        Protocol::Exchange::DeclareOk.name.should eql("exchange.declare-ok")
+        Exchange::DeclareOk.name.should eql("exchange.declare-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::DeclareOk.method.should eql("TODO")
+        Exchange::DeclareOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::Delete do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::Delete.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::Delete do
+      it "should be a subclass of Method" do
+        Exchange::Delete.should < Method
       end
 
       it "should have method name equal to exchange.delete" do
-        Protocol::Exchange::Delete.name.should eql("exchange.delete")
+        Exchange::Delete.name.should eql("exchange.delete")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::Delete.method.should eql("TODO")
+        Exchange::Delete.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::DeleteOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::DeleteOk.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::DeleteOk do
+      it "should be a subclass of Method" do
+        Exchange::DeleteOk.should < Method
       end
 
       it "should have method name equal to exchange.delete-ok" do
-        Protocol::Exchange::DeleteOk.name.should eql("exchange.delete-ok")
+        Exchange::DeleteOk.name.should eql("exchange.delete-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::DeleteOk.method.should eql("TODO")
+        Exchange::DeleteOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::Bind do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::Bind.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::Bind do
+      it "should be a subclass of Method" do
+        Exchange::Bind.should < Method
       end
 
       it "should have method name equal to exchange.bind" do
-        Protocol::Exchange::Bind.name.should eql("exchange.bind")
+        Exchange::Bind.name.should eql("exchange.bind")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::Bind.method.should eql("TODO")
+        Exchange::Bind.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::BindOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::BindOk.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::BindOk do
+      it "should be a subclass of Method" do
+        Exchange::BindOk.should < Method
       end
 
       it "should have method name equal to exchange.bind-ok" do
-        Protocol::Exchange::BindOk.name.should eql("exchange.bind-ok")
+        Exchange::BindOk.name.should eql("exchange.bind-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::BindOk.method.should eql("TODO")
+        Exchange::BindOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::Unbind do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::Unbind.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::Unbind do
+      it "should be a subclass of Method" do
+        Exchange::Unbind.should < Method
       end
 
       it "should have method name equal to exchange.unbind" do
-        Protocol::Exchange::Unbind.name.should eql("exchange.unbind")
+        Exchange::Unbind.name.should eql("exchange.unbind")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::Unbind.method.should eql("TODO")
+        Exchange::Unbind.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Exchange::UnbindOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Exchange::UnbindOk.should < Protocol::Method
+    describe AMQP::Protocol::Exchange::UnbindOk do
+      it "should be a subclass of Method" do
+        Exchange::UnbindOk.should < Method
       end
 
       it "should have method name equal to exchange.unbind-ok" do
-        Protocol::Exchange::UnbindOk.name.should eql("exchange.unbind-ok")
+        Exchange::UnbindOk.name.should eql("exchange.unbind-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Exchange::UnbindOk.method.should eql("TODO")
+        Exchange::UnbindOk.method.should eql("TODO")
       end
     end
   end
 
-  describe Protocol::Queue do
-    it "should be a subclass of Protocol::Class" do
-      Protocol::Queue.should < Protocol::Class
+  describe AMQP::Protocol::Queue do
+    it "should be a subclass of Class" do
+      Queue.should < Class
     end
 
     it "should have name equal to queue" do
-      Protocol::Queue.name.should eql("queue")
+      Queue.name.should eql("queue")
     end
 
     it "should have method equal to TODO" do
       pending
-      Protocol::Queue.method.should eql("TODO")
+      Queue.method.should eql("TODO")
     end
 
-    describe Protocol::Queue::Declare do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::Declare.should < Protocol::Method
+    describe AMQP::Protocol::Queue::Declare do
+      it "should be a subclass of Method" do
+        Queue::Declare.should < Method
       end
 
       it "should have method name equal to queue.declare" do
-        Protocol::Queue::Declare.name.should eql("queue.declare")
+        Queue::Declare.name.should eql("queue.declare")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::Declare.method.should eql("TODO")
+        Queue::Declare.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::DeclareOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::DeclareOk.should < Protocol::Method
+    describe AMQP::Protocol::Queue::DeclareOk do
+      it "should be a subclass of Method" do
+        Queue::DeclareOk.should < Method
       end
 
       it "should have method name equal to queue.declare-ok" do
-        Protocol::Queue::DeclareOk.name.should eql("queue.declare-ok")
+        Queue::DeclareOk.name.should eql("queue.declare-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::DeclareOk.method.should eql("TODO")
+        Queue::DeclareOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::Bind do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::Bind.should < Protocol::Method
+    describe AMQP::Protocol::Queue::Bind do
+      it "should be a subclass of Method" do
+        Queue::Bind.should < Method
       end
 
       it "should have method name equal to queue.bind" do
-        Protocol::Queue::Bind.name.should eql("queue.bind")
+        Queue::Bind.name.should eql("queue.bind")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::Bind.method.should eql("TODO")
+        Queue::Bind.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::BindOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::BindOk.should < Protocol::Method
+    describe AMQP::Protocol::Queue::BindOk do
+      it "should be a subclass of Method" do
+        Queue::BindOk.should < Method
       end
 
       it "should have method name equal to queue.bind-ok" do
-        Protocol::Queue::BindOk.name.should eql("queue.bind-ok")
+        Queue::BindOk.name.should eql("queue.bind-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::BindOk.method.should eql("TODO")
+        Queue::BindOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::Purge do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::Purge.should < Protocol::Method
+    describe AMQP::Protocol::Queue::Purge do
+      it "should be a subclass of Method" do
+        Queue::Purge.should < Method
       end
 
       it "should have method name equal to queue.purge" do
-        Protocol::Queue::Purge.name.should eql("queue.purge")
+        Queue::Purge.name.should eql("queue.purge")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::Purge.method.should eql("TODO")
+        Queue::Purge.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::PurgeOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::PurgeOk.should < Protocol::Method
+    describe AMQP::Protocol::Queue::PurgeOk do
+      it "should be a subclass of Method" do
+        Queue::PurgeOk.should < Method
       end
 
       it "should have method name equal to queue.purge-ok" do
-        Protocol::Queue::PurgeOk.name.should eql("queue.purge-ok")
+        Queue::PurgeOk.name.should eql("queue.purge-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::PurgeOk.method.should eql("TODO")
+        Queue::PurgeOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::Delete do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::Delete.should < Protocol::Method
+    describe AMQP::Protocol::Queue::Delete do
+      it "should be a subclass of Method" do
+        Queue::Delete.should < Method
       end
 
       it "should have method name equal to queue.delete" do
-        Protocol::Queue::Delete.name.should eql("queue.delete")
+        Queue::Delete.name.should eql("queue.delete")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::Delete.method.should eql("TODO")
+        Queue::Delete.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::DeleteOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::DeleteOk.should < Protocol::Method
+    describe AMQP::Protocol::Queue::DeleteOk do
+      it "should be a subclass of Method" do
+        Queue::DeleteOk.should < Method
       end
 
       it "should have method name equal to queue.delete-ok" do
-        Protocol::Queue::DeleteOk.name.should eql("queue.delete-ok")
+        Queue::DeleteOk.name.should eql("queue.delete-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::DeleteOk.method.should eql("TODO")
+        Queue::DeleteOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::Unbind do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::Unbind.should < Protocol::Method
+    describe AMQP::Protocol::Queue::Unbind do
+      it "should be a subclass of Method" do
+        Queue::Unbind.should < Method
       end
 
       it "should have method name equal to queue.unbind" do
-        Protocol::Queue::Unbind.name.should eql("queue.unbind")
+        Queue::Unbind.name.should eql("queue.unbind")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::Unbind.method.should eql("TODO")
+        Queue::Unbind.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Queue::UnbindOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Queue::UnbindOk.should < Protocol::Method
+    describe AMQP::Protocol::Queue::UnbindOk do
+      it "should be a subclass of Method" do
+        Queue::UnbindOk.should < Method
       end
 
       it "should have method name equal to queue.unbind-ok" do
-        Protocol::Queue::UnbindOk.name.should eql("queue.unbind-ok")
+        Queue::UnbindOk.name.should eql("queue.unbind-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Queue::UnbindOk.method.should eql("TODO")
+        Queue::UnbindOk.method.should eql("TODO")
       end
     end
   end
 
-  describe Protocol::Basic do
-    it "should be a subclass of Protocol::Class" do
-      Protocol::Basic.should < Protocol::Class
+  describe AMQP::Protocol::Basic do
+    it "should be a subclass of Class" do
+      Basic.should < Class
     end
 
     it "should have name equal to basic" do
-      Protocol::Basic.name.should eql("basic")
+      Basic.name.should eql("basic")
     end
 
     it "should have method equal to TODO" do
       pending
-      Protocol::Basic.method.should eql("TODO")
+      Basic.method.should eql("TODO")
     end
-    describe Protocol::Basic::Qos do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Qos.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Qos do
+      it "should be a subclass of Method" do
+        Basic::Qos.should < Method
       end
 
       it "should have method name equal to basic.qos" do
-        Protocol::Basic::Qos.name.should eql("basic.qos")
+        Basic::Qos.name.should eql("basic.qos")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Qos.method.should eql("TODO")
+        Basic::Qos.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::QosOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::QosOk.should < Protocol::Method
+    describe AMQP::Protocol::Basic::QosOk do
+      it "should be a subclass of Method" do
+        Basic::QosOk.should < Method
       end
 
       it "should have method name equal to basic.qos-ok" do
-        Protocol::Basic::QosOk.name.should eql("basic.qos-ok")
+        Basic::QosOk.name.should eql("basic.qos-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::QosOk.method.should eql("TODO")
+        Basic::QosOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Consume do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Consume.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Consume do
+      it "should be a subclass of Method" do
+        Basic::Consume.should < Method
       end
 
       it "should have method name equal to basic.consume" do
-        Protocol::Basic::Consume.name.should eql("basic.consume")
+        Basic::Consume.name.should eql("basic.consume")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Consume.method.should eql("TODO")
+        Basic::Consume.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::ConsumeOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::ConsumeOk.should < Protocol::Method
+    describe AMQP::Protocol::Basic::ConsumeOk do
+      it "should be a subclass of Method" do
+        Basic::ConsumeOk.should < Method
       end
 
       it "should have method name equal to basic.consume-ok" do
-        Protocol::Basic::ConsumeOk.name.should eql("basic.consume-ok")
+        Basic::ConsumeOk.name.should eql("basic.consume-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::ConsumeOk.method.should eql("TODO")
+        Basic::ConsumeOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Cancel do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Cancel.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Cancel do
+      it "should be a subclass of Method" do
+        Basic::Cancel.should < Method
       end
 
       it "should have method name equal to basic.cancel" do
-        Protocol::Basic::Cancel.name.should eql("basic.cancel")
+        Basic::Cancel.name.should eql("basic.cancel")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Cancel.method.should eql("TODO")
+        Basic::Cancel.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::CancelOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::CancelOk.should < Protocol::Method
+    describe AMQP::Protocol::Basic::CancelOk do
+      it "should be a subclass of Method" do
+        Basic::CancelOk.should < Method
       end
 
       it "should have method name equal to basic.cancel-ok" do
-        Protocol::Basic::CancelOk.name.should eql("basic.cancel-ok")
+        Basic::CancelOk.name.should eql("basic.cancel-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::CancelOk.method.should eql("TODO")
+        Basic::CancelOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Publish do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Publish.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Publish do
+      it "should be a subclass of Method" do
+        Basic::Publish.should < Method
       end
 
       it "should have method name equal to basic.publish" do
-        Protocol::Basic::Publish.name.should eql("basic.publish")
+        Basic::Publish.name.should eql("basic.publish")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Publish.method.should eql("TODO")
+        Basic::Publish.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Return do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Return.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Return do
+      it "should be a subclass of Method" do
+        Basic::Return.should < Method
       end
 
       it "should have method name equal to basic.return" do
-        Protocol::Basic::Return.name.should eql("basic.return")
+        Basic::Return.name.should eql("basic.return")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Return.method.should eql("TODO")
+        Basic::Return.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Deliver do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Deliver.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Deliver do
+      it "should be a subclass of Method" do
+        Basic::Deliver.should < Method
       end
 
       it "should have method name equal to basic.deliver" do
-        Protocol::Basic::Deliver.name.should eql("basic.deliver")
+        Basic::Deliver.name.should eql("basic.deliver")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Deliver.method.should eql("TODO")
+        Basic::Deliver.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Get do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Get.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Get do
+      it "should be a subclass of Method" do
+        Basic::Get.should < Method
       end
 
       it "should have method name equal to basic.get" do
-        Protocol::Basic::Get.name.should eql("basic.get")
+        Basic::Get.name.should eql("basic.get")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Get.method.should eql("TODO")
+        Basic::Get.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::GetOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::GetOk.should < Protocol::Method
+    describe AMQP::Protocol::Basic::GetOk do
+      it "should be a subclass of Method" do
+        Basic::GetOk.should < Method
       end
 
       it "should have method name equal to basic.get-ok" do
-        Protocol::Basic::GetOk.name.should eql("basic.get-ok")
+        Basic::GetOk.name.should eql("basic.get-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::GetOk.method.should eql("TODO")
+        Basic::GetOk.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::GetEmpty do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::GetEmpty.should < Protocol::Method
+    describe AMQP::Protocol::Basic::GetEmpty do
+      it "should be a subclass of Method" do
+        Basic::GetEmpty.should < Method
       end
 
       it "should have method name equal to basic.get-empty" do
-        Protocol::Basic::GetEmpty.name.should eql("basic.get-empty")
+        Basic::GetEmpty.name.should eql("basic.get-empty")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::GetEmpty.method.should eql("TODO")
+        Basic::GetEmpty.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Ack do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Ack.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Ack do
+      it "should be a subclass of Method" do
+        Basic::Ack.should < Method
       end
 
       it "should have method name equal to basic.ack" do
-        Protocol::Basic::Ack.name.should eql("basic.ack")
+        Basic::Ack.name.should eql("basic.ack")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Ack.method.should eql("TODO")
+        Basic::Ack.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Reject do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Reject.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Reject do
+      it "should be a subclass of Method" do
+        Basic::Reject.should < Method
       end
 
       it "should have method name equal to basic.reject" do
-        Protocol::Basic::Reject.name.should eql("basic.reject")
+        Basic::Reject.name.should eql("basic.reject")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Reject.method.should eql("TODO")
+        Basic::Reject.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::RecoverAsync do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::RecoverAsync.should < Protocol::Method
+    describe AMQP::Protocol::Basic::RecoverAsync do
+      it "should be a subclass of Method" do
+        Basic::RecoverAsync.should < Method
       end
 
       it "should have method name equal to basic.recover-async" do
-        Protocol::Basic::RecoverAsync.name.should eql("basic.recover-async")
+        Basic::RecoverAsync.name.should eql("basic.recover-async")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::RecoverAsync.method.should eql("TODO")
+        Basic::RecoverAsync.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::Recover do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::Recover.should < Protocol::Method
+    describe AMQP::Protocol::Basic::Recover do
+      it "should be a subclass of Method" do
+        Basic::Recover.should < Method
       end
 
       it "should have method name equal to basic.recover" do
-        Protocol::Basic::Recover.name.should eql("basic.recover")
+        Basic::Recover.name.should eql("basic.recover")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::Recover.method.should eql("TODO")
+        Basic::Recover.method.should eql("TODO")
       end
     end
 
-    describe Protocol::Basic::RecoverOk do
-      it "should be a subclass of Protocol::Method" do
-        Protocol::Basic::RecoverOk.should < Protocol::Method
+    describe AMQP::Protocol::Basic::RecoverOk do
+      it "should be a subclass of Method" do
+        Basic::RecoverOk.should < Method
       end
 
       it "should have method name equal to basic.recover-ok" do
-        Protocol::Basic::RecoverOk.name.should eql("basic.recover-ok")
+        Basic::RecoverOk.name.should eql("basic.recover-ok")
       end
 
       it "should have method equal to TODO" do
         pending
-        Protocol::Basic::RecoverOk.method.should eql("TODO")
+        Basic::RecoverOk.method.should eql("TODO")
       end
     end
   end
