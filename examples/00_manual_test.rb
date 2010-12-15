@@ -15,21 +15,21 @@ rescue Errno::ECONNREFUSED
 end
 
 # helpers
-Frame.encode(:method, 0, Connection::TuneOk.encode(0, 131072, 0))
+MethodFrame.encode(:method, 0, Connection::TuneOk.encode(0, 131072, 0))
 
 def socket.encode(klass, *args)
   STDERR.puts "#{klass}.encode(#{args.inspect[1..-2]})"
   klass.encode(*args).tap do |result|
     STDERR.puts "=> #{result.inspect}"
-    STDERR.puts "Frame.encode(:method, 0, #{result.inspect})"
-    STDERR.puts "=> #{Frame.encode(:method, 0, result).inspect}\n\n"
-    self.write(Frame.encode(:method, 0, result))
+    STDERR.puts "MethodFrame.encode(:method, 0, #{result.inspect})"
+    STDERR.puts "=> #{MethodFrame.encode(:method, 0, result).inspect}\n\n"
+    self.write(MethodFrame.encode(:method, 0, result))
   end
 end
 
 def socket.decode
-  frame = Frame.decode(self)
-  STDERR.puts "Frame.decode(#{self.inspect})"
+  frame = MethodFrame.decode(self)
+  STDERR.puts "MethodFrame.decode(#{self.inspect})"
   STDERR.puts "=> #{frame.inspect}\n\n"
 end
 
@@ -50,3 +50,11 @@ socket.encode Connection::TuneOk, 0, 131072, 0
 # socket.decode
 
 socket.close
+
+__END__
+[CLIENT] conn#4 ch#0 -> {#method<connection.start-ok>(client-properties={product=AMQP, information=http://github.com/tmm1/amqp, platform=Ruby/EventMachine, version=0.6.7},mechanism=AMQPLAIN,response=LOGINSguesPASSWORDSguest,locale=en_US),null,""}
+[SERVER] conn#4 ch#0 <- {#method<connection.start>(version-major=8,version-minor=0,server properties={product=RabbitMQ, information=Licensed under the MPL.  See http://www.rabbitmq.com/, platform=Erlang/OTP, copyright=Copyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd., version=2.1.0},mechanisms=PLAIN AMQPLAIN,locales=en_US),null,""}
+[SERVER] conn#4 ch#0 <- {#method<connection.tune>(channel-max=0,frame-max=131072,heartbeat=0),null,""}
+[CLIENT] conn#4 ch#0 -> {#method<connection.tune-ok>(channel-max=0,frame-max=131072,heartbeat=0),null,""}
+[CLIENT] conn#4 ch#0 -> {#method<connection.open>(virtual-host=/,capabilities=,insist=false),null,""}
+[SERVER] conn#4 ch#0 <- {#method<connection.open-ok>(known-hosts=),null,""}

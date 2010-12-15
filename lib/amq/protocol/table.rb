@@ -1,6 +1,6 @@
 # encoding: binary
 
-module AMQP
+module AMQ
   module Protocol
     class Table
       class InvalidTableError < StandardError

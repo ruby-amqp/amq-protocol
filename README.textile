@@ -13,15 +13,20 @@ Check the @examples@ directory for some examples.
 h1. Development
 
 <pre>
-git clone git://github.com/botanicus/amqp-protocol.git
-git submodule init
-git submodule update
+git clone git://github.com/botanicus/amq-protocol.git --recursive
+</pre>
+
+Or, if you are on an older version of Git:
+
+<pre>
+git clone git://github.com/botanicus/amq-protocol.git
+git submodule update --init
 </pre>
 
 If you want to change some code, don't do so in @lib/amqp/protocol.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
 
 h1. Links
 
-* "RDoc.info API Docs":http://rdoc.info/github/botanicus/amqp-protocol/master/frames
-* "Examples":https://github.com/botanicus/amqp-protocol/tree/master/examples/
-* "Bug reporting":http://github.com/botanicus/amqp-protocol/issues
+* "RDoc.info API Docs":http://rdoc.info/github/botanicus/amq-protocol/master/frames
+* "Examples":https://github.com/botanicus/amq-protocol/tree/master/examples/
+* "Bug reporting":http://github.com/botanicus/amq-protocol/issues

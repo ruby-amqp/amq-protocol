@@ -8,7 +8,7 @@
 require_relative "protocol/table.rb"
 require_relative "protocol/frame.rb"
 
-module AMQP
+module AMQ
   module Protocol
     PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}"
     PREAMBLE = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}"
@@ -35,7 +35,10 @@ module AMQP
       end
     end
 
-    class Frame
+    class ConnectionError < Error
+      def initialize(types)
+        super("Must be one of #{types.inspect}")
+      end
     end
 
     # We don't instantiate the following classes,

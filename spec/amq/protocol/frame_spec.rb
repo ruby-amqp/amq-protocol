@@ -5,8 +5,8 @@ require "stringio"
 
 describe AMQP::Protocol::Frame do
   describe ".encode" do
-    it "should raise RuntimeError if type isn't one of: [:method, :header, :body, :heartbeat]" do
-      -> { Frame.encode(nil, 0, "") }.should raise_error(RuntimeError, "Must be one of [:method, :header, :body, :heartbeat]")
+    it "should raise ConnectionError if type isn't one of: [:method, :header, :body, :heartbeat]" do
+      -> { Frame.encode(nil, 0, "") }.should raise_error(ConnectionError, "Must be one of [:method, :header, :body, :heartbeat]")
     end
 
     it "should raise RuntimeError if channel isn't 0 or an integer in range 1..65535" do
