@@ -1,8 +1,8 @@
 # encoding: binary
 
 require "rspec"
-require_relative "../lib/amqp/protocol.rb"
+require_relative "../lib/amq/protocol.rb"
 
 RSpec.configure do |config|
-  config.include AMQP::Protocol
+  config.include AMQ::Protocol
 end

@@ -71,7 +71,7 @@ module AMQ
       def method_class
         klass_id, method_id = self.payload.unpack("n2")
         index = klass_id << 16 | method_id
-        AMQP::Protocol::METHODS[index]
+        AMQ::Protocol::METHODS[index]
       end
 
       def decode_payload

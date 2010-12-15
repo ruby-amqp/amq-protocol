@@ -2,7 +2,7 @@
 # encoding: binary
 
 begin
-  require "amqp/spec"
+  require "amq/spec"
 rescue LoadError
   abort "You have to install the amqp gem in order to run the benchmark against its AMQP encoder/decoder."
 end
@@ -18,7 +18,7 @@ Benchmark.bmbm do |bm|
     # TODO
   end
 
-  bm.report("AMQP Protocol Gem") do
+  bm.report("AMQ Protocol Gem") do
     # TODO
   end
 end

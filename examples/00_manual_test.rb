@@ -1,9 +1,9 @@
 # encoding: binary
 
 require "socket"
-require_relative "../lib/amqp/protocol.rb"
+require_relative "../lib/amq/protocol.rb"
 
-include AMQP::Protocol
+include AMQ::Protocol
 
 socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
 sockaddr = Socket.pack_sockaddr_in((ARGV.first || 5672).to_i, "127.0.0.1") # NOTE: this doesn't work with "localhost", I don't know why.
@@ -34,12 +34,12 @@ def socket.decode
 end
 
 # AMQP preamble
-puts "Sending AMQP preamble (#{AMQP::Protocol::PREAMBLE.inspect})\n\n"
-socket.write AMQP::Protocol::PREAMBLE
+puts "Sending AMQP preamble (#{AMQ::Protocol::PREAMBLE.inspect})\n\n"
+socket.write AMQ::Protocol::PREAMBLE
 
 # Start/Start-Ok
 socket.decode
-socket.encode Connection::StartOk, {client: "AMQP Protocol"}, "PLAIN", "guest\0guest\0", "en_GB"
+socket.encode Connection::StartOk, {client: "AMQ Protocol"}, "PLAIN", "guest\0guest\0", "en_GB"
 
 # Tune/Tune-Ok
 socket.decode

@@ -18,13 +18,13 @@ module AMQ
     EMPTY_STRING = "".freeze
 
     # @version 0.0.1
-    # @return [Array] Collection of subclasses of AMQP::Protocol::Class.
+    # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
       Class.classes
     end
 
     # @version 0.0.1
-    # @return [Array] Collection of subclasses of AMQP::Protocol::Method.
+    # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
       Method.methods
     end
@@ -172,7 +172,7 @@ module AMQ
 
       % if klass.name == "basic" : ## TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
       def self.encode_properties(body_size, properties)
-        pieces = Array.new(14) { AMQP::Protocol::EMPTY_STRING }
+        pieces = Array.new(14) { AMQ::Protocol::EMPTY_STRING }
         flags = 0
 
         properties.each do |key, value|

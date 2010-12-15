@@ -2,38 +2,38 @@
 
 require_relative "../spec_helper.rb"
 
-describe AMQP::Protocol do
+describe AMQ::Protocol do
   it "should have PROTOCOL_VERSION constant" do
-    AMQP::Protocol::PROTOCOL_VERSION.should match(/^\d+\.\d+\.\d$/)
+    AMQ::Protocol::PROTOCOL_VERSION.should match(/^\d+\.\d+\.\d$/)
   end
 
   it "should have DEFAULT_PORT constant" do
-    AMQP::Protocol::DEFAULT_PORT.should be_kind_of(Integer)
+    AMQ::Protocol::DEFAULT_PORT.should be_kind_of(Integer)
   end
 
   it "should have PREAMBLE constant" do
-    AMQP::Protocol::PREAMBLE.should be_kind_of(String)
+    AMQ::Protocol::PREAMBLE.should be_kind_of(String)
   end
 
   describe ".classes" do
     it "should include all the AMQP classes" do
-      AMQP::Protocol.classes.should include(Queue)
+      AMQ::Protocol.classes.should include(Queue)
     end
   end
 
   describe ".methods" do
     it "should include all the AMQP methods" do
-      AMQP::Protocol.methods.should include(Queue::DeclareOk)
+      AMQ::Protocol.methods.should include(Queue::DeclareOk)
     end
   end
 
-  describe AMQP::Protocol::Error do
+  describe AMQ::Protocol::Error do
     it "should be an exception class" do
-      AMQP::Protocol::Error.should < Exception
+      AMQ::Protocol::Error.should < Exception
     end
   end
 
-  describe AMQP::Protocol::Connection do
+  describe AMQ::Protocol::Connection do
     it "should be a subclass of Class" do
       Connection.should < Class
     end
@@ -47,7 +47,7 @@ describe AMQP::Protocol do
       Connection.method.should eql("TODO")
     end
 
-    describe AMQP::Protocol::Connection::Start do
+    describe AMQ::Protocol::Connection::Start do
       it "should be a subclass of Method" do
         Connection::Start.should < Method
       end
@@ -62,7 +62,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::StartOk do
+    describe AMQ::Protocol::Connection::StartOk do
       it "should be a subclass of Method" do
         Connection::StartOk.should < Method
       end
@@ -78,13 +78,13 @@ describe AMQP::Protocol do
 
       describe ".encode" do
         it do
-          result = Connection::StartOk.encode({client: "AMQP Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
-          result.should eql("\x00\n\x00\v\x00\x00\x00\x19\x06clientS\x00\x00\x00\rAMQP Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
+          result = Connection::StartOk.encode({client: "AMQ Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
+          result.should eql("\x00\n\x00\v\x00\x00\x00\x18\x06clientS\x00\x00\x00\fAMQ Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
         end
       end
     end
 
-    describe AMQP::Protocol::Connection::Secure do
+    describe AMQ::Protocol::Connection::Secure do
       it "should be a subclass of Method" do
         Connection::Secure.should < Method
       end
@@ -99,7 +99,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::SecureOk do
+    describe AMQ::Protocol::Connection::SecureOk do
       it "should be a subclass of Method" do
         Connection::SecureOk.should < Method
       end
@@ -114,7 +114,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::Tune do
+    describe AMQ::Protocol::Connection::Tune do
       it "should be a subclass of Method" do
         Connection::Tune.should < Method
       end
@@ -129,7 +129,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::TuneOk do
+    describe AMQ::Protocol::Connection::TuneOk do
       it "should be a subclass of Method" do
         Connection::TuneOk.should < Method
       end
@@ -151,7 +151,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::Open do
+    describe AMQ::Protocol::Connection::Open do
       it "should be a subclass of Method" do
         Connection::Open.should < Method
       end
@@ -166,7 +166,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::OpenOk do
+    describe AMQ::Protocol::Connection::OpenOk do
       it "should be a subclass of Method" do
         Connection::OpenOk.should < Method
       end
@@ -181,7 +181,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::Close do
+    describe AMQ::Protocol::Connection::Close do
       it "should be a subclass of Method" do
         Connection::Close.should < Method
       end
@@ -196,7 +196,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Connection::CloseOk do
+    describe AMQ::Protocol::Connection::CloseOk do
       it "should be a subclass of Method" do
         Connection::CloseOk.should < Method
       end
@@ -212,7 +212,7 @@ describe AMQP::Protocol do
     end
   end
 
-  describe AMQP::Protocol::Channel do
+  describe AMQ::Protocol::Channel do
     it "should be a subclass of Class" do
       Channel.should < Class
     end
@@ -226,7 +226,7 @@ describe AMQP::Protocol do
       Channel.method.should eql("TODO")
     end
 
-    describe AMQP::Protocol::Channel::Open do
+    describe AMQ::Protocol::Channel::Open do
       it "should be a subclass of Method" do
         Channel::Open.should < Method
       end
@@ -241,7 +241,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Channel::OpenOk do
+    describe AMQ::Protocol::Channel::OpenOk do
       it "should be a subclass of Method" do
         Channel::OpenOk.should < Method
       end
@@ -256,7 +256,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Channel::Flow do
+    describe AMQ::Protocol::Channel::Flow do
       it "should be a subclass of Method" do
         Channel::Flow.should < Method
       end
@@ -271,7 +271,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Channel::FlowOk do
+    describe AMQ::Protocol::Channel::FlowOk do
       it "should be a subclass of Method" do
         Channel::FlowOk.should < Method
       end
@@ -286,7 +286,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Channel::Close do
+    describe AMQ::Protocol::Channel::Close do
       it "should be a subclass of Method" do
         Channel::Close.should < Method
       end
@@ -301,7 +301,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Channel::CloseOk do
+    describe AMQ::Protocol::Channel::CloseOk do
       it "should be a subclass of Method" do
         Channel::CloseOk.should < Method
       end
@@ -317,7 +317,7 @@ describe AMQP::Protocol do
     end
   end
 
-  describe AMQP::Protocol::Exchange do
+  describe AMQ::Protocol::Exchange do
     it "should be a subclass of Class" do
       Exchange.should < Class
     end
@@ -331,7 +331,7 @@ describe AMQP::Protocol do
       Exchange.method.should eql("TODO")
     end
 
-    describe AMQP::Protocol::Exchange::Declare do
+    describe AMQ::Protocol::Exchange::Declare do
       it "should be a subclass of Method" do
         Exchange::Declare.should < Method
       end
@@ -346,7 +346,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::DeclareOk do
+    describe AMQ::Protocol::Exchange::DeclareOk do
       it "should be a subclass of Method" do
         Exchange::DeclareOk.should < Method
       end
@@ -361,7 +361,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::Delete do
+    describe AMQ::Protocol::Exchange::Delete do
       it "should be a subclass of Method" do
         Exchange::Delete.should < Method
       end
@@ -376,7 +376,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::DeleteOk do
+    describe AMQ::Protocol::Exchange::DeleteOk do
       it "should be a subclass of Method" do
         Exchange::DeleteOk.should < Method
       end
@@ -391,7 +391,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::Bind do
+    describe AMQ::Protocol::Exchange::Bind do
       it "should be a subclass of Method" do
         Exchange::Bind.should < Method
       end
@@ -406,7 +406,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::BindOk do
+    describe AMQ::Protocol::Exchange::BindOk do
       it "should be a subclass of Method" do
         Exchange::BindOk.should < Method
       end
@@ -421,7 +421,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::Unbind do
+    describe AMQ::Protocol::Exchange::Unbind do
       it "should be a subclass of Method" do
         Exchange::Unbind.should < Method
       end
@@ -436,7 +436,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Exchange::UnbindOk do
+    describe AMQ::Protocol::Exchange::UnbindOk do
       it "should be a subclass of Method" do
         Exchange::UnbindOk.should < Method
       end
@@ -452,7 +452,7 @@ describe AMQP::Protocol do
     end
   end
 
-  describe AMQP::Protocol::Queue do
+  describe AMQ::Protocol::Queue do
     it "should be a subclass of Class" do
       Queue.should < Class
     end
@@ -466,7 +466,7 @@ describe AMQP::Protocol do
       Queue.method.should eql("TODO")
     end
 
-    describe AMQP::Protocol::Queue::Declare do
+    describe AMQ::Protocol::Queue::Declare do
       it "should be a subclass of Method" do
         Queue::Declare.should < Method
       end
@@ -481,7 +481,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::DeclareOk do
+    describe AMQ::Protocol::Queue::DeclareOk do
       it "should be a subclass of Method" do
         Queue::DeclareOk.should < Method
       end
@@ -496,7 +496,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::Bind do
+    describe AMQ::Protocol::Queue::Bind do
       it "should be a subclass of Method" do
         Queue::Bind.should < Method
       end
@@ -511,7 +511,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::BindOk do
+    describe AMQ::Protocol::Queue::BindOk do
       it "should be a subclass of Method" do
         Queue::BindOk.should < Method
       end
@@ -526,7 +526,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::Purge do
+    describe AMQ::Protocol::Queue::Purge do
       it "should be a subclass of Method" do
         Queue::Purge.should < Method
       end
@@ -541,7 +541,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::PurgeOk do
+    describe AMQ::Protocol::Queue::PurgeOk do
       it "should be a subclass of Method" do
         Queue::PurgeOk.should < Method
       end
@@ -556,7 +556,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::Delete do
+    describe AMQ::Protocol::Queue::Delete do
       it "should be a subclass of Method" do
         Queue::Delete.should < Method
       end
@@ -571,7 +571,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::DeleteOk do
+    describe AMQ::Protocol::Queue::DeleteOk do
       it "should be a subclass of Method" do
         Queue::DeleteOk.should < Method
       end
@@ -586,7 +586,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::Unbind do
+    describe AMQ::Protocol::Queue::Unbind do
       it "should be a subclass of Method" do
         Queue::Unbind.should < Method
       end
@@ -601,7 +601,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Queue::UnbindOk do
+    describe AMQ::Protocol::Queue::UnbindOk do
       it "should be a subclass of Method" do
         Queue::UnbindOk.should < Method
       end
@@ -617,7 +617,7 @@ describe AMQP::Protocol do
     end
   end
 
-  describe AMQP::Protocol::Basic do
+  describe AMQ::Protocol::Basic do
     it "should be a subclass of Class" do
       Basic.should < Class
     end
@@ -630,7 +630,7 @@ describe AMQP::Protocol do
       pending
       Basic.method.should eql("TODO")
     end
-    describe AMQP::Protocol::Basic::Qos do
+    describe AMQ::Protocol::Basic::Qos do
       it "should be a subclass of Method" do
         Basic::Qos.should < Method
       end
@@ -645,7 +645,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::QosOk do
+    describe AMQ::Protocol::Basic::QosOk do
       it "should be a subclass of Method" do
         Basic::QosOk.should < Method
       end
@@ -660,7 +660,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Consume do
+    describe AMQ::Protocol::Basic::Consume do
       it "should be a subclass of Method" do
         Basic::Consume.should < Method
       end
@@ -675,7 +675,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::ConsumeOk do
+    describe AMQ::Protocol::Basic::ConsumeOk do
       it "should be a subclass of Method" do
         Basic::ConsumeOk.should < Method
       end
@@ -690,7 +690,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Cancel do
+    describe AMQ::Protocol::Basic::Cancel do
       it "should be a subclass of Method" do
         Basic::Cancel.should < Method
       end
@@ -705,7 +705,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::CancelOk do
+    describe AMQ::Protocol::Basic::CancelOk do
       it "should be a subclass of Method" do
         Basic::CancelOk.should < Method
       end
@@ -720,7 +720,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Publish do
+    describe AMQ::Protocol::Basic::Publish do
       it "should be a subclass of Method" do
         Basic::Publish.should < Method
       end
@@ -735,7 +735,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Return do
+    describe AMQ::Protocol::Basic::Return do
       it "should be a subclass of Method" do
         Basic::Return.should < Method
       end
@@ -750,7 +750,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Deliver do
+    describe AMQ::Protocol::Basic::Deliver do
       it "should be a subclass of Method" do
         Basic::Deliver.should < Method
       end
@@ -765,7 +765,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Get do
+    describe AMQ::Protocol::Basic::Get do
       it "should be a subclass of Method" do
         Basic::Get.should < Method
       end
@@ -780,7 +780,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::GetOk do
+    describe AMQ::Protocol::Basic::GetOk do
       it "should be a subclass of Method" do
         Basic::GetOk.should < Method
       end
@@ -795,7 +795,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::GetEmpty do
+    describe AMQ::Protocol::Basic::GetEmpty do
       it "should be a subclass of Method" do
         Basic::GetEmpty.should < Method
       end
@@ -810,7 +810,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Ack do
+    describe AMQ::Protocol::Basic::Ack do
       it "should be a subclass of Method" do
         Basic::Ack.should < Method
       end
@@ -825,7 +825,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Reject do
+    describe AMQ::Protocol::Basic::Reject do
       it "should be a subclass of Method" do
         Basic::Reject.should < Method
       end
@@ -840,7 +840,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::RecoverAsync do
+    describe AMQ::Protocol::Basic::RecoverAsync do
       it "should be a subclass of Method" do
         Basic::RecoverAsync.should < Method
       end
@@ -855,7 +855,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::Recover do
+    describe AMQ::Protocol::Basic::Recover do
       it "should be a subclass of Method" do
         Basic::Recover.should < Method
       end
@@ -870,7 +870,7 @@ describe AMQP::Protocol do
       end
     end
 
-    describe AMQP::Protocol::Basic::RecoverOk do
+    describe AMQ::Protocol::Basic::RecoverOk do
       it "should be a subclass of Method" do
         Basic::RecoverOk.should < Method
       end

@@ -2,7 +2,7 @@
 
 require_relative "../../spec_helper.rb"
 
-describe AMQP::Protocol::Table do
+describe AMQ::Protocol::Table do
   DATA = {
     Hash.new              => "\x00\x00\x00\x00",
     {"test" => 1}         => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",

@@ -23,7 +23,7 @@ git clone git://github.com/botanicus/amq-protocol.git
 git submodule update --init
 </pre>
 
-If you want to change some code, don't do so in @lib/amqp/protocol.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
+If you want to change some code, don't do so in @lib/amq/protocol.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
 
 h1. Links
 

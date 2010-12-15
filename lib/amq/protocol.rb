@@ -17,13 +17,13 @@ module AMQ
     EMPTY_STRING = "".freeze
 
     # @version 0.0.1
-    # @return [Array] Collection of subclasses of AMQP::Protocol::Class.
+    # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
       Class.classes
     end
 
     # @version 0.0.1
-    # @return [Array] Collection of subclasses of AMQP::Protocol::Method.
+    # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
       Method.methods
     end
@@ -192,7 +192,7 @@ module AMQ
         def self.encode(client_properties, mechanism, response, locale)
           pieces = []
           pieces << [10, 11].pack("n2")
-          pieces << AMQP::Protocol::Table.encode(client_properties)
+          pieces << AMQ::Protocol::Table.encode(client_properties)
           pieces << mechanism.bytesize.chr
           pieces << mechanism
           pieces << [response.bytesize].pack("N")
@@ -585,7 +585,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if auto_delete
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
@@ -661,7 +661,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
@@ -701,7 +701,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
@@ -746,7 +746,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
@@ -797,7 +797,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
@@ -913,7 +913,7 @@ module AMQ
           pieces << exchange
           pieces << routing_key.bytesize.chr
           pieces << routing_key
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
@@ -975,7 +975,7 @@ module AMQ
       # 1 << 13
       def self.encode_headers(value)
         pieces = []
-        pieces << AMQP::Protocol::Table.encode(result)
+        pieces << AMQ::Protocol::Table.encode(result)
         [2, 0x2000, result]
       end
 
@@ -1065,7 +1065,7 @@ module AMQ
       end
 
       def self.encode_properties(body_size, properties)
-        pieces = Array.new(14) { AMQP::Protocol::EMPTY_STRING }
+        pieces = Array.new(14) { AMQ::Protocol::EMPTY_STRING }
         flags = 0
 
         properties.each do |key, value|
@@ -1146,7 +1146,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 1) if no_ack
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
-          pieces << AMQP::Protocol::Table.encode(arguments)
+          pieces << AMQ::Protocol::Table.encode(arguments)
           pieces.join("")
         end
       end
