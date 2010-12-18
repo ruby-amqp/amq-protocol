@@ -2,5 +2,5 @@
 # encoding: utf-8
 
 eval(File.read("amq-protocol.gemspec")).tap do |specification|
-  specification.version = "#{specification.version}.pre"
+  specification.version = "#{Time.now.strftime("%Y.%m.%d")}.pre"
 end
