@@ -7,10 +7,10 @@ Task.new(:generate) do |task|
     if spec.nil?
       spec = "vendor/rabbitmq-codegen/amqp-rabbitmq-0.9.1.json"
       unless File.exist?(spec)
-        sh "git submodule init"
-        sh "git submodule update"
+        sh "git submodule update --init"
       end
     end
+
     %w{client server}.each do |type|
       path = "lib/amq/protocol/#{type}.rb"
       sh "./codegen.py #{type} #{spec} #{path}"
