@@ -40,6 +40,84 @@ module AMQ
       end
     end
 
+    class SoftError < Error
+    end
+
+    class HardError < Error
+    end
+
+    class ContentTooLarge < SoftError
+      VALUE = 311
+    end
+
+    class NoRoute < SoftError
+      VALUE = 312
+    end
+
+    class NoConsumers < SoftError
+      VALUE = 313
+    end
+
+    class AccessRefused < SoftError
+      VALUE = 403
+    end
+
+    class NotFound < SoftError
+      VALUE = 404
+    end
+
+    class ResourceLocked < SoftError
+      VALUE = 405
+    end
+
+    class PreconditionFailed < SoftError
+      VALUE = 406
+    end
+
+    class ConnectionForced < HardError
+      VALUE = 320
+    end
+
+    class InvalidPath < HardError
+      VALUE = 402
+    end
+
+    class FrameError < HardError
+      VALUE = 501
+    end
+
+    class SyntaxError < HardError
+      VALUE = 502
+    end
+
+    class CommandInvalid < HardError
+      VALUE = 503
+    end
+
+    class ChannelError < HardError
+      VALUE = 504
+    end
+
+    class UnexpectedFrame < HardError
+      VALUE = 505
+    end
+
+    class ResourceError < HardError
+      VALUE = 506
+    end
+
+    class NotAllowed < HardError
+      VALUE = 530
+    end
+
+    class NotImplemented < HardError
+      VALUE = 540
+    end
+
+    class InternalError < HardError
+      VALUE = 541
+    end
+
     # We don"t instantiate the following classes,
     # as we don"t actually need any per-instance state.
     # Also, this is pretty low-level functionality,

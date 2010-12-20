@@ -84,6 +84,16 @@ def convert_to_ruby(field):
     else:
         return "%s = %r" % (name, field.defaultvalue)
 
+def to_ruby_name(name):
+    return re.sub("[- ]", "_", name)
+
+def to_ruby_class_name(name):
+    parts = re.split("[- ]", name)
+    ruby_class_name = ""
+    for part in parts:
+        ruby_class_name = ruby_class_name + part[0].upper() + part[1:].lower()
+    return ruby_class_name
+
 def params(self):
     buffer = []
     for f in self.arguments:
