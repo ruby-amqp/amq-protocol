@@ -1,7 +1,7 @@
 # encoding: binary
 
 require "socket"
-require_relative "../lib/amq/protocol.rb"
+require_relative "../lib/amq/protocol/client.rb"
 
 include AMQ::Protocol
 
@@ -53,7 +53,11 @@ begin
   puts "Max agreed frame size: #{frame_max}"
 
   # Connection.Open/Connection.Open-Ok
-  socket.encode Connection::Open, "/", "", false
+  socket.encode Connection::Open, "/", "0", false
+  # TODO: capabilities & insist MUST be zero,
+  # we need to adjust the JSON file for 0.9.1,
+  # basically we want to hide them in the clients
+  # as they can't be set to any other value.
   connection_open_ok_response = socket.decode
 
   # Channel.Start/Channel.Start-Ok

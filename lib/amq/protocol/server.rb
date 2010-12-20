@@ -4,8 +4,8 @@
 # IT DIRECTLY ! FOR CHANGES, PLEASE UPDATE CODEGEN.PY
 # IN THE ROOT DIRECTORY OF THE AMQP-PROTOCOL REPOSITORY.
 
-require_relative "protocol/table.rb"
-require_relative "protocol/frame.rb"
+require_relative "table.rb"
+require_relative "frame.rb"
 
 module AMQ
   module Protocol
@@ -130,9 +130,8 @@ module AMQ
       VALUE = 541
     end
 
-
-    # We don't instantiate the following classes,
-    # as we don't actually need any per-instance state.
+    # We don"t instantiate the following classes,
+    # as we don"t actually need any per-instance state.
     # Also, this is pretty low-level functionality,
     # hence it should have a reasonable performance.
     # As everyone knows, garbage collector in MRI performs
@@ -140,10 +139,10 @@ module AMQ
     # not creating any objects, but only use class as
     # a struct. Creating classes is quite expensive though,
     # but here the inheritance comes handy and mainly
-    # as we can't simply make a reference to a function,
-    # we can't use a hash or an object. I've been also
+    # as we can"t simply make a reference to a function,
+    # we can"t use a hash or an object. I"ve been also
     # considering to have just a bunch of methods, but
-    # here's the problem, that after we'd require this file,
+    # here"s the problem, that after we"d require this file,
     # all these methods would become global which would
     # be a bad, bad thing to do.
     class Class
@@ -207,7 +206,7 @@ module AMQ
 
       def self.encode_body(body, frame_size)
         # Spec is broken: Our errata says that it does define
-        # something, but it just doesn't relate do method and
+        # something, but it just doesn"t relate do method and
         # properties frames. Which makes it, well, suboptimal.
         # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
         limit = frame_size - 7 - 1
@@ -239,30 +238,26 @@ module AMQ
       @name = "connection"
       @method = 10
 
-
-
       class Start < Method
         @name = "connection.start"
         @method = 10
         @index = 0x000A000A # 10, 10, 655370
 
-
         # @return
-        # ['version_major = false', 'version_minor = 9', 'server properties = nil', "mechanisms = 'PLAIN'", "locales = 'en_US'"]
+        # ["version_major = false", "version_minor = 9", "server properties = nil", "mechanisms = "PLAIN"", "locales = "en_US""]
         def self.encode(version_major, version_minor, server_properties, mechanisms, locales)
           pieces = []
           pieces << [10, 10].pack("n2")
-          pieces << [version_major].pack('B')
-          pieces << [version_minor].pack('B')
+          pieces << [version_major].pack("B")
+          pieces << [version_minor].pack("B")
           pieces << AMQ::Protocol::Table.encode(server_properties)
-          pieces << [mechanisms.bytesize].pack('N')
+          pieces << [mechanisms.bytesize].pack("N")
           pieces << mechanisms
-          pieces << [locales.bytesize].pack('N')
+          pieces << [locales.bytesize].pack("N")
           pieces << locales
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class StartOk < Method
@@ -275,15 +270,15 @@ module AMQ
           offset = 0
           table_length = Table.length(data[offset..(offset + 4)])
           client_properties = Table.decode(data[offset..table_length])
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           mechanism = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 4)].unpack('N').first
+          length = data[offset..(offset + 4)].unpack("N").first
           offset += 4
           response = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           locale = data[offset..(offset + length)]
           offset += length
@@ -297,8 +292,6 @@ module AMQ
           @response = response
           @locale = locale
         end
-
-
       end
 
       class Secure < Method
@@ -306,18 +299,16 @@ module AMQ
         @method = 20
         @index = 0x000A0014 # 10, 20, 655380
 
-
         # @return
-        # ['challenge = nil']
+        # ["challenge = nil"]
         def self.encode(challenge)
           pieces = []
           pieces << [10, 20].pack("n2")
-          pieces << [challenge.bytesize].pack('N')
+          pieces << [challenge.bytesize].pack("N")
           pieces << challenge
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class SecureOk < Method
@@ -328,7 +319,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 4)].unpack('N').first
+          length = data[offset..(offset + 4)].unpack("N").first
           offset += 4
           response = data[offset..(offset + length)]
           offset += length
@@ -339,8 +330,6 @@ module AMQ
         def initialize(response)
           @response = response
         end
-
-
       end
 
       class Tune < Method
@@ -348,19 +337,17 @@ module AMQ
         @method = 30
         @index = 0x000A001E # 10, 30, 655390
 
-
         # @return
-        # ['channel_max = false', 'frame_max = false', 'heartbeat = false']
+        # ["channel_max = false", "frame_max = false", "heartbeat = false"]
         def self.encode(channel_max, frame_max, heartbeat)
           pieces = []
           pieces << [10, 30].pack("n2")
-          pieces << [channel_max].pack('n')
-          pieces << [frame_max].pack('N')
-          pieces << [heartbeat].pack('n')
+          pieces << [channel_max].pack("n")
+          pieces << [frame_max].pack("N")
+          pieces << [heartbeat].pack("n")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class TuneOk < Method
@@ -371,11 +358,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          channel_max = data[offset..(offset + 2)].unpack('n').first
+          channel_max = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          frame_max = data[offset..(offset + 4)].unpack('N').first
+          frame_max = data[offset..(offset + 4)].unpack("N").first
           offset += 4
-          heartbeat = data[offset..(offset + 2)].unpack('n').first
+          heartbeat = data[offset..(offset + 2)].unpack("n").first
           offset += 2
           self.new(channel_max, frame_max, heartbeat)
         end
@@ -386,8 +373,6 @@ module AMQ
           @frame_max = frame_max
           @heartbeat = heartbeat
         end
-
-
       end
 
       class Open < Method
@@ -398,15 +383,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           virtual_host = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           capabilities = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           insist = (bit_buffer & (1 << 0)) != 0
           self.new(virtual_host, capabilities, insist)
@@ -418,8 +403,6 @@ module AMQ
           @capabilities = capabilities
           @insist = insist
         end
-
-
       end
 
       class OpenOk < Method
@@ -427,9 +410,8 @@ module AMQ
         @method = 41
         @index = 0x000A0029 # 10, 41, 655401
 
-
         # @return
-        # ["known_hosts = ''"]
+        # ["known_hosts = """]
         def self.encode(known_hosts)
           pieces = []
           pieces << [10, 41].pack("n2")
@@ -438,7 +420,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Close < Method
@@ -449,15 +430,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset..(offset + 2)].unpack('n').first
+          reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
-          class_id = data[offset..(offset + 2)].unpack('n').first
+          class_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          method_id = data[offset..(offset + 2)].unpack('n').first
+          method_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
           self.new(reply_code, reply_text, class_id, method_id)
         end
@@ -471,19 +452,18 @@ module AMQ
         end
 
         # @return
-        # ['reply_code = nil', "reply_text = ''", 'class_id = nil', 'method_id = nil']
+        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [10, 50].pack("n2")
-          pieces << [reply_code].pack('n')
+          pieces << [reply_code].pack("n")
           pieces << reply_text.bytesize.chr
           pieces << reply_text
-          pieces << [class_id].pack('n')
-          pieces << [method_id].pack('n')
+          pieces << [class_id].pack("n")
+          pieces << [method_id].pack("n")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class CloseOk < Method
@@ -508,16 +488,12 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
-
     end
 
     class Channel < Class
       @name = "channel"
       @method = 20
-
-
 
       class Open < Method
         @name = "channel.open"
@@ -527,7 +503,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           out_of_band = data[offset..(offset + length)]
           offset += length
@@ -538,8 +514,6 @@ module AMQ
         def initialize(out_of_band)
           @out_of_band = out_of_band
         end
-
-
       end
 
       class OpenOk < Method
@@ -547,18 +521,16 @@ module AMQ
         @method = 11
         @index = 0x0014000B # 20, 11, 1310731
 
-
         # @return
-        # ["channel_id = ''"]
+        # ["channel_id = """]
         def self.encode(channel_id)
           pieces = []
           pieces << [20, 11].pack("n2")
-          pieces << [channel_id.bytesize].pack('N')
+          pieces << [channel_id.bytesize].pack("N")
           pieces << channel_id
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Flow < Method
@@ -569,7 +541,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
           self.new(active)
@@ -581,17 +553,16 @@ module AMQ
         end
 
         # @return
-        # ['active = nil']
+        # ["active = nil"]
         def self.encode(active)
           pieces = []
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack('c')
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class FlowOk < Method
@@ -602,7 +573,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
           self.new(active)
@@ -614,17 +585,16 @@ module AMQ
         end
 
         # @return
-        # ['active = nil']
+        # ["active = nil"]
         def self.encode(active)
           pieces = []
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack('c')
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Close < Method
@@ -635,15 +605,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset..(offset + 2)].unpack('n').first
+          reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
-          class_id = data[offset..(offset + 2)].unpack('n').first
+          class_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          method_id = data[offset..(offset + 2)].unpack('n').first
+          method_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
           self.new(reply_code, reply_text, class_id, method_id)
         end
@@ -657,19 +627,18 @@ module AMQ
         end
 
         # @return
-        # ['reply_code = nil', "reply_text = ''", 'class_id = nil', 'method_id = nil']
+        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [20, 40].pack("n2")
-          pieces << [reply_code].pack('n')
+          pieces << [reply_code].pack("n")
           pieces << reply_text.bytesize.chr
           pieces << reply_text
-          pieces << [class_id].pack('n')
-          pieces << [method_id].pack('n')
+          pieces << [class_id].pack("n")
+          pieces << [method_id].pack("n")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class CloseOk < Method
@@ -694,16 +663,12 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
-
     end
 
     class Exchange < Class
       @name = "exchange"
       @method = 40
-
-
 
       class Declare < Method
         @name = "exchange.declare"
@@ -713,17 +678,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           type = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           passive = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -743,15 +708,12 @@ module AMQ
           @nowait = nowait
           @arguments = arguments
         end
-
-
       end
 
       class DeclareOk < Method
         @name = "exchange.declare-ok"
         @method = 11
         @index = 0x0028000B # 40, 11, 2621451
-
 
         # @return
         # []
@@ -761,7 +723,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Delete < Method
@@ -772,13 +733,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           if_unused = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, exchange, if_unused, nowait)
@@ -791,15 +752,12 @@ module AMQ
           @if_unused = if_unused
           @nowait = nowait
         end
-
-
       end
 
       class DeleteOk < Method
         @name = "exchange.delete-ok"
         @method = 21
         @index = 0x00280015 # 40, 21, 2621461
-
 
         # @return
         # []
@@ -809,7 +767,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Bind < Method
@@ -820,21 +777,21 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           destination = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           source = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -851,15 +808,12 @@ module AMQ
           @nowait = nowait
           @arguments = arguments
         end
-
-
       end
 
       class BindOk < Method
         @name = "exchange.bind-ok"
         @method = 31
         @index = 0x0028001F # 40, 31, 2621471
-
 
         # @return
         # []
@@ -869,7 +823,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Unbind < Method
@@ -880,21 +833,21 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           destination = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           source = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -911,15 +864,12 @@ module AMQ
           @nowait = nowait
           @arguments = arguments
         end
-
-
       end
 
       class UnbindOk < Method
         @name = "exchange.unbind-ok"
         @method = 51
         @index = 0x00280033 # 40, 51, 2621491
-
 
         # @return
         # []
@@ -929,16 +879,12 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
-
     end
 
     class Queue < Class
       @name = "queue"
       @method = 50
-
-
 
       class Declare < Method
         @name = "queue.declare"
@@ -948,13 +894,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           passive = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -973,8 +919,6 @@ module AMQ
           @nowait = nowait
           @arguments = arguments
         end
-
-
       end
 
       class DeclareOk < Method
@@ -982,20 +926,18 @@ module AMQ
         @method = 11
         @index = 0x0032000B # 50, 11, 3276811
 
-
         # @return
-        # ['queue = nil', 'message_count = nil', 'consumer_count = nil']
+        # ["queue = nil", "message_count = nil", "consumer_count = nil"]
         def self.encode(queue, message_count, consumer_count)
           pieces = []
           pieces << [50, 11].pack("n2")
           pieces << queue.bytesize.chr
           pieces << queue
-          pieces << [message_count].pack('N')
-          pieces << [consumer_count].pack('N')
+          pieces << [message_count].pack("N")
+          pieces << [consumer_count].pack("N")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Bind < Method
@@ -1006,21 +948,21 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -1037,15 +979,12 @@ module AMQ
           @nowait = nowait
           @arguments = arguments
         end
-
-
       end
 
       class BindOk < Method
         @name = "queue.bind-ok"
         @method = 21
         @index = 0x00320015 # 50, 21, 3276821
-
 
         # @return
         # []
@@ -1055,7 +994,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Purge < Method
@@ -1066,13 +1004,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, queue, nowait)
@@ -1084,8 +1022,6 @@ module AMQ
           @queue = queue
           @nowait = nowait
         end
-
-
       end
 
       class PurgeOk < Method
@@ -1093,17 +1029,15 @@ module AMQ
         @method = 31
         @index = 0x0032001F # 50, 31, 3276831
 
-
         # @return
-        # ['message_count = nil']
+        # ["message_count = nil"]
         def self.encode(message_count)
           pieces = []
           pieces << [50, 31].pack("n2")
-          pieces << [message_count].pack('N')
+          pieces << [message_count].pack("N")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Delete < Method
@@ -1114,13 +1048,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           if_unused = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, queue, if_unused, if_empty, nowait)
@@ -1134,8 +1068,6 @@ module AMQ
           @if_empty = if_empty
           @nowait = nowait
         end
-
-
       end
 
       class DeleteOk < Method
@@ -1143,17 +1075,15 @@ module AMQ
         @method = 41
         @index = 0x00320029 # 50, 41, 3276841
 
-
         # @return
-        # ['message_count = nil']
+        # ["message_count = nil"]
         def self.encode(message_count)
           pieces = []
           pieces << [50, 41].pack("n2")
-          pieces << [message_count].pack('N')
+          pieces << [message_count].pack("N")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Unbind < Method
@@ -1164,17 +1094,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1191,15 +1121,12 @@ module AMQ
           @routing_key = routing_key
           @arguments = arguments
         end
-
-
       end
 
       class UnbindOk < Method
         @name = "queue.unbind-ok"
         @method = 51
         @index = 0x00320033 # 50, 51, 3276851
-
 
         # @return
         # []
@@ -1209,9 +1136,7 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
-
     end
 
     class Basic < Class
@@ -1261,14 +1186,14 @@ module AMQ
       # 1 << 12
       def self.encode_delivery_mode(value)
         pieces = []
-        pieces << [result].pack('B')
+        pieces << [result].pack("B")
         [3, 0x1000, result]
       end
 
       # 1 << 11
       def self.encode_priority(value)
         pieces = []
-        pieces << [result].pack('B')
+        pieces << [result].pack("B")
         [4, 0x0800, result]
       end
 
@@ -1307,7 +1232,7 @@ module AMQ
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
-        pieces << [result].pack('>Q')
+        pieces << [result].pack(">Q")
         [9, 0x0040, result]
       end
 
@@ -1343,8 +1268,6 @@ module AMQ
         [13, 0x0004, result]
       end
 
-
-
       def self.encode_properties(body_size, properties)
         pieces = Array.new(14) { AMQ::Protocol::EMPTY_STRING }
         flags = 0
@@ -1362,14 +1285,14 @@ module AMQ
       #def self.decode_properties
       #  print "def %s(data, offset):" % (c.decode,)
       #  print "    props = {}"
-      #  print "    flags, = struct.unpack_from('!H', data, offset)"
+      #  print "    flags, = struct.unpack_from("!H", data, offset)"
       #  print "    offset += 2"
       #  print "    assert (flags & 0x01) == 0"
       #  for i, f in enumerate(c.fields):
       #      print "    if (flags & 0x%04x): # 1 << %i" % (1 << (15-i), 15-i)
       #      fields = codegen_helpers.UnpackWrapper()
       #      fields.add(f.n, f.t)
-      #      fields.do_print(" "*8, "props['%s']")
+      #      fields.do_print(" "*8, "props["%s"]")
       #  print "    return props, offset"
       #end
 
@@ -1381,11 +1304,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          prefetch_size = data[offset..(offset + 4)].unpack('N').first
+          prefetch_size = data[offset..(offset + 4)].unpack("N").first
           offset += 4
-          prefetch_count = data[offset..(offset + 2)].unpack('n').first
+          prefetch_count = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           global = (bit_buffer & (1 << 0)) != 0
           self.new(prefetch_size, prefetch_count, global)
@@ -1397,15 +1320,12 @@ module AMQ
           @prefetch_count = prefetch_count
           @global = global
         end
-
-
       end
 
       class QosOk < Method
         @name = "basic.qos-ok"
         @method = 11
         @index = 0x003C000B # 60, 11, 3932171
-
 
         # @return
         # []
@@ -1415,7 +1335,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Consume < Method
@@ -1426,17 +1345,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           no_local = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -1455,8 +1374,6 @@ module AMQ
           @nowait = nowait
           @arguments = arguments
         end
-
-
       end
 
       class ConsumeOk < Method
@@ -1464,9 +1381,8 @@ module AMQ
         @method = 21
         @index = 0x003C0015 # 60, 21, 3932181
 
-
         # @return
-        # ['consumer_tag = nil']
+        # ["consumer_tag = nil"]
         def self.encode(consumer_tag)
           pieces = []
           pieces << [60, 21].pack("n2")
@@ -1475,7 +1391,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Cancel < Method
@@ -1486,11 +1401,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           self.new(consumer_tag, nowait)
@@ -1501,8 +1416,6 @@ module AMQ
           @consumer_tag = consumer_tag
           @nowait = nowait
         end
-
-
       end
 
       class CancelOk < Method
@@ -1510,9 +1423,8 @@ module AMQ
         @method = 31
         @index = 0x003C001F # 60, 31, 3932191
 
-
         # @return
-        # ['consumer_tag = nil']
+        # ["consumer_tag = nil"]
         def self.encode(consumer_tag)
           pieces = []
           pieces << [60, 31].pack("n2")
@@ -1521,7 +1433,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Publish < Method
@@ -1532,17 +1443,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           mandatory = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, exchange, routing_key, mandatory, immediate)
@@ -1556,8 +1467,6 @@ module AMQ
           @mandatory = mandatory
           @immediate = immediate
         end
-
-
       end
 
       class Return < Method
@@ -1565,13 +1474,12 @@ module AMQ
         @method = 50
         @index = 0x003C0032 # 60, 50, 3932210
 
-
         # @return
-        # ['reply_code = nil', "reply_text = ''", 'exchange = nil', 'routing_key = nil', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
+        # ["reply_code = nil", "reply_text = """, "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(reply_code, reply_text, exchange, routing_key)
           pieces = []
           pieces << [60, 50].pack("n2")
-          pieces << [reply_code].pack('n')
+          pieces << [reply_code].pack("n")
           pieces << reply_text.bytesize.chr
           pieces << reply_text
           pieces << exchange.bytesize.chr
@@ -1584,7 +1492,6 @@ module AMQ
           frames << HeadersFrame.new(user_headers)
           return frames
         end
-
       end
 
       class Deliver < Method
@@ -1592,18 +1499,17 @@ module AMQ
         @method = 60
         @index = 0x003C003C # 60, 60, 3932220
 
-
         # @return
-        # ['consumer_tag = nil', 'delivery_tag = nil', 'redelivered = false', 'exchange = nil', 'routing_key = nil', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
+        # ["consumer_tag = nil", "delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(consumer_tag, delivery_tag, redelivered, exchange, routing_key)
           pieces = []
           pieces << [60, 60].pack("n2")
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
-          pieces << [delivery_tag].pack('>Q')
+          pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack('c')
+          pieces << [bit_buffer].pack("c")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
@@ -1614,7 +1520,6 @@ module AMQ
           frames << HeadersFrame.new(user_headers)
           return frames
         end
-
       end
 
       class Get < Method
@@ -1625,13 +1530,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack('n').first
+          ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack('N')[0]
+          length = data[offset..(offset + 1)].unpack("N")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           no_ack = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, queue, no_ack)
@@ -1643,8 +1548,6 @@ module AMQ
           @queue = queue
           @no_ack = no_ack
         end
-
-
       end
 
       class GetOk < Method
@@ -1652,28 +1555,26 @@ module AMQ
         @method = 71
         @index = 0x003C0047 # 60, 71, 3932231
 
-
         # @return
-        # ['delivery_tag = nil', 'redelivered = false', 'exchange = nil', 'routing_key = nil', 'message_count = nil', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
+        # ["delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(delivery_tag, redelivered, exchange, routing_key, message_count)
           pieces = []
           pieces << [60, 71].pack("n2")
-          pieces << [delivery_tag].pack('>Q')
+          pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack('c')
+          pieces << [bit_buffer].pack("c")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
           pieces << routing_key
-          pieces << [message_count].pack('N')
+          pieces << [message_count].pack("N")
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
           frames.push(*self.encode_body(payload))
           frames << HeadersFrame.new(user_headers)
           return frames
         end
-
       end
 
       class GetEmpty < Method
@@ -1681,9 +1582,8 @@ module AMQ
         @method = 72
         @index = 0x003C0048 # 60, 72, 3932232
 
-
         # @return
-        # ["cluster_id = ''"]
+        # ["cluster_id = """]
         def self.encode(cluster_id)
           pieces = []
           pieces << [60, 72].pack("n2")
@@ -1692,7 +1592,6 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
 
       class Ack < Method
@@ -1703,9 +1602,9 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = data[offset..(offset + 8)].unpack('N2').first
+          delivery_tag = data[offset..(offset + 8)].unpack("N2").first
           offset += 8
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           multiple = (bit_buffer & (1 << 0)) != 0
           self.new(delivery_tag, multiple)
@@ -1716,8 +1615,6 @@ module AMQ
           @delivery_tag = delivery_tag
           @multiple = multiple
         end
-
-
       end
 
       class Reject < Method
@@ -1728,9 +1625,9 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = data[offset..(offset + 8)].unpack('N2').first
+          delivery_tag = data[offset..(offset + 8)].unpack("N2").first
           offset += 8
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           requeue = (bit_buffer & (1 << 0)) != 0
           self.new(delivery_tag, requeue)
@@ -1741,8 +1638,6 @@ module AMQ
           @delivery_tag = delivery_tag
           @requeue = requeue
         end
-
-
       end
 
       class RecoverAsync < Method
@@ -1753,7 +1648,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           requeue = (bit_buffer & (1 << 0)) != 0
           self.new(requeue)
@@ -1763,8 +1658,6 @@ module AMQ
         def initialize(requeue)
           @requeue = requeue
         end
-
-
       end
 
       class Recover < Method
@@ -1775,7 +1668,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack('c').first
+          bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           requeue = (bit_buffer & (1 << 0)) != 0
           self.new(requeue)
@@ -1785,15 +1678,12 @@ module AMQ
         def initialize(requeue)
           @requeue = requeue
         end
-
-
       end
 
       class RecoverOk < Method
         @name = "basic.recover-ok"
         @method = 111
         @index = 0x003C006F # 60, 111, 3932271
-
 
         # @return
         # []
@@ -1803,11 +1693,8 @@ module AMQ
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
-
       end
-
     end
-
 
     METHODS = begin
       Method.methods.inject(Hash.new) do |hash, klass|
@@ -1816,4 +1703,3 @@ module AMQ
     end
   end
 end
-

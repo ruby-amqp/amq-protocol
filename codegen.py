@@ -30,10 +30,10 @@ class AmqpSpecObject(AmqpSpec):
         def extend_field(field):
             field.ruby_name = re.sub("[- ]", "_", field.name)
             field.type = self.resolveDomain(field.domain)
-            field.banned = bool(field.name in self.__class__.IGNORED_FIELDS)
+            field.ignored = bool(field.name in self.__class__.IGNORED_FIELDS) # I. e. deprecated
 
         for klass in self.classes:
-            klass.banned = bool(klass.name in self.__class__.IGNORED_CLASSES)
+            klass.ignored = bool(klass.name in self.__class__.IGNORED_CLASSES)
 
             for field in klass.fields:
                 extend_field(field)
@@ -42,7 +42,7 @@ class AmqpSpecObject(AmqpSpec):
                 for field in method.arguments:
                     extend_field(field)
 
-        self.classes = filter(lambda klass: not klass.banned, self.classes)
+        self.classes = filter(lambda klass: not klass.ignored, self.classes)
 
 # I know, I'm a bad, bad boy, but come on guys,
 # monkey-patching is just handy for this case.
@@ -84,6 +84,12 @@ def convert_to_ruby(field):
     else:
         return "%s = %r" % (name, field.defaultvalue)
 
+def not_ignored_args(self):
+    return map(lambda argument: argument.ruby_name, filter(lambda argument: not argument.ignored, self.arguments))
+
+AmqpMethod.not_ignored_args = not_ignored_args
+
+# helpers
 def to_ruby_name(name):
     return re.sub("[- ]", "_", name)
 
@@ -123,9 +129,13 @@ def render(path, **context):
     template = Template(file.read())
     return template.render(**context)
 
-def main(json_spec_path):
-    spec = AmqpSpecObject(json_spec_path)
-    print render("protocol.rb.pytemplate", spec = spec)
+def generateMain(type):
+    def main(json_spec_path):
+        spec = AmqpSpecObject(json_spec_path)
+        spec.type = type
+        print render("protocol.rb.pytemplate", spec = spec)
+
+    return main
 
 if __name__ == "__main__":
-    do_main_dict({"spec": main})
+    do_main_dict({"client": generateMain("client"), "server": generateMain("server")})

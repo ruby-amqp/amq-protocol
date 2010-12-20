@@ -5,7 +5,7 @@ This is an AMQP parser for AMQP 0.9.1. It isn't an AMQP client, just the parser,
 h1. Usage
 
 <pre>
-gem install amqp-parser
+gem install amq-protocol
 </pre>
 
 Check the @examples@ directory for some examples.
@@ -36,7 +36,7 @@ git clone git://github.com/botanicus/amq-protocol.git
 git submodule update --init
 </pre>
 
-If you want to change some code, don't do so in @lib/amq/protocol.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
+If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
 
 h1. Links
 

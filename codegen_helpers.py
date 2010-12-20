@@ -28,7 +28,14 @@ def genSingleEncode(spec, cValue, unresolved_domain):
 
     return buffer
 
-def genSingleDecode(spec, cLvalue, unresolved_domain):
+def genSingleDecode(spec, field):
+    cLvalue = field.ruby_name
+    unresolved_domain = field.domain
+
+    if cLvalue == "known_hosts":
+        import sys
+        print >> sys.stderr, field, field.ignored
+
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
@@ -69,7 +76,7 @@ def genSingleDecode(spec, cLvalue, unresolved_domain):
 def genEncodeMethodDefinition(spec, m):
     def finishBits():
         if bit_index is not None:
-            return "pieces << [bit_buffer].pack('B')"
+            buffer.append("pieces << [bit_buffer].pack('c')")
 
     bit_index = None
     buffer = []
@@ -106,8 +113,9 @@ def genDecodeMethodDefinition(spec, m):
                 buffer.append("bit_buffer = data[offset..(offset + 1)].unpack('c').first")
                 buffer.append("offset += 1")
                 buffer.append("%s = (bit_buffer & (1 << %d)) != 0" % (f.ruby_name, bitindex))
+                #### TODO: ADD bitindex TO THE buffer
             bitindex = bitindex + 1
         else:
             bitindex = None
-            buffer += genSingleDecode(spec, f.ruby_name, f.domain)
+            buffer += genSingleDecode(spec, f)
     return buffer

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 Task.new(:generate) do |task|
-  task.description = "Generate lib/amq/protocol.rb"
+  task.description = "Generate lib/amq/protocol/client.rb"
   task.define do |opts, spec = nil|
     if spec.nil?
       spec = "vendor/rabbitmq-codegen/amqp-rabbitmq-0.9.1.json"
@@ -11,11 +11,13 @@ Task.new(:generate) do |task|
         sh "git submodule update"
       end
     end
-    output = "lib/amq/protocol.rb"
-    sh "./codegen.py spec #{spec} #{output}"
-    if File.file?(output)
-      sh "./post-processing.rb #{output}"
-      sh "ruby -c #{output}"
+    %w{client server}.each do |type|
+      path = "lib/amq/protocol/#{type}.rb"
+      sh "./codegen.py #{type} #{spec} #{path}"
+      if File.file?(path)
+        sh "./post-processing.rb #{path}"
+        sh "ruby -c #{path}"
+      end
     end
   end
 end

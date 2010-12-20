@@ -5,8 +5,8 @@
 # IT DIRECTLY ! FOR CHANGES, PLEASE UPDATE CODEGEN.PY
 # IN THE ROOT DIRECTORY OF THE AMQP-PROTOCOL REPOSITORY.<% import codegen_helpers as helpers %><% import re, codegen %>
 
-require_relative "protocol/table.rb"
-require_relative "protocol/frame.rb"
+require_relative "table.rb"
+require_relative "frame.rb"
 
 module AMQ
   module Protocol
@@ -44,6 +44,12 @@ module AMQ
     class EmptyResponseError < Error
       def initialize(message = "Empty response received from the server.")
         super(message)
+      end
+    end
+
+    class BadResponseError < Error
+      def initialize(argument, expected, actual)
+        super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
       end
     end
 
@@ -228,7 +234,7 @@ module AMQ
         @method = ${method.index}
         @index = ${method.binary()}
 
-        % if method.accepted_by("client") :
+        % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server")):
         # @return
         def self.decode(data)
           offset = 0
@@ -248,10 +254,10 @@ module AMQ
         end
         % endif
 
-        % if method.accepted_by("server"):
+        % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")):
         # @return
         # ${method.params()}
-        def self.encode(${(", ").join(method.args())})
+        def self.encode(${(", ").join(method.not_ignored_args())})
           pieces = []
           pieces << [${klass.index}, ${method.index}].pack("n2")
           % for line in helpers.genEncodeMethodDefinition(spec, method):

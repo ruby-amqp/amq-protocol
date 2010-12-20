@@ -69,8 +69,6 @@ module AMQ
       end
     end
 
-    # Example:
-    # MethodFrame.encode(:method, 0, Connection::TuneOk.encode(0, 131072, 0))
     class MethodFrame < FrameSubclass
       @id = 1
 
