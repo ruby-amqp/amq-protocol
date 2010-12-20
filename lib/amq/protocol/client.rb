@@ -279,7 +279,7 @@ module AMQ
         @index = 0x000A000B # 10, 11, 655371
 
         # @return
-        # ["client_properties = nil", "mechanism = "PLAIN"", "response = nil", "locale = "en_US""]
+        # ["client_properties = 0", "mechanism = "PLAIN"", "response = 0", "locale = "en_US""]
         def self.encode(client_properties, mechanism, response, locale)
           pieces = []
           pieces << [10, 11].pack("n2")
@@ -322,7 +322,7 @@ module AMQ
         @index = 0x000A0015 # 10, 21, 655381
 
         # @return
-        # ["response = nil"]
+        # ["response = 0"]
         def self.encode(response)
           pieces = []
           pieces << [10, 21].pack("n2")
@@ -364,7 +364,7 @@ module AMQ
         @index = 0x000A001F # 10, 31, 655391
 
         # @return
-        # ["channel_max = false", "frame_max = false", "heartbeat = false"]
+        # ["channel_max = 0", "frame_max = 0", "heartbeat = 0"]
         def self.encode(channel_max, frame_max, heartbeat)
           pieces = []
           pieces << [10, 31].pack("n2")
@@ -382,10 +382,10 @@ module AMQ
         @index = 0x000A0028 # 10, 40, 655400
 
         # @return
-        # ["virtual_host = "/"", "capabilities = """, "insist = false"]
+        # ["virtual_host = "/"", "capabilities = """, "insist = 0"]
         def self.encode(virtual_host)
           capabilities = ""
-          insist = false
+          insist = 0
           pieces = []
           pieces << [10, 40].pack("n2")
           pieces << virtual_host.bytesize.chr
@@ -394,7 +394,7 @@ module AMQ
           pieces << capabilities
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if insist
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -451,7 +451,7 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        # ["reply_code = 0", "reply_text = """, "class_id = 0", "method_id = 0"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [10, 50].pack("n2")
@@ -552,13 +552,13 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # ["active = 0"]
         def self.encode(active)
           pieces = []
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -584,13 +584,13 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # ["active = 0"]
         def self.encode(active)
           pieces = []
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -626,7 +626,7 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        # ["reply_code = 0", "reply_text = """, "class_id = 0", "method_id = 0"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [20, 40].pack("n2")
@@ -675,10 +675,10 @@ module AMQ
         @index = 0x0028000A # 40, 10, 2621450
 
         # @return
-        # ["ticket = false", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "exchange = 0", "type = "direct"", "passive = 0", "durable = 0", "auto_delete = 0", "internal = 0", "nowait = 0", "arguments = {}"]
         def self.encode(exchange, type, passive, durable, auto_delete, internal, arguments)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [40, 10].pack("n2")
           pieces << [ticket].pack("n")
@@ -692,7 +692,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if auto_delete
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -720,10 +720,10 @@ module AMQ
         @index = 0x00280014 # 40, 20, 2621460
 
         # @return
-        # ["ticket = false", "exchange = nil", "if_unused = false", "nowait = false"]
+        # ["ticket = 0", "exchange = 0", "if_unused = 0", "nowait = 0"]
         def self.encode(exchange, if_unused)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [40, 20].pack("n2")
           pieces << [ticket].pack("n")
@@ -732,7 +732,7 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -759,10 +759,10 @@ module AMQ
         @index = 0x0028001E # 40, 30, 2621470
 
         # @return
-        # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "destination = 0", "source = 0", "routing_key = """, "nowait = 0", "arguments = {}"]
         def self.encode(destination, source, routing_key, arguments)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [40, 30].pack("n2")
           pieces << [ticket].pack("n")
@@ -774,7 +774,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -802,10 +802,10 @@ module AMQ
         @index = 0x00280028 # 40, 40, 2621480
 
         # @return
-        # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "destination = 0", "source = 0", "routing_key = """, "nowait = 0", "arguments = {}"]
         def self.encode(destination, source, routing_key, arguments)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [40, 40].pack("n2")
           pieces << [ticket].pack("n")
@@ -817,7 +817,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -850,10 +850,10 @@ module AMQ
         @index = 0x0032000A # 50, 10, 3276810
 
         # @return
-        # ["ticket = false", "queue = """, "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "queue = """, "passive = 0", "durable = 0", "exclusive = 0", "auto_delete = 0", "nowait = 0", "arguments = {}"]
         def self.encode(queue, passive, durable, exclusive, auto_delete, arguments)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [50, 10].pack("n2")
           pieces << [ticket].pack("n")
@@ -865,7 +865,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -905,10 +905,10 @@ module AMQ
         @index = 0x00320014 # 50, 20, 3276820
 
         # @return
-        # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "queue = 0", "exchange = 0", "routing_key = """, "nowait = 0", "arguments = {}"]
         def self.encode(queue, exchange, routing_key, arguments)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [50, 20].pack("n2")
           pieces << [ticket].pack("n")
@@ -920,7 +920,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -948,10 +948,10 @@ module AMQ
         @index = 0x0032001E # 50, 30, 3276830
 
         # @return
-        # ["ticket = false", "queue = nil", "nowait = false"]
+        # ["ticket = 0", "queue = 0", "nowait = 0"]
         def self.encode(queue)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [50, 30].pack("n2")
           pieces << [ticket].pack("n")
@@ -959,7 +959,7 @@ module AMQ
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -990,10 +990,10 @@ module AMQ
         @index = 0x00320028 # 50, 40, 3276840
 
         # @return
-        # ["ticket = false", "queue = nil", "if_unused = false", "if_empty = false", "nowait = false"]
+        # ["ticket = 0", "queue = 0", "if_unused = 0", "if_empty = 0", "nowait = 0"]
         def self.encode(queue, if_unused, if_empty)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [50, 40].pack("n2")
           pieces << [ticket].pack("n")
@@ -1003,7 +1003,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if if_empty
           bit_buffer = bit_buffer | (1 << 2) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1034,9 +1034,9 @@ module AMQ
         @index = 0x00320032 # 50, 50, 3276850
 
         # @return
-        # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "arguments = {}"]
+        # ["ticket = 0", "queue = 0", "exchange = 0", "routing_key = """, "arguments = {}"]
         def self.encode(queue, exchange, routing_key, arguments)
-          ticket = false
+          ticket = 0
           pieces = []
           pieces << [50, 50].pack("n2")
           pieces << [ticket].pack("n")
@@ -1231,7 +1231,7 @@ module AMQ
         @index = 0x003C000A # 60, 10, 3932170
 
         # @return
-        # ["prefetch_size = false", "prefetch_count = false", "global = false"]
+        # ["prefetch_size = 0", "prefetch_count = 0", "global = 0"]
         def self.encode(prefetch_size, prefetch_count, global)
           pieces = []
           pieces << [60, 10].pack("n2")
@@ -1239,7 +1239,7 @@ module AMQ
           pieces << [prefetch_count].pack("n")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if global
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1266,10 +1266,10 @@ module AMQ
         @index = 0x003C0014 # 60, 20, 3932180
 
         # @return
-        # ["ticket = false", "queue = nil", "consumer_tag = """, "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "queue = 0", "consumer_tag = """, "no_local = 0", "no_ack = 0", "exclusive = 0", "nowait = 0", "arguments = {}"]
         def self.encode(queue, consumer_tag, no_local, no_ack, exclusive, arguments)
-          ticket = false
-          nowait = false
+          ticket = 0
+          nowait = 0
           pieces = []
           pieces << [60, 20].pack("n2")
           pieces << [ticket].pack("n")
@@ -1282,7 +1282,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 1) if no_ack
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -1316,16 +1316,16 @@ module AMQ
         @index = 0x003C001E # 60, 30, 3932190
 
         # @return
-        # ["consumer_tag = nil", "nowait = false"]
+        # ["consumer_tag = 0", "nowait = 0"]
         def self.encode(consumer_tag)
-          nowait = false
+          nowait = 0
           pieces = []
           pieces << [60, 30].pack("n2")
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1358,9 +1358,9 @@ module AMQ
         @index = 0x003C0028 # 60, 40, 3932200
 
         # @return
-        # ["ticket = false", "exchange = """, "routing_key = """, "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["ticket = 0", "exchange = """, "routing_key = """, "mandatory = 0", "immediate = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(exchange, routing_key, mandatory, immediate)
-          ticket = false
+          ticket = 0
           pieces = []
           pieces << [60, 40].pack("n2")
           pieces << [ticket].pack("n")
@@ -1371,7 +1371,7 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if mandatory
           bit_buffer = bit_buffer | (1 << 1) if immediate
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
           frames.push(*self.encode_body(payload))
@@ -1458,9 +1458,9 @@ module AMQ
         @index = 0x003C0046 # 60, 70, 3932230
 
         # @return
-        # ["ticket = false", "queue = nil", "no_ack = false"]
+        # ["ticket = 0", "queue = 0", "no_ack = 0"]
         def self.encode(queue, no_ack)
-          ticket = false
+          ticket = 0
           pieces = []
           pieces << [60, 70].pack("n2")
           pieces << [ticket].pack("n")
@@ -1468,7 +1468,7 @@ module AMQ
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if no_ack
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1537,14 +1537,14 @@ module AMQ
         @index = 0x003C0050 # 60, 80, 3932240
 
         # @return
-        # ["delivery_tag = false", "multiple = false"]
+        # ["delivery_tag = 0", "multiple = 0"]
         def self.encode(delivery_tag, multiple)
           pieces = []
           pieces << [60, 80].pack("n2")
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1556,14 +1556,14 @@ module AMQ
         @index = 0x003C005A # 60, 90, 3932250
 
         # @return
-        # ["delivery_tag = nil", "requeue = true"]
+        # ["delivery_tag = 0", "requeue = 1"]
         def self.encode(delivery_tag, requeue)
           pieces = []
           pieces << [60, 90].pack("n2")
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1575,13 +1575,13 @@ module AMQ
         @index = 0x003C0064 # 60, 100, 3932260
 
         # @return
-        # ["requeue = false"]
+        # ["requeue = 0"]
         def self.encode(requeue)
           pieces = []
           pieces << [60, 100].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1593,13 +1593,13 @@ module AMQ
         @index = 0x003C006E # 60, 110, 3932270
 
         # @return
-        # ["requeue = false"]
+        # ["requeue = 0"]
         def self.encode(requeue)
           pieces = []
           pieces << [60, 110].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end

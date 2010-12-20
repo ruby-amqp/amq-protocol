@@ -244,7 +244,7 @@ module AMQ
         @index = 0x000A000A # 10, 10, 655370
 
         # @return
-        # ["version_major = false", "version_minor = 9", "server properties = nil", "mechanisms = "PLAIN"", "locales = "en_US""]
+        # ["version_major = 0", "version_minor = 9", "server properties = 0", "mechanisms = "PLAIN"", "locales = "en_US""]
         def self.encode(version_major, version_minor, server_properties, mechanisms, locales)
           pieces = []
           pieces << [10, 10].pack("n2")
@@ -300,7 +300,7 @@ module AMQ
         @index = 0x000A0014 # 10, 20, 655380
 
         # @return
-        # ["challenge = nil"]
+        # ["challenge = 0"]
         def self.encode(challenge)
           pieces = []
           pieces << [10, 20].pack("n2")
@@ -338,7 +338,7 @@ module AMQ
         @index = 0x000A001E # 10, 30, 655390
 
         # @return
-        # ["channel_max = false", "frame_max = false", "heartbeat = false"]
+        # ["channel_max = 0", "frame_max = 0", "heartbeat = 0"]
         def self.encode(channel_max, frame_max, heartbeat)
           pieces = []
           pieces << [10, 30].pack("n2")
@@ -452,7 +452,7 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        # ["reply_code = 0", "reply_text = """, "class_id = 0", "method_id = 0"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [10, 50].pack("n2")
@@ -553,13 +553,13 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # ["active = 0"]
         def self.encode(active)
           pieces = []
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -585,13 +585,13 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # ["active = 0"]
         def self.encode(active)
           pieces = []
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -627,7 +627,7 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        # ["reply_code = 0", "reply_text = """, "class_id = 0", "method_id = 0"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [20, 40].pack("n2")
@@ -927,7 +927,7 @@ module AMQ
         @index = 0x0032000B # 50, 11, 3276811
 
         # @return
-        # ["queue = nil", "message_count = nil", "consumer_count = nil"]
+        # ["queue = 0", "message_count = 0", "consumer_count = 0"]
         def self.encode(queue, message_count, consumer_count)
           pieces = []
           pieces << [50, 11].pack("n2")
@@ -1030,7 +1030,7 @@ module AMQ
         @index = 0x0032001F # 50, 31, 3276831
 
         # @return
-        # ["message_count = nil"]
+        # ["message_count = 0"]
         def self.encode(message_count)
           pieces = []
           pieces << [50, 31].pack("n2")
@@ -1076,7 +1076,7 @@ module AMQ
         @index = 0x00320029 # 50, 41, 3276841
 
         # @return
-        # ["message_count = nil"]
+        # ["message_count = 0"]
         def self.encode(message_count)
           pieces = []
           pieces << [50, 41].pack("n2")
@@ -1382,7 +1382,7 @@ module AMQ
         @index = 0x003C0015 # 60, 21, 3932181
 
         # @return
-        # ["consumer_tag = nil"]
+        # ["consumer_tag = 0"]
         def self.encode(consumer_tag)
           pieces = []
           pieces << [60, 21].pack("n2")
@@ -1424,7 +1424,7 @@ module AMQ
         @index = 0x003C001F # 60, 31, 3932191
 
         # @return
-        # ["consumer_tag = nil"]
+        # ["consumer_tag = 0"]
         def self.encode(consumer_tag)
           pieces = []
           pieces << [60, 31].pack("n2")
@@ -1475,7 +1475,7 @@ module AMQ
         @index = 0x003C0032 # 60, 50, 3932210
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["reply_code = 0", "reply_text = """, "exchange = 0", "routing_key = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(reply_code, reply_text, exchange, routing_key)
           pieces = []
           pieces << [60, 50].pack("n2")
@@ -1500,7 +1500,7 @@ module AMQ
         @index = 0x003C003C # 60, 60, 3932220
 
         # @return
-        # ["consumer_tag = nil", "delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["consumer_tag = 0", "delivery_tag = 0", "redelivered = 0", "exchange = 0", "routing_key = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(consumer_tag, delivery_tag, redelivered, exchange, routing_key)
           pieces = []
           pieces << [60, 60].pack("n2")
@@ -1509,7 +1509,7 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
@@ -1556,14 +1556,14 @@ module AMQ
         @index = 0x003C0047 # 60, 71, 3932231
 
         # @return
-        # ["delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["delivery_tag = 0", "redelivered = 0", "exchange = 0", "routing_key = 0", "message_count = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(delivery_tag, redelivered, exchange, routing_key, message_count)
           pieces = []
           pieces << [60, 71].pack("n2")
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack("c*")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr

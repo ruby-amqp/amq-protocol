@@ -74,7 +74,7 @@ def accepted_by(self, *receivers):
 AmqpMethod.accepted_by = accepted_by
 
 def convert_value_to_ruby(value):
-    values = {None: "nil", False: "false", True: "true"}
+    values = {None: 0, False: 0, True: 1}
 
     try:
         return values[value]

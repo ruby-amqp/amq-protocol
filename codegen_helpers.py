@@ -76,7 +76,7 @@ def genSingleDecode(spec, field):
 def genEncodeMethodDefinition(spec, m):
     def finishBits():
         if bit_index is not None:
-            buffer.append("pieces << [bit_buffer].pack('c')")
+            buffer.append("pieces << [bit_buffer].pack('c*')")
 
     bit_index = None
     buffer = []
