@@ -34,9 +34,15 @@ module AMQ
       end
     end
 
-    class ConnectionError < Error
+    class FrameTypeError < Error
       def initialize(types)
         super("Must be one of #{types.inspect}")
+      end
+    end
+
+    class EmptyResponseError < Error
+      def initialize(message = nil)
+        super(message || "Empty response received from the server.")
       end
     end
 
@@ -179,10 +185,10 @@ module AMQ
         @@methods
       end
 
-      def self.split_headers(user_headers, properties_set)
+      def self.split_headers(user_headers)
         properties, headers = {}, {}
-        user_headers.iteritems.each do |key, value|
-          if properties_set.has_key?(key)
+        user_headers.each do |key, value|
+          if Basic::PROPERTIES.has_key?(key) or Basic::PROPERTIES.has_key?(key.to_sym)
             properties[key] = value
           else
             headers[key] = value
@@ -202,7 +208,8 @@ module AMQ
         Array.new.tap do |array|
           while body
             payload, body = body[0..limit], body[limit..-1]
-            array << [0x03, payload]
+            # array << [0x03, payload]
+            array << BodyFrame.new(payload)
           end
         end
       end
@@ -1322,7 +1329,10 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 0) if mandatory
           bit_buffer = bit_buffer | (1 << 1) if immediate
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          frames = [MethodFrame.new(buffer)]
+          frames.push(*self.encode_body(payload))
+          frames << HeadersFrame.new(user_headers)
+          return frames
         end
       end
 
