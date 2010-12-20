@@ -30,6 +30,13 @@ module AMQ
     end
 
     class Error < StandardError
+      def self.[](code) # TODO: rewrite more effectively
+        ObjectSpace.each_object(::Class) do |klass|
+          return klass if klass < self && (klass.const_defined?(:VALUE) && klass::VALUE == code)
+        end
+        raise "No such exception class for code #{code}"
+      end
+
       def initialize(message = "AMQP error")
         super(message)
       end
@@ -241,7 +248,15 @@ module AMQ
           % for line in helpers.genDecodeMethodDefinition(spec, method):
           ${line}
           % endfor
+          % if (method.klass.name == "connection" or method.klass.name == "channel") and method.name == "close":
+          if reply_code.eql?(200)
+            self.new(${', '.join([f.ruby_name for f in method.arguments])})
+          else
+            raise Error[reply_code].new(reply_text)
+          end
+          % else:
           self.new(${', '.join([f.ruby_name for f in method.arguments])})
+          % endif
         end
 
         % if len(method.arguments) > 0:

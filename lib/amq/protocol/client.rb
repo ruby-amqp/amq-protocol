@@ -29,6 +29,13 @@ module AMQ
     end
 
     class Error < StandardError
+      def self.[](code) # TODO: rewrite more effectively
+        ObjectSpace.each_object(::Class) do |klass|
+          return klass if klass < self && (klass.const_defined?(:VALUE) && klass::VALUE == code)
+        end
+        raise "No such exception class for code #{code}"
+      end
+
       def initialize(message = "AMQP error")
         super(message)
       end
@@ -394,7 +401,7 @@ module AMQ
           pieces << capabilities
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if insist
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -408,7 +415,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           known_hosts = data[offset..(offset + length)]
           offset += length
@@ -431,7 +438,7 @@ module AMQ
           offset = 0
           reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
@@ -439,7 +446,11 @@ module AMQ
           offset += 2
           method_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          self.new(reply_code, reply_text, class_id, method_id)
+          if reply_code.eql?(200)
+            self.new(reply_code, reply_text, class_id, method_id)
+          else
+            raise Error[reply_code].new(reply_text)
+          end
         end
 
         attr_reader :reply_code, :reply_text, :class_id, :method_id
@@ -558,7 +569,7 @@ module AMQ
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -590,7 +601,7 @@ module AMQ
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -606,7 +617,7 @@ module AMQ
           offset = 0
           reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
@@ -614,7 +625,11 @@ module AMQ
           offset += 2
           method_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          self.new(reply_code, reply_text, class_id, method_id)
+          if reply_code.eql?(200)
+            self.new(reply_code, reply_text, class_id, method_id)
+          else
+            raise Error[reply_code].new(reply_text)
+          end
         end
 
         attr_reader :reply_code, :reply_text, :class_id, :method_id
@@ -692,7 +707,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if auto_delete
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -732,7 +747,7 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -774,7 +789,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -817,7 +832,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -865,7 +880,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -880,7 +895,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
@@ -920,7 +935,7 @@ module AMQ
           pieces << routing_key
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -959,7 +974,7 @@ module AMQ
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1003,7 +1018,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if if_empty
           bit_buffer = bit_buffer | (1 << 2) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1239,7 +1254,7 @@ module AMQ
           pieces << [prefetch_count].pack("n")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if global
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1282,7 +1297,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 1) if no_ack
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << AMQ::Protocol::Table.encode(arguments)
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -1297,7 +1312,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
@@ -1325,7 +1340,7 @@ module AMQ
           pieces << consumer_tag
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1339,7 +1354,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
@@ -1371,7 +1386,7 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if mandatory
           bit_buffer = bit_buffer | (1 << 1) if immediate
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
           frames.push(*self.encode_body(payload))
@@ -1390,15 +1405,15 @@ module AMQ
           offset = 0
           reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1422,7 +1437,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
@@ -1431,11 +1446,11 @@ module AMQ
           bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           redelivered = (bit_buffer & (1 << 0)) != 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1468,7 +1483,7 @@ module AMQ
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if no_ack
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1487,11 +1502,11 @@ module AMQ
           bit_buffer = data[offset..(offset + 1)].unpack("c").first
           offset += 1
           redelivered = (bit_buffer & (1 << 0)) != 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1518,7 +1533,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           cluster_id = data[offset..(offset + length)]
           offset += length
@@ -1544,7 +1559,7 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1563,7 +1578,7 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1581,7 +1596,7 @@ module AMQ
           pieces << [60, 100].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -1599,7 +1614,7 @@ module AMQ
           pieces << [60, 110].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end

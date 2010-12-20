@@ -3,19 +3,16 @@
 - optimisations (see puka)
 - Don't let users set the deprecated arguments.
 
-AMQP spec says they should be ignored, but ignoring can be fairly confusing, so we rather might want to do something like:
-def self.encode(virtual_host, capabilities = "", insist = false)
-  if capabilities != EMPTY_STRING
-    raise ArgumentError.new("Argument 'capabilities' is deprecated in AMQP 0.9.1")
-  end
-end
-
-Don't forget that RabbitMQ un-deprecate some deprecated arguments!
-
-
 OpenOk
 if $DEBUG
   if data[offset..(offset + 1)] != "\x00"
     raise BadResponseError.new("known_hosts", "\x00", data)
   end
+end
+
+
+DO NOT GENERATE THE FOLLOWING:
+attr_reader :known_hosts
+def initialize(known_hosts)
+  @known_hosts = known_hosts
 end

@@ -29,6 +29,13 @@ module AMQ
     end
 
     class Error < StandardError
+      def self.[](code) # TODO: rewrite more effectively
+        ObjectSpace.each_object(::Class) do |klass|
+          return klass if klass < self && (klass.const_defined?(:VALUE) && klass::VALUE == code)
+        end
+        raise "No such exception class for code #{code}"
+      end
+
       def initialize(message = "AMQP error")
         super(message)
       end
@@ -270,7 +277,7 @@ module AMQ
           offset = 0
           table_length = Table.length(data[offset..(offset + 4)])
           client_properties = Table.decode(data[offset..table_length])
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           mechanism = data[offset..(offset + length)]
           offset += length
@@ -278,7 +285,7 @@ module AMQ
           offset += 4
           response = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           locale = data[offset..(offset + length)]
           offset += length
@@ -383,11 +390,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           virtual_host = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           capabilities = data[offset..(offset + length)]
           offset += length
@@ -432,7 +439,7 @@ module AMQ
           offset = 0
           reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
@@ -440,7 +447,11 @@ module AMQ
           offset += 2
           method_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          self.new(reply_code, reply_text, class_id, method_id)
+          if reply_code.eql?(200)
+            self.new(reply_code, reply_text, class_id, method_id)
+          else
+            raise Error[reply_code].new(reply_text)
+          end
         end
 
         attr_reader :reply_code, :reply_text, :class_id, :method_id
@@ -503,7 +514,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           out_of_band = data[offset..(offset + length)]
           offset += length
@@ -559,7 +570,7 @@ module AMQ
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -591,7 +602,7 @@ module AMQ
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
         end
@@ -607,7 +618,7 @@ module AMQ
           offset = 0
           reply_code = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
@@ -615,7 +626,11 @@ module AMQ
           offset += 2
           method_id = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          self.new(reply_code, reply_text, class_id, method_id)
+          if reply_code.eql?(200)
+            self.new(reply_code, reply_text, class_id, method_id)
+          else
+            raise Error[reply_code].new(reply_text)
+          end
         end
 
         attr_reader :reply_code, :reply_text, :class_id, :method_id
@@ -680,11 +695,11 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           type = data[offset..(offset + length)]
           offset += length
@@ -735,7 +750,7 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
@@ -779,15 +794,15 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           destination = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           source = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -835,15 +850,15 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           destination = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           source = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -896,7 +911,7 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
@@ -950,15 +965,15 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1006,7 +1021,7 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
@@ -1050,7 +1065,7 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
@@ -1096,15 +1111,15 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1347,11 +1362,11 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
@@ -1401,7 +1416,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
@@ -1445,11 +1460,11 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1509,7 +1524,7 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
@@ -1532,7 +1547,7 @@ module AMQ
           offset = 0
           ticket = data[offset..(offset + 2)].unpack("n").first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("N")[0].to_i # This is "cause it can be \x00 which is just an octet. It occurs for example in Connection::OpenOk.
+          length = data[offset..(offset + 1)].unpack("c")[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
@@ -1563,7 +1578,7 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack("c*")
+          pieces << [bit_buffer].pack("c")
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
