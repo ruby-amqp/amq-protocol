@@ -53,19 +53,19 @@ begin
   puts "Max agreed frame size: #{frame_max}"
 
   # Connection.Open/Connection.Open-Ok
-  socket.encode Connection::Open, "/", "0", false
+  socket.encode Connection::Open, "/"
   # TODO: capabilities & insist MUST be zero,
   # we need to adjust the JSON file for 0.9.1,
   # basically we want to hide them in the clients
   # as they can't be set to any other value.
   connection_open_ok_response = socket.decode
 
-  # Channel.Start/Channel.Start-Ok
-  socket.encode Channel::Start
-  channel_start_ok_response = socket.decode
+  # Channel.Open/Channel.Open-Ok
+  socket.encode Channel::Open, ""
+  channel_open_ok_response = socket.decode
 
   # Exchange.Declare/Exchange.Declare-Ok
-  socket.encode Exchange::Declare
+  socket.encode Exchange::Declare, "tasks", "fanout", false, false, false, false, {}
   exchange_declare_ok_response = socket.decode
 
   # Channel.Close/Channel.Close-Ok

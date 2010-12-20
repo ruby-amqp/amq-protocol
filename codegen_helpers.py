@@ -39,7 +39,7 @@ def genSingleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        buffer.append("length = data[offset..(offset + 1)].unpack('N')[0]")
+        buffer.append("length = data[offset..(offset + 1)].unpack('N')[0].to_i # This is 'cause it can be \\x00 which is just an octet. It occurs for example in Connection::OpenOk.")
         buffer.append("offset += 1")
         buffer.append("%s = data[offset..(offset + length)]" % (cLvalue,))
         buffer.append("offset += length")

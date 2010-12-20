@@ -73,21 +73,27 @@ def accepted_by(self, *receivers):
 
 AmqpMethod.accepted_by = accepted_by
 
+def convert_value_to_ruby(value):
+    values = {None: "nil", False: "false", True: "true"}
+
+    try:
+        return values[value]
+    except:
+        return value.__repr__()
+
 def convert_to_ruby(field):
     name = re.sub("-", "_", field.name) # TODO: use ruby_name
-    if field.defaultvalue == None:
-        return "%s = nil" % (name,)
-    elif field.defaultvalue == False:
-        return "%s = false" % (name,)
-    elif field.defaultvalue == True:
-        return "%s = true" % (name,)
-    else:
-        return "%s = %r" % (name, field.defaultvalue)
+    return "%s = %s" % (name, convert_value_to_ruby(field.defaultvalue))
 
 def not_ignored_args(self):
     return map(lambda argument: argument.ruby_name, filter(lambda argument: not argument.ignored, self.arguments))
 
 AmqpMethod.not_ignored_args = not_ignored_args
+
+def ignored_args(self):
+    return filter(lambda argument: argument.ignored, self.arguments)
+
+AmqpMethod.ignored_args = ignored_args
 
 # helpers
 def to_ruby_name(name):
