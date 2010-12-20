@@ -1491,7 +1491,7 @@ module AMQ
 
         # @return
         # ["reply_code = 0", "reply_text = """, "exchange = 0", "routing_key = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(reply_code, reply_text, exchange, routing_key)
+        def self.encode(reply_code, reply_text, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 50].pack("n2")
           pieces << [reply_code].pack("n")
@@ -1503,7 +1503,7 @@ module AMQ
           pieces << routing_key
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload))
+          frames.push(*self.encode_body(payload, frame_size))
           frames << HeadersFrame.new(user_headers)
           return frames
         end
@@ -1516,7 +1516,7 @@ module AMQ
 
         # @return
         # ["consumer_tag = 0", "delivery_tag = 0", "redelivered = 0", "exchange = 0", "routing_key = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(consumer_tag, delivery_tag, redelivered, exchange, routing_key)
+        def self.encode(consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 60].pack("n2")
           pieces << consumer_tag.bytesize.chr
@@ -1531,7 +1531,7 @@ module AMQ
           pieces << routing_key
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload))
+          frames.push(*self.encode_body(payload, frame_size))
           frames << HeadersFrame.new(user_headers)
           return frames
         end
@@ -1572,7 +1572,7 @@ module AMQ
 
         # @return
         # ["delivery_tag = 0", "redelivered = 0", "exchange = 0", "routing_key = 0", "message_count = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(delivery_tag, redelivered, exchange, routing_key, message_count)
+        def self.encode(delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
           pieces << [60, 71].pack("n2")
           pieces << [delivery_tag].pack(">Q")
@@ -1586,7 +1586,7 @@ module AMQ
           pieces << [message_count].pack("N")
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload))
+          frames.push(*self.encode_body(payload, frame_size))
           frames << HeadersFrame.new(user_headers)
           return frames
         end

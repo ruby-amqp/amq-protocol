@@ -1374,7 +1374,7 @@ module AMQ
 
         # @return
         # ["ticket = 0", "exchange = """, "routing_key = """, "mandatory = 0", "immediate = 0", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(exchange, routing_key, mandatory, immediate)
+        def self.encode(exchange, routing_key, mandatory, immediate, frame_size)
           ticket = 0
           pieces = []
           pieces << [60, 40].pack("n2")
@@ -1389,7 +1389,7 @@ module AMQ
           pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload))
+          frames.push(*self.encode_body(payload, frame_size))
           frames << HeadersFrame.new(user_headers)
           return frames
         end

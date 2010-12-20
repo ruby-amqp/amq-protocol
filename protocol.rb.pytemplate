@@ -272,7 +272,7 @@ module AMQ
         % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")):
         # @return
         # ${method.params()}
-        def self.encode(${(", ").join(method.not_ignored_args())})
+        def self.encode(${(", ").join(method.not_ignored_args())}${"payload" in method.args() and ", frame_size" or ""})
           % for argument in method.ignored_args():
           ${codegen.convert_to_ruby(argument)}
           % endfor
@@ -285,7 +285,7 @@ module AMQ
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer)]
           % if "payload" in method.args():
-          frames.push(*self.encode_body(payload))
+          frames.push(*self.encode_body(payload, frame_size))
           % endif
           % if "user_headers" in method.args():
           frames << HeadersFrame.new(user_headers)
