@@ -277,7 +277,8 @@ module AMQ
           pieces << response
           pieces << locale.bytesize.chr
           pieces << locale
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -314,7 +315,8 @@ module AMQ
           pieces << [10, 21].pack("n2")
           pieces << [response.bytesize].pack("N")
           pieces << response
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -356,7 +358,8 @@ module AMQ
           pieces << [channel_max].pack("n")
           pieces << [frame_max].pack("N")
           pieces << [heartbeat].pack("n")
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -376,7 +379,8 @@ module AMQ
           pieces << capabilities
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if insist
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -440,7 +444,8 @@ module AMQ
           pieces << reply_text
           pieces << [class_id].pack("n")
           pieces << [method_id].pack("n")
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -455,7 +460,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
 
@@ -464,7 +468,8 @@ module AMQ
         def self.encode()
           pieces = []
           pieces << [10, 51].pack("n2")
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
     end
@@ -485,7 +490,8 @@ module AMQ
           pieces << [20, 10].pack("n2")
           pieces << out_of_band.bytesize.chr
           pieces << out_of_band
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -536,7 +542,8 @@ module AMQ
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -566,7 +573,8 @@ module AMQ
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -609,7 +617,8 @@ module AMQ
           pieces << reply_text
           pieces << [class_id].pack("n")
           pieces << [method_id].pack("n")
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -624,7 +633,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
 
@@ -633,7 +641,8 @@ module AMQ
         def self.encode()
           pieces = []
           pieces << [20, 41].pack("n2")
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
     end
@@ -664,7 +673,8 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 3) if internal
           bit_buffer = bit_buffer | (1 << 4) if nowait
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -679,7 +689,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -700,7 +709,8 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if nowait
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -715,7 +725,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -740,7 +749,8 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -755,7 +765,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -780,7 +789,8 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -795,7 +805,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -825,7 +834,8 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 3) if auto_delete
           bit_buffer = bit_buffer | (1 << 4) if nowait
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -876,7 +886,8 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -891,7 +902,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -911,7 +921,8 @@ module AMQ
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -951,7 +962,8 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 0) if if_unused
           bit_buffer = bit_buffer | (1 << 1) if if_empty
           bit_buffer = bit_buffer | (1 << 2) if nowait
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -992,7 +1004,8 @@ module AMQ
           pieces << routing_key.bytesize.chr
           pieces << routing_key
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1007,7 +1020,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -1184,7 +1196,8 @@ module AMQ
           pieces << [prefetch_count].pack("n")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if global
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1199,7 +1212,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end
@@ -1225,7 +1237,8 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 2) if exclusive
           bit_buffer = bit_buffer | (1 << 3) if nowait
           pieces << AMQ::Protocol::Table.encode(arguments)
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1264,7 +1277,8 @@ module AMQ
           pieces << consumer_tag
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1307,7 +1321,8 @@ module AMQ
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if mandatory
           bit_buffer = bit_buffer | (1 << 1) if immediate
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1398,7 +1413,8 @@ module AMQ
           pieces << queue
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if no_ack
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1472,7 +1488,8 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1489,7 +1506,8 @@ module AMQ
           pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1505,7 +1523,8 @@ module AMQ
           pieces << [60, 100].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1521,7 +1540,8 @@ module AMQ
           pieces << [60, 110].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
-          pieces.join("")
+          buffer = pieces.join("")
+          MethodFrame.new(buffer)
         end
       end
 
@@ -1536,7 +1556,6 @@ module AMQ
           self.new()
         end
 
-        attr_reader
         def initialize()
         end
       end

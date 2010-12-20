@@ -78,8 +78,8 @@ describe AMQ::Protocol do
 
       describe ".encode" do
         it do
-          result = Connection::StartOk.encode({client: "AMQ Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
-          result.should eql("\x00\n\x00\v\x00\x00\x00\x18\x06clientS\x00\x00\x00\fAMQ Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
+          frame = Connection::StartOk.encode({client: "AMQ Protocol"}, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
+          frame.payload.should eql("\x00\n\x00\v\x00\x00\x00\x18\x06clientS\x00\x00\x00\fAMQ Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
         end
       end
     end
@@ -145,8 +145,8 @@ describe AMQ::Protocol do
 
       describe ".encode" do
         it do
-          result = Connection::TuneOk.encode(0, 131072, 0)
-          result.should eql("\x00\n\x00\x1F\x00\x00\x00\x02\x00\x00\x00\x00")
+          frame = Connection::TuneOk.encode(0, 131072, 0)
+          frame.payload.should eql("\x00\n\x00\x1F\x00\x00\x00\x02\x00\x00\x00\x00")
         end
       end
     end

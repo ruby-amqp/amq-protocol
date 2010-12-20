@@ -18,38 +18,44 @@ module AMQ
 
           case value
           when String
-            buffer += ["S".ord, value.bytesize].pack(">cN")
+            buffer += "S"
+            buffer += [value.bytesize].pack("N")
             buffer += value
           when Integer
-            buffer += ["I".ord, value].pack(">cN")
+            buffer += "I"
+            buffer += [value].pack("N")
           when TrueClass, FalseClass
             value = value ? 1 : 0
-            buffer += ["I".ord, value].pack(">cN")
+            buffer += "I"
+            buffer += [value].pack("N")
           when Hash
             buffer += "F" # it will work as long as the encoding is ASCII-8BIT
             buffer += self.encode(value)
+          when Time
+            # TODO: encode timezone?
+            buffer += "T"
+            buffer += [value.to_i].pack("q").reverse # Don't ask. It works.
           else
             # We don't want to require these libraries.
             if const_defined?(:BigDecimal) && value.is_a?(BigDecimal)
-              # TODO
-              # value = value.normalize()
-              # if value._exp < 0:
-              #     decimals = -value._exp
-              #     raw = int(value * (decimal.Decimal(10) ** decimals))
-              #     pieces.append(struct.pack('>cBI', 'D', decimals, raw))
-              # else:
-              #     # per spec, the "decimals" octet is unsigned (!)
-              #     pieces.append(struct.pack('>cBI', 'D', 0, int(value)))
-            elsif const_defined?(:DateTime) && value.is_a?(DateTime)
-              # TODO
-              # buffer += ["T", calendar.timegm(value.utctimetuple())].pack(">cQ")
+              buffer += "D"
+              if value.exponent < 0
+                decimals = -value.exponent
+                p [value.exponent] # normalize
+                raw = (value * (decimals ** 10)).to_i
+                #pieces.append(struct.pack('>cBI', 'D', decimals, raw)) # byte integer
+                buffer += [decimals + 1, raw].pack("CN") # somewhat like floating point
+              else
+                # per spec, the "decimals" octet is unsigned (!)
+                buffer += [0, value.to_i].pack("CN")
+              end
             else
               raise InvalidTableError.new(key, value)
             end
           end
         end
 
-        [buffer.bytesize].pack(">N") + buffer
+        [buffer.bytesize].pack("N") + buffer
       end
 
       def self.length(data)
@@ -76,13 +82,18 @@ module AMQ
             value = data[offset...(offset + 4)].unpack("N").first
             offset += 4
           when "D"
-            # TODO: decimal
+            decimals, raw = data[offset..(offset + 5)].unpack("CN")
+            offset += 5
+            value = BigDecimal.new(raw.to_s) * (BigDecimal.new("10") ** -decimals)
           when "T"
-            # TODO: timestamp
+            # TODO: what is the first unpacked value??? Zone, maybe? It's 0, so it'd make sense.
+            timestamp = data[offset..(offset + 8)].unpack("N2").last
+            value = Time.at(timestamp)
+            offset += 8
           when "F"
             value = self.decode(data[offset..-1])
           else
-            raise "Not a valid type: #{type.inspect}"
+            raise "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}"
           end
           table[key] = value
         end
