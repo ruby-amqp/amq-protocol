@@ -16,3 +16,12 @@ attr_reader :known_hosts
 def initialize(known_hosts)
   @known_hosts = known_hosts
 end
+
+arguments = Basic::Publish.method(:encode).parameters.map { |array| array.last }
+arguments.should include(:frame_size)
+
+arguments = Connection::Open.method(:encode).map { |array| array.last }
+arguments.should_not include(:capabilities)
+arguments.should_not include(:insist)
+
+generate the spec file(s)?

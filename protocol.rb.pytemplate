@@ -93,8 +93,8 @@ module AMQ
     class Class
       @@classes = Array.new
 
-      def self.method
-        @method
+      def self.method_id
+        @method_id
       end
 
       def self.name
@@ -114,8 +114,8 @@ module AMQ
 
     class Method
       @@methods = Array.new
-      def self.method
-        @method
+      def self.method_id
+        @method_id
       end
 
       def self.name
@@ -182,7 +182,7 @@ module AMQ
     % for klass in spec.classes :
     class ${klass.constant_name} < Class
       @name = "${klass.name}"
-      @method = ${klass.index}
+      @method_id = ${klass.index}
 
       % if klass.fields: ## only the Basic class has fields (refered as properties in the JSON)
       PROPERTIES = [
@@ -238,7 +238,7 @@ module AMQ
       % for method in klass.methods :
       class ${method.constant_name} < Method
         @name = "${klass.name}.${method.name}"
-        @method = ${method.index}
+        @method_id = ${method.index}
         @index = ${method.binary()}
 
         % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server")):

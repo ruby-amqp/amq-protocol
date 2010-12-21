@@ -155,8 +155,8 @@ module AMQ
     class Class
       @@classes = Array.new
 
-      def self.method
-        @method
+      def self.method_id
+        @method_id
       end
 
       def self.name
@@ -176,8 +176,8 @@ module AMQ
 
     class Method
       @@methods = Array.new
-      def self.method
-        @method
+      def self.method_id
+        @method_id
       end
 
       def self.name
@@ -243,11 +243,11 @@ module AMQ
 
     class Connection < Class
       @name = "connection"
-      @method = 10
+      @method_id = 10
 
       class Start < Method
         @name = "connection.start"
-        @method = 10
+        @method_id = 10
         @index = 0x000A000A # 10, 10, 655370
 
         # @return
@@ -282,7 +282,7 @@ module AMQ
 
       class StartOk < Method
         @name = "connection.start-ok"
-        @method = 11
+        @method_id = 11
         @index = 0x000A000B # 10, 11, 655371
 
         # @return
@@ -304,7 +304,7 @@ module AMQ
 
       class Secure < Method
         @name = "connection.secure"
-        @method = 20
+        @method_id = 20
         @index = 0x000A0014 # 10, 20, 655380
 
         # @return
@@ -325,7 +325,7 @@ module AMQ
 
       class SecureOk < Method
         @name = "connection.secure-ok"
-        @method = 21
+        @method_id = 21
         @index = 0x000A0015 # 10, 21, 655381
 
         # @return
@@ -342,7 +342,7 @@ module AMQ
 
       class Tune < Method
         @name = "connection.tune"
-        @method = 30
+        @method_id = 30
         @index = 0x000A001E # 10, 30, 655390
 
         # @return
@@ -367,7 +367,7 @@ module AMQ
 
       class TuneOk < Method
         @name = "connection.tune-ok"
-        @method = 31
+        @method_id = 31
         @index = 0x000A001F # 10, 31, 655391
 
         # @return
@@ -385,7 +385,7 @@ module AMQ
 
       class Open < Method
         @name = "connection.open"
-        @method = 40
+        @method_id = 40
         @index = 0x000A0028 # 10, 40, 655400
 
         # @return
@@ -401,6 +401,7 @@ module AMQ
           pieces << capabilities
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if insist
+          p [bit_buffer, [bit_buffer].pack("c")]
           pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           MethodFrame.new(buffer)
@@ -409,7 +410,7 @@ module AMQ
 
       class OpenOk < Method
         @name = "connection.open-ok"
-        @method = 41
+        @method_id = 41
         @index = 0x000A0029 # 10, 41, 655401
 
         # @return
@@ -430,7 +431,7 @@ module AMQ
 
       class Close < Method
         @name = "connection.close"
-        @method = 50
+        @method_id = 50
         @index = 0x000A0032 # 10, 50, 655410
 
         # @return
@@ -478,7 +479,7 @@ module AMQ
 
       class CloseOk < Method
         @name = "connection.close-ok"
-        @method = 51
+        @method_id = 51
         @index = 0x000A0033 # 10, 51, 655411
 
         # @return
@@ -503,11 +504,11 @@ module AMQ
 
     class Channel < Class
       @name = "channel"
-      @method = 20
+      @method_id = 20
 
       class Open < Method
         @name = "channel.open"
-        @method = 10
+        @method_id = 10
         @index = 0x0014000A # 20, 10, 1310730
 
         # @return
@@ -524,7 +525,7 @@ module AMQ
 
       class OpenOk < Method
         @name = "channel.open-ok"
-        @method = 11
+        @method_id = 11
         @index = 0x0014000B # 20, 11, 1310731
 
         # @return
@@ -545,7 +546,7 @@ module AMQ
 
       class Flow < Method
         @name = "channel.flow"
-        @method = 20
+        @method_id = 20
         @index = 0x00140014 # 20, 20, 1310740
 
         # @return
@@ -577,7 +578,7 @@ module AMQ
 
       class FlowOk < Method
         @name = "channel.flow-ok"
-        @method = 21
+        @method_id = 21
         @index = 0x00140015 # 20, 21, 1310741
 
         # @return
@@ -609,7 +610,7 @@ module AMQ
 
       class Close < Method
         @name = "channel.close"
-        @method = 40
+        @method_id = 40
         @index = 0x00140028 # 20, 40, 1310760
 
         # @return
@@ -657,7 +658,7 @@ module AMQ
 
       class CloseOk < Method
         @name = "channel.close-ok"
-        @method = 41
+        @method_id = 41
         @index = 0x00140029 # 20, 41, 1310761
 
         # @return
@@ -682,11 +683,11 @@ module AMQ
 
     class Exchange < Class
       @name = "exchange"
-      @method = 40
+      @method_id = 40
 
       class Declare < Method
         @name = "exchange.declare"
-        @method = 10
+        @method_id = 10
         @index = 0x0028000A # 40, 10, 2621450
 
         # @return
@@ -716,7 +717,7 @@ module AMQ
 
       class DeclareOk < Method
         @name = "exchange.declare-ok"
-        @method = 11
+        @method_id = 11
         @index = 0x0028000B # 40, 11, 2621451
 
         # @return
@@ -731,7 +732,7 @@ module AMQ
 
       class Delete < Method
         @name = "exchange.delete"
-        @method = 20
+        @method_id = 20
         @index = 0x00280014 # 40, 20, 2621460
 
         # @return
@@ -755,7 +756,7 @@ module AMQ
 
       class DeleteOk < Method
         @name = "exchange.delete-ok"
-        @method = 21
+        @method_id = 21
         @index = 0x00280015 # 40, 21, 2621461
 
         # @return
@@ -770,7 +771,7 @@ module AMQ
 
       class Bind < Method
         @name = "exchange.bind"
-        @method = 30
+        @method_id = 30
         @index = 0x0028001E # 40, 30, 2621470
 
         # @return
@@ -798,7 +799,7 @@ module AMQ
 
       class BindOk < Method
         @name = "exchange.bind-ok"
-        @method = 31
+        @method_id = 31
         @index = 0x0028001F # 40, 31, 2621471
 
         # @return
@@ -813,7 +814,7 @@ module AMQ
 
       class Unbind < Method
         @name = "exchange.unbind"
-        @method = 40
+        @method_id = 40
         @index = 0x00280028 # 40, 40, 2621480
 
         # @return
@@ -841,7 +842,7 @@ module AMQ
 
       class UnbindOk < Method
         @name = "exchange.unbind-ok"
-        @method = 51
+        @method_id = 51
         @index = 0x00280033 # 40, 51, 2621491
 
         # @return
@@ -857,11 +858,11 @@ module AMQ
 
     class Queue < Class
       @name = "queue"
-      @method = 50
+      @method_id = 50
 
       class Declare < Method
         @name = "queue.declare"
-        @method = 10
+        @method_id = 10
         @index = 0x0032000A # 50, 10, 3276810
 
         # @return
@@ -889,7 +890,7 @@ module AMQ
 
       class DeclareOk < Method
         @name = "queue.declare-ok"
-        @method = 11
+        @method_id = 11
         @index = 0x0032000B # 50, 11, 3276811
 
         # @return
@@ -916,7 +917,7 @@ module AMQ
 
       class Bind < Method
         @name = "queue.bind"
-        @method = 20
+        @method_id = 20
         @index = 0x00320014 # 50, 20, 3276820
 
         # @return
@@ -944,7 +945,7 @@ module AMQ
 
       class BindOk < Method
         @name = "queue.bind-ok"
-        @method = 21
+        @method_id = 21
         @index = 0x00320015 # 50, 21, 3276821
 
         # @return
@@ -959,7 +960,7 @@ module AMQ
 
       class Purge < Method
         @name = "queue.purge"
-        @method = 30
+        @method_id = 30
         @index = 0x0032001E # 50, 30, 3276830
 
         # @return
@@ -982,7 +983,7 @@ module AMQ
 
       class PurgeOk < Method
         @name = "queue.purge-ok"
-        @method = 31
+        @method_id = 31
         @index = 0x0032001F # 50, 31, 3276831
 
         # @return
@@ -1001,7 +1002,7 @@ module AMQ
 
       class Delete < Method
         @name = "queue.delete"
-        @method = 40
+        @method_id = 40
         @index = 0x00320028 # 50, 40, 3276840
 
         # @return
@@ -1026,7 +1027,7 @@ module AMQ
 
       class DeleteOk < Method
         @name = "queue.delete-ok"
-        @method = 41
+        @method_id = 41
         @index = 0x00320029 # 50, 41, 3276841
 
         # @return
@@ -1045,7 +1046,7 @@ module AMQ
 
       class Unbind < Method
         @name = "queue.unbind"
-        @method = 50
+        @method_id = 50
         @index = 0x00320032 # 50, 50, 3276850
 
         # @return
@@ -1069,7 +1070,7 @@ module AMQ
 
       class UnbindOk < Method
         @name = "queue.unbind-ok"
-        @method = 51
+        @method_id = 51
         @index = 0x00320033 # 50, 51, 3276851
 
         # @return
@@ -1085,7 +1086,7 @@ module AMQ
 
     class Basic < Class
       @name = "basic"
-      @method = 60
+      @method_id = 60
 
       PROPERTIES = [
         :content_type, # shortstr
@@ -1242,7 +1243,7 @@ module AMQ
 
       class Qos < Method
         @name = "basic.qos"
-        @method = 10
+        @method_id = 10
         @index = 0x003C000A # 60, 10, 3932170
 
         # @return
@@ -1262,7 +1263,7 @@ module AMQ
 
       class QosOk < Method
         @name = "basic.qos-ok"
-        @method = 11
+        @method_id = 11
         @index = 0x003C000B # 60, 11, 3932171
 
         # @return
@@ -1277,7 +1278,7 @@ module AMQ
 
       class Consume < Method
         @name = "basic.consume"
-        @method = 20
+        @method_id = 20
         @index = 0x003C0014 # 60, 20, 3932180
 
         # @return
@@ -1306,7 +1307,7 @@ module AMQ
 
       class ConsumeOk < Method
         @name = "basic.consume-ok"
-        @method = 21
+        @method_id = 21
         @index = 0x003C0015 # 60, 21, 3932181
 
         # @return
@@ -1327,7 +1328,7 @@ module AMQ
 
       class Cancel < Method
         @name = "basic.cancel"
-        @method = 30
+        @method_id = 30
         @index = 0x003C001E # 60, 30, 3932190
 
         # @return
@@ -1348,7 +1349,7 @@ module AMQ
 
       class CancelOk < Method
         @name = "basic.cancel-ok"
-        @method = 31
+        @method_id = 31
         @index = 0x003C001F # 60, 31, 3932191
 
         # @return
@@ -1369,7 +1370,7 @@ module AMQ
 
       class Publish < Method
         @name = "basic.publish"
-        @method = 40
+        @method_id = 40
         @index = 0x003C0028 # 60, 40, 3932200
 
         # @return
@@ -1397,7 +1398,7 @@ module AMQ
 
       class Return < Method
         @name = "basic.return"
-        @method = 50
+        @method_id = 50
         @index = 0x003C0032 # 60, 50, 3932210
 
         # @return
@@ -1431,7 +1432,7 @@ module AMQ
 
       class Deliver < Method
         @name = "basic.deliver"
-        @method = 60
+        @method_id = 60
         @index = 0x003C003C # 60, 60, 3932220
 
         # @return
@@ -1469,7 +1470,7 @@ module AMQ
 
       class Get < Method
         @name = "basic.get"
-        @method = 70
+        @method_id = 70
         @index = 0x003C0046 # 60, 70, 3932230
 
         # @return
@@ -1491,7 +1492,7 @@ module AMQ
 
       class GetOk < Method
         @name = "basic.get-ok"
-        @method = 71
+        @method_id = 71
         @index = 0x003C0047 # 60, 71, 3932231
 
         # @return
@@ -1527,7 +1528,7 @@ module AMQ
 
       class GetEmpty < Method
         @name = "basic.get-empty"
-        @method = 72
+        @method_id = 72
         @index = 0x003C0048 # 60, 72, 3932232
 
         # @return
@@ -1548,7 +1549,7 @@ module AMQ
 
       class Ack < Method
         @name = "basic.ack"
-        @method = 80
+        @method_id = 80
         @index = 0x003C0050 # 60, 80, 3932240
 
         # @return
@@ -1567,7 +1568,7 @@ module AMQ
 
       class Reject < Method
         @name = "basic.reject"
-        @method = 90
+        @method_id = 90
         @index = 0x003C005A # 60, 90, 3932250
 
         # @return
@@ -1586,7 +1587,7 @@ module AMQ
 
       class RecoverAsync < Method
         @name = "basic.recover-async"
-        @method = 100
+        @method_id = 100
         @index = 0x003C0064 # 60, 100, 3932260
 
         # @return
@@ -1604,7 +1605,7 @@ module AMQ
 
       class Recover < Method
         @name = "basic.recover"
-        @method = 110
+        @method_id = 110
         @index = 0x003C006E # 60, 110, 3932270
 
         # @return
@@ -1622,7 +1623,7 @@ module AMQ
 
       class RecoverOk < Method
         @name = "basic.recover-ok"
-        @method = 111
+        @method_id = 111
         @index = 0x003C006F # 60, 111, 3932271
 
         # @return

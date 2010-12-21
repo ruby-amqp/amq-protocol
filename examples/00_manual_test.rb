@@ -54,13 +54,10 @@ begin
 
   # Connection.Open/Connection.Open-Ok
   socket.encode Connection::Open, "/"
-  # TODO: capabilities & insist MUST be zero,
-  # we need to adjust the JSON file for 0.9.1,
-  # basically we want to hide them in the clients
-  # as they can't be set to any other value.
   connection_open_ok_response = socket.decode
 
   # Channel.Open/Channel.Open-Ok
+  puts "========================"
   socket.encode Channel::Open, ""
   channel_open_ok_response = socket.decode
 
@@ -80,7 +77,3 @@ begin
 ensure
   socket.close
 end
-
-__END__
-[CLIENT] conn#4 ch#0 -> {#method<connection.open>(virtual-host=/,capabilities=,insist=false),null,""}
-[SERVER] conn#4 ch#0 <- {#method<connection.open-ok>(known-hosts=),null,""}
