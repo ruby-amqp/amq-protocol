@@ -696,9 +696,9 @@ module AMQ
         @index = 0x0028000A # 40, 10, 2621450
 
         # @return
-        # ["ticket = false", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
         def self.encode(channel, exchange, type, passive, durable, auto_delete, internal, arguments)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [40, 10].pack("n2")
@@ -741,9 +741,9 @@ module AMQ
         @index = 0x00280014 # 40, 20, 2621460
 
         # @return
-        # ["ticket = false", "exchange = nil", "if_unused = false", "nowait = false"]
+        # ["ticket = 0", "exchange = nil", "if_unused = false", "nowait = false"]
         def self.encode(channel, exchange, if_unused)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [40, 20].pack("n2")
@@ -780,9 +780,9 @@ module AMQ
         @index = 0x0028001E # 40, 30, 2621470
 
         # @return
-        # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
         def self.encode(channel, destination, source, routing_key, arguments)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [40, 30].pack("n2")
@@ -823,9 +823,9 @@ module AMQ
         @index = 0x00280028 # 40, 40, 2621480
 
         # @return
-        # ["ticket = false", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = """, "nowait = false", "arguments = {}"]
         def self.encode(channel, destination, source, routing_key, arguments)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [40, 40].pack("n2")
@@ -871,9 +871,9 @@ module AMQ
         @index = 0x0032000A # 50, 10, 3276810
 
         # @return
-        # ["ticket = false", "queue = """, "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "queue = """, "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
         def self.encode(channel, queue, passive, durable, exclusive, auto_delete, arguments)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [50, 10].pack("n2")
@@ -926,9 +926,9 @@ module AMQ
         @index = 0x00320014 # 50, 20, 3276820
 
         # @return
-        # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "queue = nil", "exchange = nil", "routing_key = """, "nowait = false", "arguments = {}"]
         def self.encode(channel, queue, exchange, routing_key, arguments)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [50, 20].pack("n2")
@@ -969,9 +969,9 @@ module AMQ
         @index = 0x0032001E # 50, 30, 3276830
 
         # @return
-        # ["ticket = false", "queue = nil", "nowait = false"]
+        # ["ticket = 0", "queue = nil", "nowait = false"]
         def self.encode(channel, queue)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [50, 30].pack("n2")
@@ -1011,9 +1011,9 @@ module AMQ
         @index = 0x00320028 # 50, 40, 3276840
 
         # @return
-        # ["ticket = false", "queue = nil", "if_unused = false", "if_empty = false", "nowait = false"]
+        # ["ticket = 0", "queue = nil", "if_unused = false", "if_empty = false", "nowait = false"]
         def self.encode(channel, queue, if_unused, if_empty)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [50, 40].pack("n2")
@@ -1055,9 +1055,9 @@ module AMQ
         @index = 0x00320032 # 50, 50, 3276850
 
         # @return
-        # ["ticket = false", "queue = nil", "exchange = nil", "routing_key = """, "arguments = {}"]
+        # ["ticket = 0", "queue = nil", "exchange = nil", "routing_key = """, "arguments = {}"]
         def self.encode(channel, queue, exchange, routing_key, arguments)
-          ticket = false
+          ticket = 0
           pieces = []
           pieces << [50, 50].pack("n2")
           pieces << [ticket].pack("n")
@@ -1287,9 +1287,9 @@ module AMQ
         @index = 0x003C0014 # 60, 20, 3932180
 
         # @return
-        # ["ticket = false", "queue = nil", "consumer_tag = """, "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
+        # ["ticket = 0", "queue = nil", "consumer_tag = """, "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
         def self.encode(channel, queue, consumer_tag, no_local, no_ack, exclusive, arguments)
-          ticket = false
+          ticket = 0
           nowait = false
           pieces = []
           pieces << [60, 20].pack("n2")
@@ -1379,9 +1379,9 @@ module AMQ
         @index = 0x003C0028 # 60, 40, 3932200
 
         # @return
-        # ["ticket = false", "exchange = """, "routing_key = """, "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["ticket = 0", "exchange = """, "routing_key = """, "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, exchange, routing_key, mandatory, immediate, frame_size)
-          ticket = false
+          ticket = 0
           pieces = []
           pieces << [60, 40].pack("n2")
           pieces << [ticket].pack("n")
@@ -1481,9 +1481,9 @@ module AMQ
         @index = 0x003C0046 # 60, 70, 3932230
 
         # @return
-        # ["ticket = false", "queue = nil", "no_ack = false"]
+        # ["ticket = 0", "queue = nil", "no_ack = false"]
         def self.encode(channel, queue, no_ack)
-          ticket = false
+          ticket = 0
           pieces = []
           pieces << [60, 70].pack("n2")
           pieces << [ticket].pack("n")

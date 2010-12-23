@@ -83,7 +83,10 @@ def convert_value_to_ruby(value):
 
 def convert_to_ruby(field):
     name = re.sub("-", "_", field.name) # TODO: use ruby_name
-    return "%s = %s" % (name, convert_value_to_ruby(field.defaultvalue))
+    if name == "ticket":
+        return "%s = %s" % (name, field.defaultvalue) # we want to keep it as an int, not as a boolean
+    else:
+        return "%s = %s" % (name, convert_value_to_ruby(field.defaultvalue))
 
 def not_ignored_args(self):
     return map(lambda argument: argument.ruby_name, filter(lambda argument: not argument.ignored, self.arguments))
