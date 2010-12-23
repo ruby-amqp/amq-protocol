@@ -3,7 +3,7 @@
 module AMQ
   module Protocol
     class Frame
-      TYPES         = {method: 1, header: 2, body: 3, heartbeat: 4}
+      TYPES         = {method: 1, headers: 2, body: 3, heartbeat: 4}
       TYPES_REVERSE = TYPES.inject({}) { |hash, pair| hash.merge!(pair[1] => pair[0]) }
       TYPES_OPTIONS = TYPES.keys
       CHANNEL_RANGE = (0..65535)
@@ -26,7 +26,7 @@ module AMQ
       def self.new(original_type, *args)
         type  = TYPES[original_type]
         klass = CLASSES[type]
-        raise "Type can be an integer in range 1..4 or #{TYPES_OPTIONS.inspect}, was #{original_type.inspect}" if klass.nil?
+        raise "Type must be an integer in range 1..4 or #{TYPES_OPTIONS.inspect}, was #{original_type.inspect}" if klass.nil?
         klass.new(*args)
       end
 
@@ -41,6 +41,7 @@ module AMQ
         # raise RuntimeError.new("invalid size: is #{payload.bytesize}, expected #{size}") if @payload.bytesize != size # We obviously can't test that, because we used read(size), so it's pointless.
         raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type)
         self.new(type, payload, size, channel)
+        # TODO: omit the size
       end
     end
 
@@ -59,7 +60,8 @@ module AMQ
         super(@id, payload, channel)
       end
 
-      attr_reader :payload, :size, :channel
+      attr_accessor :channel
+      attr_reader :payload, :size
       def initialize(payload, size = payload.bytesize, channel = 0)
         @payload, @size, @channel = payload, size, channel
       end
@@ -83,7 +85,7 @@ module AMQ
       end
     end
 
-    class HeaderFrame < FrameSubclass
+    class HeadersFrame < FrameSubclass
       @id = 2
     end
 
@@ -95,7 +97,7 @@ module AMQ
       @id = 4
     end
 
-    Frame::CLASSES = {method: MethodFrame, header: HeaderFrame, body: BodyFrame, heartbeat: HeaderFrame}
+    Frame::CLASSES = {method: MethodFrame, headers: HeadersFrame, body: BodyFrame, heartbeat: HeadersFrame}
     Frame::CLASSES.default_proc = lambda { |hash, key| hash[Frame::TYPES_REVERSE[key]] if (1..4).include?(key) }
   end
 end
