@@ -20,7 +20,7 @@ module AMQ
       end
 
       class << self
-        alias_method :__new__, :new
+        alias_method :__new__, :new unless method_defined?(:__new__) # because of reloading
       end
 
       def self.new(original_type, *args)

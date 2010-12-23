@@ -12,6 +12,7 @@ sockaddr = Socket.pack_sockaddr_in((ARGV.first || 5672).to_i, "127.0.0.1") # NOT
 def socket.encode(klass, *args)
   STDERR.puts "#{klass}.encode(#{args.inspect[1..-2]})"
   result = klass.encode(*args)
+  STDERR.puts "=> #{result}"
   if result.is_a?(Frame)
     self.write(result.encode)
   else
@@ -68,7 +69,7 @@ begin
   exchange_declare_ok_response = socket.decode
 
   # Basic.Publish
-  socket.encode Basic::Publish, 1, "this is a payload", {a: 1}, "tasks", "", false, false, frame_max
+  socket.encode Basic::Publish, 1, "this is a payload", {content_type: "text/plain"}, "tasks", "", false, false, frame_max
 
   # Channel.Close/Channel.Close-Ok
   socket.encode Channel::Close, 1, 200, "bye", 0, 0

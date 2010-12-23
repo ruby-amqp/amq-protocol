@@ -139,14 +139,14 @@ module AMQ
       def self.split_headers(user_headers)
         properties, headers = {}, {}
         user_headers.each do |key, value|
-          if Basic::PROPERTIES.has_key?(key) or Basic::PROPERTIES.has_key?(key.to_sym)
+          if Basic::PROPERTIES.include?(key) # key MUST be a symbol! we can't just randomly call #to_sym, otherwise we might end up will over-fulled RAM after a DDOS attack
             properties[key] = value
           else
             headers[key] = value
           end
         end
 
-        return properties, headers
+        return [properties, headers]
       end
 
       def self.encode_body(body, channel, frame_size)
@@ -195,10 +195,10 @@ module AMQ
       # <% i = klass.fields.index(f) %>1 << ${15 - i}
       def self.encode_${f.ruby_name}(value)
         pieces = []
-        % for line in helpers.genSingleEncode(spec, "result", f.domain):
+        % for line in helpers.genSingleEncode(spec, "value", f.domain):
         ${line}
         % endfor
-        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, result]
+        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join("")]
       end
 
       % endfor
@@ -216,8 +216,13 @@ module AMQ
           pieces[i] = result
         end
 
-        result = [CLASS_BASIC, 0, body_size, flags].pack("!HHQH")
-        [0x02, result, pieces.join("")].join("")
+        # result = [${klass.index}, 0, body_size, flags].pack("n2Qn")
+        result = [${klass.index}, 0].pack("n2")
+        x = [body_size].pack("Q")
+        head, tail = x[0], x[1..-1]
+        result += tail + head # Well, this is really awkward! No more joints for Matz please :/ And my solution isn't solution at all because Q means native endianess and I don't know which endianess you have on your machine ... grrrrr! Anyway, I have little-endian, hence I need to do this dirty hack for now :/
+        result += [flags].pack("n")
+        result + pieces.join("")
       end
 
       #def self.decode_properties
@@ -287,15 +292,18 @@ module AMQ
           buffer = pieces.join("")
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer, channel)]
-          % if "payload" in method.args():
-          frames.push(*self.encode_body(payload, channel, frame_size))
-          % endif
           % if "user_headers" in method.args():
-          properties, headers = user_headers #### properties is what is in Basic::PROPERTIES
-          headers_payload = Table.encode(user_headers)
-          frames << HeadersFrame.new(headers_payload, channel)
+          properties, headers = self.split_headers(user_headers)
+          # TODO: what shall I do with the headers?
+          if properties.nil? or properties.empty?
+            raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
+          end
+          properties_payload = Basic.encode_properties(payload.bytesize, properties)
+          frames << HeadersFrame.new(properties_payload, channel)
           % endif
-          return frames
+          % if "payload" in method.args():
+          frames + self.encode_body(payload, channel, frame_size)
+          % endif
           % else:
           MethodFrame.new(buffer, channel)
           % endif

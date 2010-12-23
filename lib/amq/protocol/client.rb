@@ -201,14 +201,14 @@ module AMQ
       def self.split_headers(user_headers)
         properties, headers = {}, {}
         user_headers.each do |key, value|
-          if Basic::PROPERTIES.has_key?(key) or Basic::PROPERTIES.has_key?(key.to_sym)
+          if Basic::PROPERTIES.include?(key) # key MUST be a symbol! we can"t just randomly call #to_sym, otherwise we might end up will over-fulled RAM after a DDOS attack
             properties[key] = value
           else
             headers[key] = value
           end
         end
 
-        return properties, headers
+        return [properties, headers]
       end
 
       def self.encode_body(body, channel, frame_size)
@@ -1113,109 +1113,109 @@ module AMQ
       # 1 << 15
       def self.encode_content_type(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [0, 0x8000, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [0, 0x8000, pieces.join("")]
       end
 
       # 1 << 14
       def self.encode_content_encoding(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [1, 0x4000, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [1, 0x4000, pieces.join("")]
       end
 
       # 1 << 13
       def self.encode_headers(value)
         pieces = []
-        pieces << AMQ::Protocol::Table.encode(result)
-        [2, 0x2000, result]
+        pieces << AMQ::Protocol::Table.encode(value)
+        [2, 0x2000, pieces.join("")]
       end
 
       # 1 << 12
       def self.encode_delivery_mode(value)
         pieces = []
-        pieces << [result].pack("B")
-        [3, 0x1000, result]
+        pieces << [value].pack("B")
+        [3, 0x1000, pieces.join("")]
       end
 
       # 1 << 11
       def self.encode_priority(value)
         pieces = []
-        pieces << [result].pack("B")
-        [4, 0x0800, result]
+        pieces << [value].pack("B")
+        [4, 0x0800, pieces.join("")]
       end
 
       # 1 << 10
       def self.encode_correlation_id(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [5, 0x0400, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [5, 0x0400, pieces.join("")]
       end
 
       # 1 << 9
       def self.encode_reply_to(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [6, 0x0200, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [6, 0x0200, pieces.join("")]
       end
 
       # 1 << 8
       def self.encode_expiration(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [7, 0x0100, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [7, 0x0100, pieces.join("")]
       end
 
       # 1 << 7
       def self.encode_message_id(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [8, 0x0080, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [8, 0x0080, pieces.join("")]
       end
 
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
-        pieces << [result].pack(">Q")
-        [9, 0x0040, result]
+        pieces << [value].pack(">Q")
+        [9, 0x0040, pieces.join("")]
       end
 
       # 1 << 5
       def self.encode_type(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [10, 0x0020, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [10, 0x0020, pieces.join("")]
       end
 
       # 1 << 4
       def self.encode_user_id(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [11, 0x0010, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [11, 0x0010, pieces.join("")]
       end
 
       # 1 << 3
       def self.encode_app_id(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [12, 0x0008, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [12, 0x0008, pieces.join("")]
       end
 
       # 1 << 2
       def self.encode_cluster_id(value)
         pieces = []
-        pieces << result.bytesize.chr
-        pieces << result
-        [13, 0x0004, result]
+        pieces << value.bytesize.chr
+        pieces << value
+        [13, 0x0004, pieces.join("")]
       end
 
       def self.encode_properties(body_size, properties)
@@ -1228,8 +1228,13 @@ module AMQ
           pieces[i] = result
         end
 
-        result = [CLASS_BASIC, 0, body_size, flags].pack("!HHQH")
-        [0x02, result, pieces.join("")].join("")
+        # result = [60, 0, body_size, flags].pack("n2Qn")
+        result = [60, 0].pack("n2")
+        x = [body_size].pack("Q")
+        head, tail = x[0], x[1..-1]
+        result += tail + head # Well, this is really awkward! No more joints for Matz please :/ And my solution isn"t solution at all because Q means native endianess and I don"t know which endianess you have on your machine ... grrrrr! Anyway, I have little-endian, hence I need to do this dirty hack for now :/
+        result += [flags].pack("n")
+        result + pieces.join("")
       end
 
       #def self.decode_properties
@@ -1395,11 +1400,14 @@ module AMQ
           pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
           frames = [MethodFrame.new(buffer, channel)]
-          frames.push(*self.encode_body(payload, channel, frame_size))
-          properties, headers = user_headers #### properties is what is in Basic::PROPERTIES
-          headers_payload = Table.encode(user_headers)
-          frames << HeadersFrame.new(headers_payload, channel)
-          return frames
+          properties, headers = self.split_headers(user_headers)
+          # TODO: what shall I do with the headers?
+          if properties.nil? or properties.empty?
+            raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
+          end
+          properties_payload = Basic.encode_properties(payload.bytesize, properties)
+          frames << HeadersFrame.new(properties_payload, channel)
+          frames + self.encode_body(payload, channel, frame_size)
         end
       end
 
