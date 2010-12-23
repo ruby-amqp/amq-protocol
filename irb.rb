@@ -41,4 +41,10 @@ else
 
   require_relative "lib/amq/protocol/client.rb"
   include AMQ::Protocol
+
+  require "stringio"
+
+  def fd(data)
+    Frame.decode(StringIO.new(data))
+  end
 end
