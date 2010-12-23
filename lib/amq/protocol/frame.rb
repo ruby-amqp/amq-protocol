@@ -47,7 +47,7 @@ module AMQ
       # Restore original new
       class << self
         alias_method :new, :__new__
-        undef_method :decode
+        undef_method :decode if method_defined?(:decode)
       end
 
       def self.id
