@@ -10,15 +10,15 @@ def genSingleEncode(spec, cValue, unresolved_domain):
         buffer.append("pieces << [%s.bytesize].pack('N')" % (cValue,))
         buffer.append("pieces << %s" % (cValue,))
     elif type == 'octet':
-        buffer.append("pieces << [%s].pack('B')" % (cValue,))
+        buffer.append("pieces << [%s].pack('c')" % (cValue,))
     elif type == 'short':
         buffer.append("pieces << [%s].pack('n')" % (cValue,))
     elif type == 'long':
         buffer.append("pieces << [%s].pack('N')" % (cValue,))
     elif type == 'longlong':
-        buffer.append("pieces << [%s].pack('>Q')" % (cValue,))
+        buffer.append("raise NotImplementedError.new #pieces << [%s].pack('>Q')" % (cValue,)) # TODO: this is what's screwed-up in Ruby, we need a solution!
     elif type == 'timestamp':
-        buffer.append("pieces << [%s].pack('>Q')" % (cValue,))
+        buffer.append("#raise NotImplementedError.new #pieces << [%s].pack('>Q')" % (cValue,)) # TODO: this is what's screwed-up in Ruby, we need a solution!
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':

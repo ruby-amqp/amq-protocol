@@ -256,8 +256,8 @@ module AMQ
           channel = 0
           pieces = []
           pieces << [10, 10].pack("n2")
-          pieces << [version_major].pack("B")
-          pieces << [version_minor].pack("B")
+          pieces << [version_major].pack("c")
+          pieces << [version_minor].pack("c")
           pieces << AMQ::Protocol::Table.encode(server_properties)
           pieces << [mechanisms.bytesize].pack("N")
           pieces << mechanisms
@@ -1207,14 +1207,14 @@ module AMQ
       # 1 << 12
       def self.encode_delivery_mode(value)
         pieces = []
-        pieces << [value].pack("B")
+        pieces << [value].pack("c")
         [3, 0x1000, pieces.join("")]
       end
 
       # 1 << 11
       def self.encode_priority(value)
         pieces = []
-        pieces << [value].pack("B")
+        pieces << [value].pack("c")
         [4, 0x0800, pieces.join("")]
       end
 
@@ -1253,7 +1253,7 @@ module AMQ
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
-        pieces << [value].pack(">Q")
+        #raise NotImplementedError.new #pieces << [value].pack(">Q")
         [9, 0x0040, pieces.join("")]
       end
 
@@ -1537,7 +1537,7 @@ module AMQ
           pieces << [60, 60].pack("n2")
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
-          pieces << [delivery_tag].pack(">Q")
+          raise NotImplementedError.new #pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
           pieces << [bit_buffer].pack("c")
@@ -1596,7 +1596,7 @@ module AMQ
         def self.encode(channel, payload, user_headers, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
           pieces << [60, 71].pack("n2")
-          pieces << [delivery_tag].pack(">Q")
+          raise NotImplementedError.new #pieces << [delivery_tag].pack(">Q")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
           pieces << [bit_buffer].pack("c")
