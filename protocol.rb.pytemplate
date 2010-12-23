@@ -146,10 +146,10 @@ module AMQ
           end
         end
 
-        return props, headers
+        return properties, headers
       end
 
-      def self.encode_body(body, frame_size)
+      def self.encode_body(body, channel, frame_size)
         # Spec is broken: Our errata says that it does define
         # something, but it just doesn't relate do method and
         # properties frames. Which makes it, well, suboptimal.
@@ -160,7 +160,7 @@ module AMQ
           while body
             payload, body = body[0..limit], body[limit..-1]
             # array << [0x03, payload]
-            array << BodyFrame.new(payload)
+            array << BodyFrame.new(payload, channel)
           end
         end
       end
@@ -272,10 +272,13 @@ module AMQ
         % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")):
         # @return
         # ${method.params()}
-        def self.encode(${(", ").join(method.not_ignored_args())}${"payload" in method.args() and ", frame_size" or ""})
+        def self.encode(${klass.name != "connection" and "channel" or ""}${(klass.name != "connection" and method.args()) and ", " or ""}${(", ").join(method.not_ignored_args())}${"payload" in method.args() and ", frame_size" or ""})
           % for argument in method.ignored_args():
           ${codegen.convert_to_ruby(argument)}
           % endfor
+          % if klass.name == "connection":
+          channel = 0
+          % endif
           pieces = []
           pieces << [${klass.index}, ${method.index}].pack("n2")
           % for line in helpers.genEncodeMethodDefinition(spec, method):
@@ -283,16 +286,18 @@ module AMQ
           % endfor
           buffer = pieces.join("")
           % if "payload" in method.args() or "user_headers" in method.args():
-          frames = [MethodFrame.new(buffer)]
+          frames = [MethodFrame.new(buffer, channel)]
           % if "payload" in method.args():
-          frames.push(*self.encode_body(payload, frame_size))
+          frames.push(*self.encode_body(payload, channel, frame_size))
           % endif
           % if "user_headers" in method.args():
-          frames << HeadersFrame.new(user_headers)
+          properties, headers = user_headers #### properties is what is in Basic::PROPERTIES
+          headers_payload = Table.encode(user_headers)
+          frames << HeadersFrame.new(headers_payload, channel)
           % endif
           return frames
           % else:
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
           % endif
         end
         % endif

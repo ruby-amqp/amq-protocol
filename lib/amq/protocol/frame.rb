@@ -60,7 +60,7 @@ module AMQ
 
       attr_accessor :channel
       attr_reader :payload
-      def initialize(payload, channel = 0)
+      def initialize(payload, channel)
         @payload, @channel = payload, channel
       end
 
@@ -69,7 +69,7 @@ module AMQ
       end
 
       def encode
-        [self.class.id, channel, self.size].pack("cnN") + payload + FINAL_OCTET
+        [self.class.id, @channel, self.size].pack("cnN") + @payload + FINAL_OCTET
       end
     end
 

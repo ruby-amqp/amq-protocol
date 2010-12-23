@@ -208,10 +208,10 @@ module AMQ
           end
         end
 
-        return props, headers
+        return properties, headers
       end
 
-      def self.encode_body(body, frame_size)
+      def self.encode_body(body, channel, frame_size)
         # Spec is broken: Our errata says that it does define
         # something, but it just doesn"t relate do method and
         # properties frames. Which makes it, well, suboptimal.
@@ -222,7 +222,7 @@ module AMQ
           while body
             payload, body = body[0..limit], body[limit..-1]
             # array << [0x03, payload]
-            array << BodyFrame.new(payload)
+            array << BodyFrame.new(payload, channel)
           end
         end
       end
@@ -253,6 +253,7 @@ module AMQ
         # @return
         # ["version_major = false", "version_minor = 9", "server properties = nil", "mechanisms = "PLAIN"", "locales = "en_US""]
         def self.encode(version_major, version_minor, server_properties, mechanisms, locales)
+          channel = 0
           pieces = []
           pieces << [10, 10].pack("n2")
           pieces << [version_major].pack("B")
@@ -263,7 +264,7 @@ module AMQ
           pieces << [locales.bytesize].pack("N")
           pieces << locales
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -309,12 +310,13 @@ module AMQ
         # @return
         # ["challenge = nil"]
         def self.encode(challenge)
+          channel = 0
           pieces = []
           pieces << [10, 20].pack("n2")
           pieces << [challenge.bytesize].pack("N")
           pieces << challenge
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -347,13 +349,14 @@ module AMQ
         # @return
         # ["channel_max = false", "frame_max = false", "heartbeat = false"]
         def self.encode(channel_max, frame_max, heartbeat)
+          channel = 0
           pieces = []
           pieces << [10, 30].pack("n2")
           pieces << [channel_max].pack("n")
           pieces << [frame_max].pack("N")
           pieces << [heartbeat].pack("n")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -420,12 +423,13 @@ module AMQ
         # @return
         # ["known_hosts = """]
         def self.encode(known_hosts)
+          channel = 0
           pieces = []
           pieces << [10, 41].pack("n2")
           pieces << known_hosts.bytesize.chr
           pieces << known_hosts
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -465,6 +469,7 @@ module AMQ
         # @return
         # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
+          channel = 0
           pieces = []
           pieces << [10, 50].pack("n2")
           pieces << [reply_code].pack("n")
@@ -473,7 +478,7 @@ module AMQ
           pieces << [class_id].pack("n")
           pieces << [method_id].pack("n")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -494,10 +499,11 @@ module AMQ
         # @return
         # []
         def self.encode()
+          channel = 0
           pieces = []
           pieces << [10, 51].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
     end
@@ -534,13 +540,13 @@ module AMQ
 
         # @return
         # ["channel_id = """]
-        def self.encode(channel_id)
+        def self.encode(channel, channel_id)
           pieces = []
           pieces << [20, 11].pack("n2")
           pieces << [channel_id.bytesize].pack("N")
           pieces << channel_id
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -565,14 +571,14 @@ module AMQ
 
         # @return
         # ["active = nil"]
-        def self.encode(active)
+        def self.encode(channel, active)
           pieces = []
           pieces << [20, 20].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
           pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -597,14 +603,14 @@ module AMQ
 
         # @return
         # ["active = nil"]
-        def self.encode(active)
+        def self.encode(channel, active)
           pieces = []
           pieces << [20, 21].pack("n2")
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
           pieces << [bit_buffer].pack("c")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -643,7 +649,7 @@ module AMQ
 
         # @return
         # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
-        def self.encode(reply_code, reply_text, class_id, method_id)
+        def self.encode(channel, reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [20, 40].pack("n2")
           pieces << [reply_code].pack("n")
@@ -652,7 +658,7 @@ module AMQ
           pieces << [class_id].pack("n")
           pieces << [method_id].pack("n")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -672,11 +678,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [20, 41].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
     end
@@ -732,11 +738,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [40, 11].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -776,11 +782,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [40, 21].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -832,11 +838,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [40, 31].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -888,11 +894,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [40, 51].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
     end
@@ -943,7 +949,7 @@ module AMQ
 
         # @return
         # ["queue = nil", "message_count = nil", "consumer_count = nil"]
-        def self.encode(queue, message_count, consumer_count)
+        def self.encode(channel, queue, message_count, consumer_count)
           pieces = []
           pieces << [50, 11].pack("n2")
           pieces << queue.bytesize.chr
@@ -951,7 +957,7 @@ module AMQ
           pieces << [message_count].pack("N")
           pieces << [consumer_count].pack("N")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1003,11 +1009,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [50, 21].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1046,12 +1052,12 @@ module AMQ
 
         # @return
         # ["message_count = nil"]
-        def self.encode(message_count)
+        def self.encode(channel, message_count)
           pieces = []
           pieces << [50, 31].pack("n2")
           pieces << [message_count].pack("N")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1092,12 +1098,12 @@ module AMQ
 
         # @return
         # ["message_count = nil"]
-        def self.encode(message_count)
+        def self.encode(channel, message_count)
           pieces = []
           pieces << [50, 41].pack("n2")
           pieces << [message_count].pack("N")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1145,11 +1151,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [50, 51].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
     end
@@ -1344,11 +1350,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [60, 11].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1398,13 +1404,13 @@ module AMQ
 
         # @return
         # ["consumer_tag = nil"]
-        def self.encode(consumer_tag)
+        def self.encode(channel, consumer_tag)
           pieces = []
           pieces << [60, 21].pack("n2")
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1440,13 +1446,13 @@ module AMQ
 
         # @return
         # ["consumer_tag = nil"]
-        def self.encode(consumer_tag)
+        def self.encode(channel, consumer_tag)
           pieces = []
           pieces << [60, 31].pack("n2")
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1491,7 +1497,7 @@ module AMQ
 
         # @return
         # ["reply_code = nil", "reply_text = """, "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(reply_code, reply_text, exchange, routing_key, frame_size)
+        def self.encode(channel, reply_code, reply_text, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 50].pack("n2")
           pieces << [reply_code].pack("n")
@@ -1502,9 +1508,11 @@ module AMQ
           pieces << routing_key.bytesize.chr
           pieces << routing_key
           buffer = pieces.join("")
-          frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload, frame_size))
-          frames << HeadersFrame.new(user_headers)
+          frames = [MethodFrame.new(buffer, channel)]
+          frames.push(*self.encode_body(payload, channel, frame_size))
+          properties, headers = user_headers #### properties is what is in Basic::PROPERTIES
+          headers_payload = Table.encode(user_headers)
+          frames << HeadersFrame.new(headers_payload, channel)
           return frames
         end
       end
@@ -1516,7 +1524,7 @@ module AMQ
 
         # @return
         # ["consumer_tag = nil", "delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
+        def self.encode(channel, consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 60].pack("n2")
           pieces << consumer_tag.bytesize.chr
@@ -1530,9 +1538,11 @@ module AMQ
           pieces << routing_key.bytesize.chr
           pieces << routing_key
           buffer = pieces.join("")
-          frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload, frame_size))
-          frames << HeadersFrame.new(user_headers)
+          frames = [MethodFrame.new(buffer, channel)]
+          frames.push(*self.encode_body(payload, channel, frame_size))
+          properties, headers = user_headers #### properties is what is in Basic::PROPERTIES
+          headers_payload = Table.encode(user_headers)
+          frames << HeadersFrame.new(headers_payload, channel)
           return frames
         end
       end
@@ -1572,7 +1582,7 @@ module AMQ
 
         # @return
         # ["delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
+        def self.encode(channel, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
           pieces << [60, 71].pack("n2")
           pieces << [delivery_tag].pack(">Q")
@@ -1585,9 +1595,11 @@ module AMQ
           pieces << routing_key
           pieces << [message_count].pack("N")
           buffer = pieces.join("")
-          frames = [MethodFrame.new(buffer)]
-          frames.push(*self.encode_body(payload, frame_size))
-          frames << HeadersFrame.new(user_headers)
+          frames = [MethodFrame.new(buffer, channel)]
+          frames.push(*self.encode_body(payload, channel, frame_size))
+          properties, headers = user_headers #### properties is what is in Basic::PROPERTIES
+          headers_payload = Table.encode(user_headers)
+          frames << HeadersFrame.new(headers_payload, channel)
           return frames
         end
       end
@@ -1599,13 +1611,13 @@ module AMQ
 
         # @return
         # ["cluster_id = """]
-        def self.encode(cluster_id)
+        def self.encode(channel, cluster_id)
           pieces = []
           pieces << [60, 72].pack("n2")
           pieces << cluster_id.bytesize.chr
           pieces << cluster_id
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
 
@@ -1702,11 +1714,11 @@ module AMQ
 
         # @return
         # []
-        def self.encode()
+        def self.encode(channel)
           pieces = []
           pieces << [60, 111].pack("n2")
           buffer = pieces.join("")
-          MethodFrame.new(buffer)
+          MethodFrame.new(buffer, channel)
         end
       end
     end
