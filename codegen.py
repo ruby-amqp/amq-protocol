@@ -89,7 +89,10 @@ def convert_to_ruby(field):
         return "%s = %s" % (name, convert_value_to_ruby(field.defaultvalue))
 
 def not_ignored_args(self):
-    return map(lambda argument: argument.ruby_name, filter(lambda argument: not argument.ignored, self.arguments))
+    if self.hasContent:
+        return ["payload", "user_headers"] + map(lambda argument: argument.ruby_name, filter(lambda argument: not argument.ignored, self.arguments)) + ["frame_size"]
+    else:
+        return map(lambda argument: argument.ruby_name, filter(lambda argument: not argument.ignored, self.arguments))
 
 AmqpMethod.not_ignored_args = not_ignored_args
 

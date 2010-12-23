@@ -272,7 +272,7 @@ module AMQ
         % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")):
         # @return
         # ${method.params()}
-        def self.encode(${klass.name != "connection" and "channel" or ""}${(klass.name != "connection" and method.args()) and ", " or ""}${(", ").join(method.not_ignored_args())}${"payload" in method.args() and ", frame_size" or ""})
+        def self.encode(${klass.name != "connection" and "channel" or ""}${(klass.name != "connection" and method.args()) and ", " or ""}${(", ").join(method.not_ignored_args())})
           % for argument in method.ignored_args():
           ${codegen.convert_to_ruby(argument)}
           % endfor

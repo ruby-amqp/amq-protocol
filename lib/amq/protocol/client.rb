@@ -1380,7 +1380,7 @@ module AMQ
 
         # @return
         # ["ticket = 0", "exchange = """, "routing_key = """, "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(channel, exchange, routing_key, mandatory, immediate, frame_size)
+        def self.encode(channel, payload, user_headers, exchange, routing_key, mandatory, immediate, frame_size)
           ticket = 0
           pieces = []
           pieces << [60, 40].pack("n2")

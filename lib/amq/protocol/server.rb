@@ -1497,7 +1497,7 @@ module AMQ
 
         # @return
         # ["reply_code = nil", "reply_text = """, "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(channel, reply_code, reply_text, exchange, routing_key, frame_size)
+        def self.encode(channel, payload, user_headers, reply_code, reply_text, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 50].pack("n2")
           pieces << [reply_code].pack("n")
@@ -1524,7 +1524,7 @@ module AMQ
 
         # @return
         # ["consumer_tag = nil", "delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(channel, consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
+        def self.encode(channel, payload, user_headers, consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 60].pack("n2")
           pieces << consumer_tag.bytesize.chr
@@ -1582,7 +1582,7 @@ module AMQ
 
         # @return
         # ["delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
-        def self.encode(channel, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
+        def self.encode(channel, payload, user_headers, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
           pieces << [60, 71].pack("n2")
           pieces << [delivery_tag].pack(">Q")
