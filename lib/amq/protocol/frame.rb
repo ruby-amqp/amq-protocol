@@ -38,10 +38,8 @@ module AMQ
         data = readable.read(size + 1)
         payload, frame_end = data[0..-2], data[-1]
         raise RuntimeError.new("Frame doesn't end with #{FINAL_OCTET} as it must, which means the size is miscalculated.") unless frame_end == FINAL_OCTET
-        # raise RuntimeError.new("invalid size: is #{payload.bytesize}, expected #{size}") if @payload.bytesize != size # We obviously can't test that, because we used read(size), so it's pointless.
         raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type)
-        self.new(type, payload, size, channel)
-        # TODO: omit the size
+        self.new(type, payload, channel)
       end
     end
 
@@ -61,13 +59,17 @@ module AMQ
       end
 
       attr_accessor :channel
-      attr_reader :payload, :size
-      def initialize(payload, size = payload.bytesize, channel = 0)
-        @payload, @size, @channel = payload, size, channel
+      attr_reader :payload
+      def initialize(payload, channel = 0)
+        @payload, @channel = payload, channel
+      end
+
+      def size
+        @payload.bytesize
       end
 
       def encode
-        [self.class.id, channel, payload.bytesize].pack("cnN") + payload + FINAL_OCTET
+        [self.class.id, channel, self.size].pack("cnN") + payload + FINAL_OCTET
       end
     end
 
@@ -92,7 +94,7 @@ module AMQ
     class BodyFrame < FrameSubclass
       @id = 3
     end
-    
+
     class HeartbeatFrame < FrameSubclass
       @id = 4
     end
