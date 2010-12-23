@@ -16,9 +16,9 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'long':
         buffer.append("pieces << [%s].pack('N')" % (cValue,))
     elif type == 'longlong':
-        buffer.append("raise NotImplementedError.new #pieces << [%s].pack('>Q')" % (cValue,)) # TODO: this is what's screwed-up in Ruby, we need a solution!
+        buffer.append("AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
     elif type == 'timestamp':
-        buffer.append("#raise NotImplementedError.new #pieces << [%s].pack('>Q')" % (cValue,)) # TODO: this is what's screwed-up in Ruby, we need a solution!
+        buffer.append("AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':

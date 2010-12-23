@@ -6,6 +6,7 @@
 
 require_relative "table.rb"
 require_relative "frame.rb"
+require_relative "hacks.rb"
 
 module AMQ
   module Protocol
@@ -1253,7 +1254,7 @@ module AMQ
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
-        #raise NotImplementedError.new #pieces << [value].pack(">Q")
+        AMQ::Hacks.pack_64_big_endian(value)
         [9, 0x0040, pieces.join("")]
       end
 
@@ -1537,7 +1538,7 @@ module AMQ
           pieces << [60, 60].pack("n2")
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
-          raise NotImplementedError.new #pieces << [delivery_tag].pack(">Q")
+          AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
           pieces << [bit_buffer].pack("c")
@@ -1596,7 +1597,7 @@ module AMQ
         def self.encode(channel, payload, user_headers, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
           pieces << [60, 71].pack("n2")
-          raise NotImplementedError.new #pieces << [delivery_tag].pack(">Q")
+          AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
           pieces << [bit_buffer].pack("c")
