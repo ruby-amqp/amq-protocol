@@ -7,19 +7,21 @@ module AMQ
     BIG_ENDIAN = ([1].pack("s") == "\x00\x01")
     Q = "Q"
 
-    def self.pack_64_big_endian(long_long)
-      if BIG_ENDIAN
+    if BIG_ENDIAN
+      def self.pack_64_big_endian(long_long)
         [long_long].pack(Q)
-      else
+      end
+
+      def self.unpack_64_big_endian(data)
+        data.unpack(Q)
+      end
+    else
+      def self.pack_64_big_endian(long_long)
         result = [long_long].pack(Q)
         result[1..-1] + result[0]
       end
-    end
 
-    def self.unpack_64_big_endian(data)
-      if BIG_ENDIAN
-        data.unpack(Q)
-      else
+      def self.unpack_64_big_endian(data)
         data = data[-1] + data[0..-2]
         data.unpack(Q)
       end
