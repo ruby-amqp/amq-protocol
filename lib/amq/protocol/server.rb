@@ -16,6 +16,10 @@ module AMQ
 
     # caching
     EMPTY_STRING = "".freeze
+    PACK_CACHE = Hash.new { |hash, key| hash[key] = key.to_s }
+    # At the beginning, the PACK_CACHE is empty. When we query the cache, we"ll get back the key as a string. So instead of creating a lot of strings in each pack/unpack call, we just query the cache and get back what we need.
+    # PACK_CACHE[:n2Q] # => "n2Q" # via the PACK_CACHE.default_proc
+    # PACK_CACHE[:n2Q] # => "n2Q" # standard hash query
 
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
@@ -30,6 +34,8 @@ module AMQ
     end
 
     class Error < StandardError
+      DEFAULT_MESSAGE ||= "AMQP error"
+
       def self.[](code) # TODO: rewrite more effectively
         ObjectSpace.each_object(::Class) do |klass|
           return klass if klass < self && (klass.const_defined?(:VALUE) && klass::VALUE == code)
@@ -37,7 +43,7 @@ module AMQ
         raise "No such exception class for code #{code}"
       end
 
-      def initialize(message = "AMQP error")
+      def initialize(message = self.class::DEFAULT_MESSAGE)
         super(message)
       end
     end
@@ -49,7 +55,9 @@ module AMQ
     end
 
     class EmptyResponseError < Error
-      def initialize(message = "Empty response received from the server.")
+      DEFAULT_MESSAGE = "Empty response received from the server."
+
+      def initialize(message = self.class::DEFAULT_MESSAGE)
         super(message)
       end
     end
@@ -256,15 +264,15 @@ module AMQ
         def self.encode(version_major, version_minor, server_properties, mechanisms, locales)
           channel = 0
           pieces = []
-          pieces << [10, 10].pack("n2")
-          pieces << [version_major].pack("c")
-          pieces << [version_minor].pack("c")
+          pieces << [10, 10].pack(PACK_CACHE[:n2])
+          pieces << [version_major].pack(PACK_CACHE[:c])
+          pieces << [version_minor].pack(PACK_CACHE[:c])
           pieces << AMQ::Protocol::Table.encode(server_properties)
-          pieces << [mechanisms.bytesize].pack("N")
+          pieces << [mechanisms.bytesize].pack(PACK_CACHE[:N])
           pieces << mechanisms
-          pieces << [locales.bytesize].pack("N")
+          pieces << [locales.bytesize].pack(PACK_CACHE[:N])
           pieces << locales
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -279,15 +287,15 @@ module AMQ
           offset = 0
           table_length = Table.length(data[offset..(offset + 4)])
           client_properties = Table.decode(data[offset..table_length])
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           mechanism = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 4)].unpack("N").first
+          length = data[offset..(offset + 4)].unpack(PACK_CACHE[:N]).first
           offset += 4
           response = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           locale = data[offset..(offset + length)]
           offset += length
@@ -313,10 +321,10 @@ module AMQ
         def self.encode(challenge)
           channel = 0
           pieces = []
-          pieces << [10, 20].pack("n2")
-          pieces << [challenge.bytesize].pack("N")
+          pieces << [10, 20].pack(PACK_CACHE[:n2])
+          pieces << [challenge.bytesize].pack(PACK_CACHE[:N])
           pieces << challenge
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -329,7 +337,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 4)].unpack("N").first
+          length = data[offset..(offset + 4)].unpack(PACK_CACHE[:N]).first
           offset += 4
           response = data[offset..(offset + length)]
           offset += length
@@ -352,11 +360,11 @@ module AMQ
         def self.encode(channel_max, frame_max, heartbeat)
           channel = 0
           pieces = []
-          pieces << [10, 30].pack("n2")
-          pieces << [channel_max].pack("n")
-          pieces << [frame_max].pack("N")
-          pieces << [heartbeat].pack("n")
-          buffer = pieces.join("")
+          pieces << [10, 30].pack(PACK_CACHE[:n2])
+          pieces << [channel_max].pack(PACK_CACHE[:n])
+          pieces << [frame_max].pack(PACK_CACHE[:N])
+          pieces << [heartbeat].pack(PACK_CACHE[:n])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -369,11 +377,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          channel_max = data[offset..(offset + 2)].unpack("n").first
+          channel_max = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          frame_max = data[offset..(offset + 4)].unpack("N").first
+          frame_max = data[offset..(offset + 4)].unpack(PACK_CACHE[:N]).first
           offset += 4
-          heartbeat = data[offset..(offset + 2)].unpack("n").first
+          heartbeat = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
           self.new(channel_max, frame_max, heartbeat)
         end
@@ -394,15 +402,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           virtual_host = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           capabilities = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           insist = (bit_buffer & (1 << 0)) != 0
           self.new(virtual_host, capabilities, insist)
@@ -422,14 +430,14 @@ module AMQ
         @index = 0x000A0029 # 10, 41, 655401
 
         # @return
-        # ["known_hosts = """]
+        # ["known_hosts = EMPTY_STRING"]
         def self.encode(known_hosts)
           channel = 0
           pieces = []
-          pieces << [10, 41].pack("n2")
+          pieces << [10, 41].pack(PACK_CACHE[:n2])
           pieces << known_hosts.bytesize.chr
           pieces << known_hosts
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -442,15 +450,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset..(offset + 2)].unpack("n").first
+          reply_code = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
-          class_id = data[offset..(offset + 2)].unpack("n").first
+          class_id = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          method_id = data[offset..(offset + 2)].unpack("n").first
+          method_id = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
           if reply_code.eql?(200)
             self.new(reply_code, reply_text, class_id, method_id)
@@ -468,17 +476,17 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           channel = 0
           pieces = []
-          pieces << [10, 50].pack("n2")
-          pieces << [reply_code].pack("n")
+          pieces << [10, 50].pack(PACK_CACHE[:n2])
+          pieces << [reply_code].pack(PACK_CACHE[:n])
           pieces << reply_text.bytesize.chr
           pieces << reply_text
-          pieces << [class_id].pack("n")
-          pieces << [method_id].pack("n")
-          buffer = pieces.join("")
+          pieces << [class_id].pack(PACK_CACHE[:n])
+          pieces << [method_id].pack(PACK_CACHE[:n])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -502,8 +510,8 @@ module AMQ
         def self.encode()
           channel = 0
           pieces = []
-          pieces << [10, 51].pack("n2")
-          buffer = pieces.join("")
+          pieces << [10, 51].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -521,7 +529,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           out_of_band = data[offset..(offset + length)]
           offset += length
@@ -540,13 +548,13 @@ module AMQ
         @index = 0x0014000B # 20, 11, 1310731
 
         # @return
-        # ["channel_id = """]
+        # ["channel_id = EMPTY_STRING"]
         def self.encode(channel, channel_id)
           pieces = []
-          pieces << [20, 11].pack("n2")
-          pieces << [channel_id.bytesize].pack("N")
+          pieces << [20, 11].pack(PACK_CACHE[:n2])
+          pieces << [channel_id.bytesize].pack(PACK_CACHE[:N])
           pieces << channel_id
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -559,7 +567,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
           self.new(active)
@@ -574,11 +582,11 @@ module AMQ
         # ["active = nil"]
         def self.encode(channel, active)
           pieces = []
-          pieces << [20, 20].pack("n2")
+          pieces << [20, 20].pack(PACK_CACHE[:n2])
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c")
-          buffer = pieces.join("")
+          pieces << [bit_buffer].pack(PACK_CACHE[:c])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -591,7 +599,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
           self.new(active)
@@ -606,11 +614,11 @@ module AMQ
         # ["active = nil"]
         def self.encode(channel, active)
           pieces = []
-          pieces << [20, 21].pack("n2")
+          pieces << [20, 21].pack(PACK_CACHE[:n2])
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
-          pieces << [bit_buffer].pack("c")
-          buffer = pieces.join("")
+          pieces << [bit_buffer].pack(PACK_CACHE[:c])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -623,15 +631,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset..(offset + 2)].unpack("n").first
+          reply_code = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           reply_text = data[offset..(offset + length)]
           offset += length
-          class_id = data[offset..(offset + 2)].unpack("n").first
+          class_id = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          method_id = data[offset..(offset + 2)].unpack("n").first
+          method_id = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
           if reply_code.eql?(200)
             self.new(reply_code, reply_text, class_id, method_id)
@@ -649,16 +657,16 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "class_id = nil", "method_id = nil"]
+        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
           pieces = []
-          pieces << [20, 40].pack("n2")
-          pieces << [reply_code].pack("n")
+          pieces << [20, 40].pack(PACK_CACHE[:n2])
+          pieces << [reply_code].pack(PACK_CACHE[:n])
           pieces << reply_text.bytesize.chr
           pieces << reply_text
-          pieces << [class_id].pack("n")
-          pieces << [method_id].pack("n")
-          buffer = pieces.join("")
+          pieces << [class_id].pack(PACK_CACHE[:n])
+          pieces << [method_id].pack(PACK_CACHE[:n])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -681,8 +689,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [20, 41].pack("n2")
-          buffer = pieces.join("")
+          pieces << [20, 41].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -700,17 +708,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           type = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           passive = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -741,8 +749,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [40, 11].pack("n2")
-          buffer = pieces.join("")
+          pieces << [40, 11].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -755,13 +763,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           if_unused = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, exchange, if_unused, nowait)
@@ -785,8 +793,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [40, 21].pack("n2")
-          buffer = pieces.join("")
+          pieces << [40, 21].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -799,21 +807,21 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           destination = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           source = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -841,8 +849,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [40, 31].pack("n2")
-          buffer = pieces.join("")
+          pieces << [40, 31].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -855,21 +863,21 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           destination = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           source = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -897,8 +905,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [40, 51].pack("n2")
-          buffer = pieces.join("")
+          pieces << [40, 51].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -916,13 +924,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           passive = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -952,12 +960,12 @@ module AMQ
         # ["queue = nil", "message_count = nil", "consumer_count = nil"]
         def self.encode(channel, queue, message_count, consumer_count)
           pieces = []
-          pieces << [50, 11].pack("n2")
+          pieces << [50, 11].pack(PACK_CACHE[:n2])
           pieces << queue.bytesize.chr
           pieces << queue
-          pieces << [message_count].pack("N")
-          pieces << [consumer_count].pack("N")
-          buffer = pieces.join("")
+          pieces << [message_count].pack(PACK_CACHE[:N])
+          pieces << [consumer_count].pack(PACK_CACHE[:N])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -970,21 +978,21 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -1012,8 +1020,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [50, 21].pack("n2")
-          buffer = pieces.join("")
+          pieces << [50, 21].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1026,13 +1034,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, queue, nowait)
@@ -1055,9 +1063,9 @@ module AMQ
         # ["message_count = nil"]
         def self.encode(channel, message_count)
           pieces = []
-          pieces << [50, 31].pack("n2")
-          pieces << [message_count].pack("N")
-          buffer = pieces.join("")
+          pieces << [50, 31].pack(PACK_CACHE[:n2])
+          pieces << [message_count].pack(PACK_CACHE[:N])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1070,13 +1078,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           if_unused = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, queue, if_unused, if_empty, nowait)
@@ -1101,9 +1109,9 @@ module AMQ
         # ["message_count = nil"]
         def self.encode(channel, message_count)
           pieces = []
-          pieces << [50, 41].pack("n2")
-          pieces << [message_count].pack("N")
-          buffer = pieces.join("")
+          pieces << [50, 41].pack(PACK_CACHE[:n2])
+          pieces << [message_count].pack(PACK_CACHE[:N])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1116,17 +1124,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
@@ -1154,8 +1162,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [50, 51].pack("n2")
-          buffer = pieces.join("")
+          pieces << [50, 51].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1187,7 +1195,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [0, 0x8000, pieces.join("")]
+        [0, 0x8000, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 14
@@ -1195,28 +1203,28 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [1, 0x4000, pieces.join("")]
+        [1, 0x4000, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 13
       def self.encode_headers(value)
         pieces = []
         pieces << AMQ::Protocol::Table.encode(value)
-        [2, 0x2000, pieces.join("")]
+        [2, 0x2000, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 12
       def self.encode_delivery_mode(value)
         pieces = []
-        pieces << [value].pack("c")
-        [3, 0x1000, pieces.join("")]
+        pieces << [value].pack(PACK_CACHE[:c])
+        [3, 0x1000, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 11
       def self.encode_priority(value)
         pieces = []
-        pieces << [value].pack("c")
-        [4, 0x0800, pieces.join("")]
+        pieces << [value].pack(PACK_CACHE[:c])
+        [4, 0x0800, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 10
@@ -1224,7 +1232,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [5, 0x0400, pieces.join("")]
+        [5, 0x0400, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 9
@@ -1232,7 +1240,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [6, 0x0200, pieces.join("")]
+        [6, 0x0200, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 8
@@ -1240,7 +1248,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [7, 0x0100, pieces.join("")]
+        [7, 0x0100, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 7
@@ -1248,14 +1256,14 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [8, 0x0080, pieces.join("")]
+        [8, 0x0080, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
         AMQ::Hacks.pack_64_big_endian(value)
-        [9, 0x0040, pieces.join("")]
+        [9, 0x0040, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 5
@@ -1263,7 +1271,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [10, 0x0020, pieces.join("")]
+        [10, 0x0020, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 4
@@ -1271,7 +1279,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [11, 0x0010, pieces.join("")]
+        [11, 0x0010, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 3
@@ -1279,7 +1287,7 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [12, 0x0008, pieces.join("")]
+        [12, 0x0008, pieces.join(EMPTY_STRING)]
       end
 
       # 1 << 2
@@ -1287,12 +1295,11 @@ module AMQ
         pieces = []
         pieces << value.bytesize.chr
         pieces << value
-        [13, 0x0004, pieces.join("")]
+        [13, 0x0004, pieces.join(EMPTY_STRING)]
       end
 
       def self.encode_properties(body_size, properties)
-        pieces = Array.new(14) { AMQ::Protocol::EMPTY_STRING }
-        flags = 0
+        pieces, flags = [], 0
 
         properties.each do |key, value|
           i, f, result = self.send(:"encode_#{key}", value)
@@ -1300,28 +1307,144 @@ module AMQ
           pieces[i] = result
         end
 
-        # result = [60, 0, body_size, flags].pack("n2Qn")
-        result = [60, 0].pack("n2")
-        x = [body_size].pack("Q")
-        head, tail = x[0], x[1..-1]
-        result += tail + head # Well, this is really awkward! No more joints for Matz please :/ And my solution isn"t solution at all because Q means native endianess and I don"t know which endianess you have on your machine ... grrrrr! Anyway, I have little-endian, hence I need to do this dirty hack for now :/
-        result += [flags].pack("n")
-        result + pieces.join("")
+        # result = [60, 0, body_size, flags].pack(PACK_CACHE[:n2Qn])
+        result = [60, 0].pack(PACK_CACHE[:n2])
+        result += AMQ::Hacks.pack_64_big_endian(body_size)
+        result += [flags].pack(PACK_CACHE[:n])
+        result + pieces.join(EMPTY_STRING)
       end
 
-      #def self.decode_properties
-      #  print "def %s(data, offset):" % (c.decode,)
-      #  print "    props = {}"
-      #  print "    flags, = struct.unpack_from("!H", data, offset)"
-      #  print "    offset += 2"
-      #  print "    assert (flags & 0x01) == 0"
-      #  for i, f in enumerate(c.fields):
-      #      print "    if (flags & 0x%04x): # 1 << %i" % (1 << (15-i), 15-i)
-      #      fields = codegen_helpers.UnpackWrapper()
-      #      fields.add(f.n, f.t)
-      #      fields.do_print(" "*8, "props["%s"]")
-      #  print "    return props, offset"
-      #end
+      # DECODE PROPERTIES
+      # % for f in klass.fields:
+      # # 1 << 2
+      # def self.decode_cluster_id(data)
+      #   pieces = []
+      #   % for line in helpers.genSingleEncode(spec, "value", f.domain):
+      #   pieces << value
+      #   % endfor
+      #   [13, 0x0004, pieces.join("")]
+      # end
+      #
+      # % endfor
+      #
+      # THIS DECODES ONLY FLAGS
+      DECODE_PROPERTIES = {
+        0x8000 => :content_type,
+        0x4000 => :content_encoding,
+        0x2000 => :headers,
+        0x1000 => :delivery_mode,
+        0x0800 => :priority,
+        0x0400 => :correlation_id,
+        0x0200 => :reply_to,
+        0x0100 => :expiration,
+        0x0080 => :message_id,
+        0x0040 => :timestamp,
+        0x0020 => :type,
+        0x0010 => :user_id,
+        0x0008 => :app_id,
+        0x0004 => :cluster_id,
+      }
+
+      def self.decode_content_type(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_content_encoding(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_headers(data)
+        Table.decode(data)
+      end
+
+      def self.decode_delivery_mode(data)
+        data.unpack(PACK_CACHE[:c]).first
+      end
+
+      def self.decode_priority(data)
+        data.unpack(PACK_CACHE[:c]).first
+      end
+
+      def self.decode_correlation_id(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_reply_to(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_expiration(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_message_id(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_timestamp(data)
+        Time.at(data.unpack(PACK_CACHE[:N2]).last)
+      end
+
+      def self.decode_type(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_user_id(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_app_id(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_cluster_id(data)
+        length = data.unpack(PACK_CACHE[:c])[0]
+        result = data[offset..-1]
+        raise "Bad size: #{length} expected, got #{result.bytesize}" if result.bytesize != length
+        result
+      end
+
+      def self.decode_properties(data)
+        offset, data_length, properties = 0, data.length, {}
+
+        while data_length < offset
+          index, size = data[offset..-1].unpack(PACK_CACHE[:nc])
+          name = DECODE_PROPERTIES[index]
+          offset += 3
+          result = self.send(:"decode_#{name}", data[offset..(offset + size)])
+          properties[name] = result
+          offset += size
+        end
+
+        properties
+      end
 
       class Qos < Method
         @name = "basic.qos"
@@ -1331,11 +1454,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          prefetch_size = data[offset..(offset + 4)].unpack("N").first
+          prefetch_size = data[offset..(offset + 4)].unpack(PACK_CACHE[:N]).first
           offset += 4
-          prefetch_count = data[offset..(offset + 2)].unpack("n").first
+          prefetch_count = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           global = (bit_buffer & (1 << 0)) != 0
           self.new(prefetch_size, prefetch_count, global)
@@ -1358,8 +1481,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [60, 11].pack("n2")
-          buffer = pieces.join("")
+          pieces << [60, 11].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1372,17 +1495,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           no_local = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset..(offset + 4)])
@@ -1412,10 +1535,10 @@ module AMQ
         # ["consumer_tag = nil"]
         def self.encode(channel, consumer_tag)
           pieces = []
-          pieces << [60, 21].pack("n2")
+          pieces << [60, 21].pack(PACK_CACHE[:n2])
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1428,11 +1551,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           consumer_tag = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           self.new(consumer_tag, nowait)
@@ -1454,10 +1577,10 @@ module AMQ
         # ["consumer_tag = nil"]
         def self.encode(channel, consumer_tag)
           pieces = []
-          pieces << [60, 31].pack("n2")
+          pieces << [60, 31].pack(PACK_CACHE[:n2])
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1470,17 +1593,17 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           exchange = data[offset..(offset + length)]
           offset += length
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           routing_key = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           mandatory = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, exchange, routing_key, mandatory, immediate)
@@ -1502,18 +1625,18 @@ module AMQ
         @index = 0x003C0032 # 60, 50, 3932210
 
         # @return
-        # ["reply_code = nil", "reply_text = """, "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["reply_code = nil", "reply_text = EMPTY_STRING", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, reply_code, reply_text, exchange, routing_key, frame_size)
           pieces = []
-          pieces << [60, 50].pack("n2")
-          pieces << [reply_code].pack("n")
+          pieces << [60, 50].pack(PACK_CACHE[:n2])
+          pieces << [reply_code].pack(PACK_CACHE[:n])
           pieces << reply_text.bytesize.chr
           pieces << reply_text
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
           pieces << routing_key
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           frames = [MethodFrame.new(buffer, channel)]
           properties, headers = self.split_headers(user_headers)
           # TODO: what shall I do with the headers?
@@ -1535,18 +1658,18 @@ module AMQ
         # ["consumer_tag = nil", "delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
           pieces = []
-          pieces << [60, 60].pack("n2")
+          pieces << [60, 60].pack(PACK_CACHE[:n2])
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
           AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack(PACK_CACHE[:c])
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
           pieces << routing_key
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           frames = [MethodFrame.new(buffer, channel)]
           properties, headers = self.split_headers(user_headers)
           # TODO: what shall I do with the headers?
@@ -1567,13 +1690,13 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          ticket = data[offset..(offset + 2)].unpack("n").first
+          ticket = data[offset..(offset + 2)].unpack(PACK_CACHE[:n]).first
           offset += 2
-          length = data[offset..(offset + 1)].unpack("c")[0]
+          length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]
           offset += 1
           queue = data[offset..(offset + length)]
           offset += length
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           no_ack = (bit_buffer & (1 << 0)) != 0
           self.new(ticket, queue, no_ack)
@@ -1596,17 +1719,17 @@ module AMQ
         # ["delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
-          pieces << [60, 71].pack("n2")
+          pieces << [60, 71].pack(PACK_CACHE[:n2])
           AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
-          pieces << [bit_buffer].pack("c")
+          pieces << [bit_buffer].pack(PACK_CACHE[:c])
           pieces << exchange.bytesize.chr
           pieces << exchange
           pieces << routing_key.bytesize.chr
           pieces << routing_key
-          pieces << [message_count].pack("N")
-          buffer = pieces.join("")
+          pieces << [message_count].pack(PACK_CACHE[:N])
+          buffer = pieces.join(EMPTY_STRING)
           frames = [MethodFrame.new(buffer, channel)]
           properties, headers = self.split_headers(user_headers)
           # TODO: what shall I do with the headers?
@@ -1625,13 +1748,13 @@ module AMQ
         @index = 0x003C0048 # 60, 72, 3932232
 
         # @return
-        # ["cluster_id = """]
+        # ["cluster_id = EMPTY_STRING"]
         def self.encode(channel, cluster_id)
           pieces = []
-          pieces << [60, 72].pack("n2")
+          pieces << [60, 72].pack(PACK_CACHE[:n2])
           pieces << cluster_id.bytesize.chr
           pieces << cluster_id
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end
@@ -1644,9 +1767,9 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = data[offset..(offset + 8)].unpack("N2").first
+          delivery_tag = AMQ::Hacks.unpack_64_big_endian(data).first
           offset += 8
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           multiple = (bit_buffer & (1 << 0)) != 0
           self.new(delivery_tag, multiple)
@@ -1667,9 +1790,9 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = data[offset..(offset + 8)].unpack("N2").first
+          delivery_tag = AMQ::Hacks.unpack_64_big_endian(data).first
           offset += 8
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           requeue = (bit_buffer & (1 << 0)) != 0
           self.new(delivery_tag, requeue)
@@ -1690,7 +1813,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           requeue = (bit_buffer & (1 << 0)) != 0
           self.new(requeue)
@@ -1710,7 +1833,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset..(offset + 1)].unpack("c").first
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
           offset += 1
           requeue = (bit_buffer & (1 << 0)) != 0
           self.new(requeue)
@@ -1731,8 +1854,8 @@ module AMQ
         # []
         def self.encode(channel)
           pieces = []
-          pieces << [60, 111].pack("n2")
-          buffer = pieces.join("")
+          pieces << [60, 111].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
           MethodFrame.new(buffer, channel)
         end
       end

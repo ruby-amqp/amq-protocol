@@ -68,8 +68,27 @@ begin
   socket.encode Exchange::Declare, 1, "tasks", "fanout", false, false, false, false, {}
   exchange_declare_ok_response = socket.decode
 
+  # Queue.Declare/Queue.Declare-Ok
+  socket.encode Queue::Declare, 1, "", false, false, false, false, {}
+  queue_declare_ok_response = socket.decode
+
+  queue_declare_ok_response.queue[-1] = "" ###
+  puts "\e[1;31mFIXME: payload decoding doesn't work properly:\e[0m" ###
+
+  puts "Queue name: #{queue_declare_ok_response.queue.inspect}"
+
+  # Queue.Bind/Queue.Bind-Ok
+  socket.encode Queue::Bind, 1, queue_declare_ok_response.queue, "tasks", "", {}
+  queue_bind_ok_response = socket.decode
+
+  # Basic.Consume
+  socket.encode Basic::Consume, 1, queue_declare_ok_response.queue, "", false, false, false, Hash.new
+
   # Basic.Publish
   socket.encode Basic::Publish, 1, "this is a payload", {content_type: "text/plain"}, "tasks", "", false, false, frame_max
+
+  # Consume data.
+  consumed_data = socket.decode
 
   # Channel.Close/Channel.Close-Ok
   socket.encode Channel::Close, 1, 200, "bye", 0, 0
@@ -80,6 +99,13 @@ begin
   # are these good args?
   # reply_code, reply_text, class_id, method_id = 200, "", 0, 0
   close_ok_response = socket.decode
+rescue Exception => exception
+  STDERR.puts "\n\e[1;31m[#{exception.class}] #{exception.message}\e[0m"
+  exception.backtrace.each do |line|
+    line = "\e[0;36m#{line}\e[0m" if line.match(Regexp::quote(File.basename(__FILE__)))
+    STDERR.puts "  - " + line
+  end
+  exit 1
 ensure
   socket.close
 end

@@ -16,7 +16,7 @@ module AMQ
         raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type) or (type = TYPES[type])
         raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
-        [TYPES[type], channel, payload.bytesize].pack("cnN") + payload + FINAL_OCTET
+        [TYPES[type], channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload + FINAL_OCTET
       end
 
       class << self
@@ -33,7 +33,7 @@ module AMQ
       def self.decode(readable)
         header = readable.read(7)
         raise EmptyResponseError.new if header.nil?
-        type_id, channel, size = header.unpack("cnN")
+        type_id, channel, size = header.unpack(PACK_CACHE[:cnN])
         type = TYPES_REVERSE[type_id]
         data = readable.read(size + 1)
         payload, frame_end = data[0..-2], data[-1]
@@ -69,7 +69,7 @@ module AMQ
       end
 
       def encode
-        [self.class.id, @channel, self.size].pack("cnN") + @payload + FINAL_OCTET
+        [self.class.id, @channel, self.size].pack(PACK_CACHE[:cnN]) + @payload + FINAL_OCTET
       end
     end
 
@@ -77,7 +77,7 @@ module AMQ
       @id = 1
 
       def method_class
-        klass_id, method_id = self.payload.unpack("n2")
+        klass_id, method_id = self.payload.unpack(PACK_CACHE[:n2])
         index = klass_id << 16 | method_id
         AMQ::Protocol::METHODS[index]
       end
@@ -89,6 +89,14 @@ module AMQ
 
     class HeadersFrame < FrameSubclass
       @id = 2
+
+      attr_reader :body_size, :weight, :klass_id # TODO: lazy-loading, so we don't have to call decode_payload first
+
+      def decode_payload
+        @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
+        @body_size = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames.
+        Basic.decode_properties(@payload[11..-1])
+      end
     end
 
     class BodyFrame < FrameSubclass

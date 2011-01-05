@@ -17,6 +17,10 @@ module AMQ
 
     # caching
     EMPTY_STRING = "".freeze
+    PACK_CACHE = Hash.new { |hash, key| hash[key] = key.to_s }
+    # At the beginning, the PACK_CACHE is empty. When we query the cache, we'll get back the key as a string. So instead of creating a lot of strings in each pack/unpack call, we just query the cache and get back what we need.
+    # PACK_CACHE[:n2Q] # => "n2Q" # via the PACK_CACHE.default_proc
+    # PACK_CACHE[:n2Q] # => "n2Q" # standard hash query
 
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
@@ -31,6 +35,8 @@ module AMQ
     end
 
     class Error < StandardError
+      DEFAULT_MESSAGE ||= "AMQP error"
+
       def self.[](code) # TODO: rewrite more effectively
         ObjectSpace.each_object(::Class) do |klass|
           return klass if klass < self && (klass.const_defined?(:VALUE) && klass::VALUE == code)
@@ -38,7 +44,7 @@ module AMQ
         raise "No such exception class for code #{code}"
       end
 
-      def initialize(message = "AMQP error")
+      def initialize(message = self.class::DEFAULT_MESSAGE)
         super(message)
       end
     end
@@ -50,7 +56,9 @@ module AMQ
     end
 
     class EmptyResponseError < Error
-      def initialize(message = "Empty response received from the server.")
+      DEFAULT_MESSAGE = "Empty response received from the server."
+
+      def initialize(message = self.class::DEFAULT_MESSAGE)
         super(message)
       end
     end
@@ -199,7 +207,7 @@ module AMQ
         % for line in helpers.genSingleEncode(spec, "value", f.domain):
         ${line}
         % endfor
-        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join("")]
+        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join(EMPTY_STRING)]
       end
 
       % endfor
@@ -208,8 +216,7 @@ module AMQ
 
       % if klass.name == "basic" : ## TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
       def self.encode_properties(body_size, properties)
-        pieces = Array.new(14) { AMQ::Protocol::EMPTY_STRING }
-        flags = 0
+        pieces, flags = [], 0
 
         properties.each do |key, value|
           i, f, result = self.send(:"encode_#{key}", value)
@@ -217,31 +224,61 @@ module AMQ
           pieces[i] = result
         end
 
-        # result = [${klass.index}, 0, body_size, flags].pack("n2Qn")
-        result = [${klass.index}, 0].pack("n2")
-        x = [body_size].pack("Q")
-        head, tail = x[0], x[1..-1]
-        result += tail + head # Well, this is really awkward! No more joints for Matz please :/ And my solution isn't solution at all because Q means native endianess and I don't know which endianess you have on your machine ... grrrrr! Anyway, I have little-endian, hence I need to do this dirty hack for now :/
-        result += [flags].pack("n")
-        result + pieces.join("")
+        # result = [${klass.index}, 0, body_size, flags].pack(PACK_CACHE[:n2Qn])
+        result = [${klass.index}, 0].pack(PACK_CACHE[:n2])
+        result += AMQ::Hacks.pack_64_big_endian(body_size)
+        result += [flags].pack(PACK_CACHE[:n])
+        result + pieces.join(EMPTY_STRING)
       end
 
-      #def self.decode_properties
-      #  print "def %s(data, offset):" % (c.decode,)
-      #  print "    props = {}"
-      #  print "    flags, = struct.unpack_from('!H', data, offset)"
-      #  print "    offset += 2"
-      #  print "    assert (flags & 0x01) == 0"
-      #  for i, f in enumerate(c.fields):
-      #      print "    if (flags & 0x%04x): # 1 << %i" % (1 << (15-i), 15-i)
-      #      fields = codegen_helpers.UnpackWrapper()
-      #      fields.add(f.n, f.t)
-      #      fields.do_print(" "*8, "props['%s']")
-      #  print "    return props, offset"
-      #end
+
+      # DECODE PROPERTIES
+      # % for f in klass.fields:
+      # # <% i = klass.fields.index(f) %>1 << ${15 - i}
+      # def self.decode_${f.ruby_name}(data)
+      #   pieces = []
+      #   % for line in helpers.genSingleEncode(spec, "value", f.domain):
+      #   ${line}
+      #   % endfor
+      #   [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join("")]
+      # end
+      #
+      # % endfor
+      #
+      # THIS DECODES ONLY FLAGS
+      DECODE_PROPERTIES = {
+        % for f in klass.fields:
+        ${"0x%04x" % ( 1 << (15 - klass.fields.index(f)),)} => :${f.ruby_name},
+        % endfor
+      }
+
+      % for f in klass.fields:
+      def self.decode_${f.ruby_name}(data)
+        % for line in helpers.genSingleSimpleDecode(spec, f):
+        ${line}
+        % endfor
+      end
+
+      % endfor
+
+      def self.decode_properties(data)
+        property_flags = data.unpack("n")
+        offset, data_length, properties = 0, data.length, {}
+
+        while data_length < offset
+          index, size = data[offset..-1].unpack(PACK_CACHE[:nc])
+          name = DECODE_PROPERTIES[index]
+          offset += 3
+          result = self.send(:"decode_#{name}", data[offset..(offset + size)])
+          properties[name] = result
+          offset += size
+        end
+
+        properties
+      end
       % endif
 
-      % for method in klass.methods :
+      % for method in klass.methods:
       class ${method.constant_name} < Method
         @name = "${klass.name}.${method.name}"
         @method_id = ${method.index}
@@ -286,11 +323,11 @@ module AMQ
           channel = 0
           % endif
           pieces = []
-          pieces << [${klass.index}, ${method.index}].pack("n2")
+          pieces << [${klass.index}, ${method.index}].pack(PACK_CACHE[:n2])
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
-          buffer = pieces.join("")
+          buffer = pieces.join(EMPTY_STRING)
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer, channel)]
           % if "user_headers" in method.args():
