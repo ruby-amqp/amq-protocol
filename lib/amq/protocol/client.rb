@@ -36,12 +36,22 @@ module AMQ
     class Error < StandardError
       DEFAULT_MESSAGE ||= "AMQP error"
 
+      def self.inherited(subclass)
+        @_subclasses ||= []
+        @_subclasses << subclass
+      end # self.inherited(subclazz)
+
+      def self.subclasses_with_values
+        @_subclasses.select{ |k| defined?(k::VALUE) }
+      end # self.subclasses_with_values
+
       def self.[](code) # TODO: rewrite more effectively
-        ObjectSpace.each_object(::Class) do |klass|
-          return klass if klass < self && (klass.const_defined?(:VALUE) && klass::VALUE == code)
-        end
-        raise "No such exception class for code #{code}"
-      end
+        if result = subclasses_with_values.detect { |klass| klass::VALUE == code }
+          result
+        else
+          raise "No such exception class for code #{code}" unless result
+        end # if
+      end # self.[]
 
       def initialize(message = self.class::DEFAULT_MESSAGE)
         super(message)
@@ -69,9 +79,15 @@ module AMQ
     end
 
     class SoftError < Error
+      def self.inherited(subclass)
+        Error.inherited(subclass)
+      end # self.inherited(subclass)
     end
 
     class HardError < Error
+      def self.inherited(subclass)
+        Error.inherited(subclass)
+      end # self.inherited(subclass)
     end
 
     class ContentTooLarge < SoftError
@@ -295,7 +311,7 @@ module AMQ
         @index = 0x000A000B # 10, 11, 655371
 
         # @return
-        # ["client_properties = nil", "mechanism = "PLAIN"", "response = nil", "locale = "en_US""]
+        # [u"client_properties = nil", u"mechanism = u"PLAIN"", u"response = nil", u"locale = u"en_US""]
         def self.encode(client_properties, mechanism, response, locale)
           channel = 0
           pieces = []
@@ -339,7 +355,7 @@ module AMQ
         @index = 0x000A0015 # 10, 21, 655381
 
         # @return
-        # ["response = nil"]
+        # [u"response = nil"]
         def self.encode(response)
           channel = 0
           pieces = []
@@ -382,7 +398,7 @@ module AMQ
         @index = 0x000A001F # 10, 31, 655391
 
         # @return
-        # ["channel_max = false", "frame_max = false", "heartbeat = false"]
+        # [u"channel_max = false", u"frame_max = false", u"heartbeat = false"]
         def self.encode(channel_max, frame_max, heartbeat)
           channel = 0
           pieces = []
@@ -401,7 +417,7 @@ module AMQ
         @index = 0x000A0028 # 10, 40, 655400
 
         # @return
-        # ["virtual_host = "/"", "capabilities = EMPTY_STRING", "insist = false"]
+        # [u"virtual_host = u"/"", u"capabilities = EMPTY_STRING", u"insist = false"]
         def self.encode(virtual_host)
           capabilities = EMPTY_STRING
           insist = false
@@ -475,7 +491,7 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
+        # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"class_id = nil", u"method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           channel = 0
           pieces = []
@@ -526,7 +542,7 @@ module AMQ
         @index = 0x0014000A # 20, 10, 1310730
 
         # @return
-        # ["out_of_band = EMPTY_STRING"]
+        # [u"out_of_band = EMPTY_STRING"]
         def self.encode(channel, out_of_band)
           pieces = []
           pieces << [20, 10].pack(PACK_CACHE[:n2])
@@ -578,7 +594,7 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # [u"active = nil"]
         def self.encode(channel, active)
           pieces = []
           pieces << [20, 20].pack(PACK_CACHE[:n2])
@@ -610,7 +626,7 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # [u"active = nil"]
         def self.encode(channel, active)
           pieces = []
           pieces << [20, 21].pack(PACK_CACHE[:n2])
@@ -656,7 +672,7 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
+        # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"class_id = nil", u"method_id = nil"]
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [20, 40].pack(PACK_CACHE[:n2])
@@ -705,7 +721,7 @@ module AMQ
         @index = 0x0028000A # 40, 10, 2621450
 
         # @return
-        # ["ticket = 0", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"exchange = nil", u"type = u"direct"", u"passive = false", u"durable = false", u"auto_delete = false", u"internal = false", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, exchange, type, passive, durable, auto_delete, internal, arguments)
           ticket = 0
           nowait = false
@@ -750,7 +766,7 @@ module AMQ
         @index = 0x00280014 # 40, 20, 2621460
 
         # @return
-        # ["ticket = 0", "exchange = nil", "if_unused = false", "nowait = false"]
+        # [u"ticket = 0", u"exchange = nil", u"if_unused = false", u"nowait = false"]
         def self.encode(channel, exchange, if_unused)
           ticket = 0
           nowait = false
@@ -789,7 +805,7 @@ module AMQ
         @index = 0x0028001E # 40, 30, 2621470
 
         # @return
-        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"destination = nil", u"source = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, destination, source, routing_key, arguments)
           ticket = 0
           nowait = false
@@ -832,7 +848,7 @@ module AMQ
         @index = 0x00280028 # 40, 40, 2621480
 
         # @return
-        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"destination = nil", u"source = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, destination, source, routing_key, arguments)
           ticket = 0
           nowait = false
@@ -880,7 +896,7 @@ module AMQ
         @index = 0x0032000A # 50, 10, 3276810
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"queue = EMPTY_STRING", u"passive = false", u"durable = false", u"exclusive = false", u"auto_delete = false", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, queue, passive, durable, exclusive, auto_delete, arguments)
           ticket = 0
           nowait = false
@@ -935,7 +951,7 @@ module AMQ
         @index = 0x00320014 # 50, 20, 3276820
 
         # @return
-        # ["ticket = 0", "queue = nil", "exchange = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"queue = nil", u"exchange = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, queue, exchange, routing_key, arguments)
           ticket = 0
           nowait = false
@@ -978,7 +994,7 @@ module AMQ
         @index = 0x0032001E # 50, 30, 3276830
 
         # @return
-        # ["ticket = 0", "queue = nil", "nowait = false"]
+        # [u"ticket = 0", u"queue = nil", u"nowait = false"]
         def self.encode(channel, queue)
           ticket = 0
           nowait = false
@@ -1020,7 +1036,7 @@ module AMQ
         @index = 0x00320028 # 50, 40, 3276840
 
         # @return
-        # ["ticket = 0", "queue = nil", "if_unused = false", "if_empty = false", "nowait = false"]
+        # [u"ticket = 0", u"queue = nil", u"if_unused = false", u"if_empty = false", u"nowait = false"]
         def self.encode(channel, queue, if_unused, if_empty)
           ticket = 0
           nowait = false
@@ -1064,7 +1080,7 @@ module AMQ
         @index = 0x00320032 # 50, 50, 3276850
 
         # @return
-        # ["ticket = 0", "queue = nil", "exchange = nil", "routing_key = EMPTY_STRING", "arguments = {}"]
+        # [u"ticket = 0", u"queue = nil", u"exchange = nil", u"routing_key = EMPTY_STRING", u"arguments = {}"]
         def self.encode(channel, queue, exchange, routing_key, arguments)
           ticket = 0
           pieces = []
@@ -1361,6 +1377,7 @@ module AMQ
       end
 
       def self.decode_properties(data)
+        property_flags = data.unpack("n")
         offset, data_length, properties = 0, data.length, {}
 
         while data_length < offset
@@ -1381,7 +1398,7 @@ module AMQ
         @index = 0x003C000A # 60, 10, 3932170
 
         # @return
-        # ["prefetch_size = false", "prefetch_count = false", "global = false"]
+        # [u"prefetch_size = false", u"prefetch_count = false", u"global = false"]
         def self.encode(channel, prefetch_size, prefetch_count, global)
           pieces = []
           pieces << [60, 10].pack(PACK_CACHE[:n2])
@@ -1416,7 +1433,7 @@ module AMQ
         @index = 0x003C0014 # 60, 20, 3932180
 
         # @return
-        # ["ticket = 0", "queue = nil", "consumer_tag = EMPTY_STRING", "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"queue = nil", u"consumer_tag = EMPTY_STRING", u"no_local = false", u"no_ack = false", u"exclusive = false", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, queue, consumer_tag, no_local, no_ack, exclusive, arguments)
           ticket = 0
           nowait = false
@@ -1466,7 +1483,7 @@ module AMQ
         @index = 0x003C001E # 60, 30, 3932190
 
         # @return
-        # ["consumer_tag = nil", "nowait = false"]
+        # [u"consumer_tag = nil", u"nowait = false"]
         def self.encode(channel, consumer_tag)
           nowait = false
           pieces = []
@@ -1508,7 +1525,7 @@ module AMQ
         @index = 0x003C0028 # 60, 40, 3932200
 
         # @return
-        # ["ticket = 0", "exchange = EMPTY_STRING", "routing_key = EMPTY_STRING", "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # [u"ticket = 0", u"exchange = EMPTY_STRING", u"routing_key = EMPTY_STRING", u"mandatory = false", u"immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, exchange, routing_key, mandatory, immediate, frame_size)
           ticket = 0
           pieces = []
@@ -1613,7 +1630,7 @@ module AMQ
         @index = 0x003C0046 # 60, 70, 3932230
 
         # @return
-        # ["ticket = 0", "queue = nil", "no_ack = false"]
+        # [u"ticket = 0", u"queue = nil", u"no_ack = false"]
         def self.encode(channel, queue, no_ack)
           ticket = 0
           pieces = []
@@ -1692,7 +1709,7 @@ module AMQ
         @index = 0x003C0050 # 60, 80, 3932240
 
         # @return
-        # ["delivery_tag = false", "multiple = false"]
+        # [u"delivery_tag = false", u"multiple = false"]
         def self.encode(channel, delivery_tag, multiple)
           pieces = []
           pieces << [60, 80].pack(PACK_CACHE[:n2])
@@ -1711,7 +1728,7 @@ module AMQ
         @index = 0x003C005A # 60, 90, 3932250
 
         # @return
-        # ["delivery_tag = nil", "requeue = true"]
+        # [u"delivery_tag = nil", u"requeue = true"]
         def self.encode(channel, delivery_tag, requeue)
           pieces = []
           pieces << [60, 90].pack(PACK_CACHE[:n2])
@@ -1730,7 +1747,7 @@ module AMQ
         @index = 0x003C0064 # 60, 100, 3932260
 
         # @return
-        # ["requeue = false"]
+        # [u"requeue = false"]
         def self.encode(channel, requeue)
           pieces = []
           pieces << [60, 100].pack(PACK_CACHE[:n2])
@@ -1748,7 +1765,7 @@ module AMQ
         @index = 0x003C006E # 60, 110, 3932270
 
         # @return
-        # ["requeue = false"]
+        # [u"requeue = false"]
         def self.encode(channel, requeue)
           pieces = []
           pieces << [60, 110].pack(PACK_CACHE[:n2])
