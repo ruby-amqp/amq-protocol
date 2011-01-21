@@ -279,11 +279,11 @@ module AMQ
 
       def self.decode_properties(data)
         property_flags = data.unpack("n")
-        offset, data_length, properties = 0, data.length, {}
+        offset, data_length, properties = 1, data.length, {}
 
-        while data_length < offset
+        while data_length > offset
           index, size = data[offset..-1].unpack(PACK_CACHE[:nc])
-          name = DECODE_PROPERTIES[index]
+          name = DECODE_PROPERTIES[index] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
           offset += 3
           result = self.send(:"decode_#{name}", data[offset..(offset + size)])
           properties[name] = result

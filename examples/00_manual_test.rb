@@ -72,9 +72,6 @@ begin
   socket.encode Queue::Declare, 1, "", false, false, false, false, {}
   queue_declare_ok_response = socket.decode
 
-  queue_declare_ok_response.queue[-1] = "" ###
-  puts "\e[1;31mFIXME: payload decoding doesn't work properly:\e[0m" ###
-
   puts "Queue name: #{queue_declare_ok_response.queue.inspect}"
 
   # Queue.Bind/Queue.Bind-Ok
@@ -87,8 +84,15 @@ begin
   # Basic.Publish
   socket.encode Basic::Publish, 1, "this is a payload", {content_type: "text/plain"}, "tasks", "", false, false, frame_max
 
-  # Consume data.
-  consumed_data = socket.decode
+  # Basic.Consume-Ok
+  basic_consume_ok_response = socket.decode
+  puts "Consumed successfully, consumer tag: #{basic_consume_ok_response.consumer_tag}"
+
+  # Basic.Deliver
+  basic_deliver = socket.decode
+  basic_deliver_header = socket.decode # header frame: {}
+  basic_deliver_body   = socket.decode # body frame: "this is a payload"
+  puts "[Received] headers: #{basic_deliver_header.inspect}, payload: #{basic_deliver_body.inspect}"
 
   # Channel.Close/Channel.Close-Ok
   socket.encode Channel::Close, 1, 200, "bye", 0, 0

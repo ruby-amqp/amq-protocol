@@ -101,6 +101,10 @@ module AMQ
 
     class BodyFrame < FrameSubclass
       @id = 3
+
+      def decode_payload
+        @payload
+      end
     end
 
     class HeartbeatFrame < FrameSubclass

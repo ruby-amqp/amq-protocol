@@ -41,12 +41,12 @@ def genSingleDecode(spec, field):
     if type == 'shortstr':
         buffer.append("length = data[offset..(offset + 1)].unpack(PACK_CACHE[:c])[0]")
         buffer.append("offset += 1")
-        buffer.append("%s = data[offset..(offset + length)]" % (cLvalue,))
+        buffer.append("%s = data[offset..(offset + length - 1)]" % (cLvalue,))
         buffer.append("offset += length")
     elif type == 'longstr':
         buffer.append("length = data[offset..(offset + 4)].unpack(PACK_CACHE[:N]).first")
         buffer.append("offset += 4")
-        buffer.append("%s = data[offset..(offset + length)]" % (cLvalue,))
+        buffer.append("%s = data[offset..(offset + length - 1)]" % (cLvalue,))
         buffer.append("offset += length")
     elif type == 'octet':
         buffer.append("%s = data[offset...(offset + 1)].unpack(PACK_CACHE[:c]).first" % (cLvalue,))
@@ -86,15 +86,17 @@ def genSingleSimpleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        buffer.append("length = data.unpack(PACK_CACHE[:c])[0]")
-        buffer.append("result = data[offset..-1]")
-        buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
-        buffer.append("result")
+        # buffer.append("length = data.unpack(PACK_CACHE[:c])[0]")
+        # buffer.append("result = data[offset..-1]")
+        # buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
+        # buffer.append("result")
+        buffer.append("data")
     elif type == 'longstr':
-        buffer.append("length = data.unpack(PACK_CACHE[:N])[0]")
-        buffer.append("result = data[offset..-1]")
-        buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
-        buffer.append("result")
+        # buffer.append("length = data.unpack(PACK_CACHE[:N])[0]")
+        # buffer.append("result = data[offset..-1]")
+        # buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
+        # buffer.append("result")
+        buffer.append("data")
     elif type == 'octet':
         buffer.append("data.unpack(PACK_CACHE[:c]).first")
     elif type == 'short':
