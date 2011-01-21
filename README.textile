@@ -26,13 +26,13 @@ _*NOTE:* This could be better achieved by a gem server, but it's just utterly br
 h2. Git Repository
 
 <pre>
-git clone git://github.com/botanicus/amq-protocol.git --recursive
+git clone git://github.com/ruby-amqp/amq-protocol.git --recursive
 </pre>
 
 Or, if you are on an older version of Git:
 
 <pre>
-git clone git://github.com/botanicus/amq-protocol.git
+git clone git://github.com/ruby-amqp/amq-protocol.git
 git submodule update --init
 </pre>
 
@@ -40,6 +40,6 @@ If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, bu
 
 h1. Links
 
-* "RDoc.info API Docs":http://rdoc.info/github/botanicus/amq-protocol/master/frames
-* "Examples":https://github.com/botanicus/amq-protocol/tree/master/examples/
-* "Bug reporting":http://github.com/botanicus/amq-protocol/issues
+* "RDoc.info API Docs":http://rdoc.info/github/ruby-amqp/amq-protocol/master/frames
+* "Examples":https://github.com/ruby-amqp/amq-protocol/tree/master/examples/
+* "Bug reporting":http://github.com/ruby-amqp/amq-protocol/issues
