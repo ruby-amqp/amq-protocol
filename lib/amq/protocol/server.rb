@@ -1846,6 +1846,106 @@ module AMQ
           MethodFrame.new(buffer, channel)
         end
       end
+
+      class Nack < Method
+        @name = "basic.nack"
+        @method_id = 120
+        @index = 0x003C0078 # 60, 120, 3932280
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          delivery_tag = AMQ::Hacks.unpack_64_big_endian(data).first
+          offset += 8
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
+          offset += 1
+          multiple = (bit_buffer & (1 << 0)) != 0
+          self.new(delivery_tag, multiple, requeue)
+        end
+
+        attr_reader :delivery_tag, :multiple, :requeue
+        def initialize(delivery_tag, multiple, requeue)
+          @delivery_tag = delivery_tag
+          @multiple = multiple
+          @requeue = requeue
+        end
+
+        # @return
+        # ["delivery_tag = false", "multiple = false", "requeue = true"]
+        def self.encode(channel, delivery_tag, multiple, requeue)
+          pieces = []
+          pieces << [60, 120].pack(PACK_CACHE[:n2])
+          AMQ::Hacks.pack_64_big_endian(delivery_tag)
+          bit_buffer = 0
+          bit_buffer = bit_buffer | (1 << 0) if multiple
+          bit_buffer = bit_buffer | (1 << 1) if requeue
+          pieces << [bit_buffer].pack(PACK_CACHE[:c])
+          buffer = pieces.join(EMPTY_STRING)
+          MethodFrame.new(buffer, channel)
+        end
+      end
+    end
+
+    class Confirm < Class
+      @name = "confirm"
+      @method_id = 85
+
+      class Select < Method
+        @name = "confirm.select"
+        @method_id = 10
+        @index = 0x0055000A # 85, 10, 5570570
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          bit_buffer = data[offset..(offset + 1)].unpack(PACK_CACHE[:c]).first
+          offset += 1
+          nowait = (bit_buffer & (1 << 0)) != 0
+          self.new(nowait)
+        end
+
+        attr_reader :nowait
+        def initialize(nowait)
+          @nowait = nowait
+        end
+
+        # @return
+        # ["nowait = false"]
+        def self.encode(channel)
+          nowait = false
+          pieces = []
+          pieces << [85, 10].pack(PACK_CACHE[:n2])
+          bit_buffer = 0
+          bit_buffer = bit_buffer | (1 << 0) if nowait
+          pieces << [bit_buffer].pack(PACK_CACHE[:c])
+          buffer = pieces.join(EMPTY_STRING)
+          MethodFrame.new(buffer, channel)
+        end
+      end
+
+      class SelectOk < Method
+        @name = "confirm.select-ok"
+        @method_id = 11
+        @index = 0x0055000B # 85, 11, 5570571
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        def initialize()
+        end
+
+        # @return
+        # []
+        def self.encode(channel)
+          pieces = []
+          pieces << [85, 11].pack(PACK_CACHE[:n2])
+          buffer = pieces.join(EMPTY_STRING)
+          MethodFrame.new(buffer, channel)
+        end
+      end
     end
 
     METHODS = begin
