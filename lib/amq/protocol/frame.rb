@@ -30,45 +30,20 @@ module AMQ
         klass.new(*args)
       end
 
-      # NOTE: this will be moved to a separate library which will take care of
       def self.decode(*)
         raise NotImplementedError.new <<-EOF
 You are supposed to redefine this method, because it's dependent on used IO adapter.
 
-If you want to read data from a socket or other IO object:
-
-    class << AMQ::Protocol::Frame
-      alias_method :decode, :decode_from_io
-    end
-
-If you want to use string as data:
-
-    class << AMQ::Protocol::Frame
-      alias_method :decode, :decode_from_string
-    end
-
-And if you want to constru
+This functionality is part of the https://github.com/ruby-amqp/amq-client library.
         EOF
       end
 
-      def self.decode(readable)
-        header = readable.read(7)
-        self.decode_from_string(data[header)
-        self.new(type, payload, channel)
-      end
-
-      def self.decode_from_string(data)
-        self.decode_from_string(data[0..6])
-      end
-
-      def self.decode_from_header(header)
+      def self.decode_header(header)
         raise EmptyResponseError.new if header.nil?
         type_id, channel, size = header.unpack(PACK_CACHE[:cnN])
         type = TYPES_REVERSE[type_id]
-        data = readable.read(size + 1)
-        payload, frame_end = data[0..-2], data[-1]
-        raise RuntimeError.new("Frame doesn't end with #{FINAL_OCTET} as it must, which means the size is miscalculated.") unless frame_end == FINAL_OCTET
         raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type)
+        [type, channel, size]
       end
     end
 
