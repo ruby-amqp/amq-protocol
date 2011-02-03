@@ -1,6 +1,7 @@
 h1. About
 
-This is an AMQP parser for AMQP 0.9.1. It isn't an AMQP client, just the parser, so if you want to write your own AMQP client without digging into the protocol, this gem can help you with that.
+This is an AMQP parser for AMQP 0.9.1. It isn't an AMQP client, just the parser, so if you want to write your own
+AMQP client without digging into the protocol, this gem can help you with that.
 
 h1. Usage
 
@@ -36,7 +37,9 @@ git clone git://github.com/ruby-amqp/amq-protocol.git
 git submodule update --init
 </pre>
 
-If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, but in @protocol.rb.pytemplate@ which is a template file for @codegen.py@. You can re-generate the code by @./tasks.rb generate@.
+If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, but in @protocol.rb.pytemplate@
+which is a template file for @codegen.py@. You can re-generate the code by @nake ./tasks.rb generate@.
+This assumes you have nake gem installed.
 
 h1. Links
 
