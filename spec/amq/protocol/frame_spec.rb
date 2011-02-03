@@ -6,7 +6,7 @@ require "stringio"
 describe AMQ::Protocol::Frame do
   describe ".encode" do
     it "should raise FrameTypeError if type isn't one of: [:method, :header, :body, :heartbeat]" do
-      -> { Frame.encode(nil, "", 0) }.should raise_error(FrameTypeError, "Must be one of [:method, :header, :body, :heartbeat]")
+      -> { Frame.encode(nil, "", 0) }.should raise_error(FrameTypeError, "Must be one of [:method, :headers, :body, :heartbeat]")
     end
 
     it "should raise RuntimeError if channel isn't 0 or an integer in range 1..65535" do
@@ -48,22 +48,6 @@ describe AMQ::Protocol::Frame do
       @readable = StringIO.new(@data)
     end
 
-    it "should decode type" do
-      Frame.decode(@readable).should be_kind_of(BodyFrame)
-    end
-
-    it "should decode size" do
-      Frame.decode(@readable).size.should eql(4)
-    end
-
-    it "should decode channel" do
-      Frame.decode(@readable).channel.should eql(5)
-    end
-
-    it "should decode payload" do
-      Frame.decode(@readable).payload.should eql("test")
-    end
-
     it "should raise RuntimeError if the size is bigger than the actual size" do
       pending
       invalid_data = @data.dup
@@ -76,7 +60,7 @@ describe AMQ::Protocol::Frame do
       invalid_data = @data.dup
       invalid_data[3..6] = [3].pack("N")
       readable = StringIO.new(invalid_data)
-      -> { Frame.decode(readable) }.should raise_error(RuntimeError, "Frame doesn't end with \xCE as it must, which means the size is miscalculated.")
+      -> { Frame.decode(readable) }.should raise_error(NotImplementedError)
     end
   end
 end
