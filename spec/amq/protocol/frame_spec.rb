@@ -38,7 +38,7 @@ describe AMQ::Protocol::Frame do
     end
 
     it "should include final octet" do
-      AMQ::Protocol::Frame.encode(:body, "test", 12)[-1].should eql("\xCE")
+      AMQ::Protocol::Frame.encode(:body, "test", 12).should =~ /\xCE$/
     end
   end
 
