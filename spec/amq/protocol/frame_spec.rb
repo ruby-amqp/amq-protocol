@@ -58,7 +58,7 @@ describe AMQ::Protocol::Frame do
 
     it "should raise RuntimeError if the size is smaller than the actual size" do
       invalid_data = @data.dup
-      puts invalid_data.inspect
+
       invalid_data[3..6] = [3].pack("N")
       readable = StringIO.new(invalid_data)
       lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(NotImplementedError)
