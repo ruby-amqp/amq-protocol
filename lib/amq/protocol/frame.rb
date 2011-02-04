@@ -3,13 +3,14 @@
 module AMQ
   module Protocol
     class Frame
-      TYPES         = {method: 1, headers: 2, body: 3, heartbeat: 4}
+      TYPES         = Hash.new do |hash, key|
+        key if (1..4).include?(key)
+      end.merge({ :method => 1, :headers => 2, :body => 3, :heartbeat => 4 })
+
       TYPES_REVERSE = TYPES.inject({}) { |hash, pair| hash.merge!(pair[1] => pair[0]) }
       TYPES_OPTIONS = TYPES.keys
       CHANNEL_RANGE = (0..65535)
       FINAL_OCTET   = "\xCE" # 206
-
-      TYPES.default_proc = lambda { |hash, key| key if (1..4).include?(key) }
 
       # The channel number is 0 for all frames which are global to the connection and 1-65535 for frames that refer to specific channels.
       def self.encode(type, payload, channel)
@@ -115,7 +116,8 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       @id = 4
     end
 
-    Frame::CLASSES = {method: MethodFrame, headers: HeadersFrame, body: BodyFrame, heartbeat: HeadersFrame}
-    Frame::CLASSES.default_proc = lambda { |hash, key| hash[Frame::TYPES_REVERSE[key]] if (1..4).include?(key) }
+    Frame::CLASSES = Hash.new do |hash, key|
+      hash[Frame::TYPES_REVERSE[key]] if (1..4).include?(key)
+    end.merge({ :method => MethodFrame, :headers => HeadersFrame, :body => BodyFrame, :heartbeat => HeadersFrame })
   end
 end

@@ -5,9 +5,9 @@
 # IT DIRECTLY ! FOR CHANGES, PLEASE UPDATE CODEGEN.PY
 # IN THE ROOT DIRECTORY OF THE AMQ-PROTOCOL REPOSITORY.<% import codegen_helpers as helpers %><% import re, codegen %>
 
-require_relative "table.rb"
-require_relative "frame.rb"
-require_relative "hacks.rb"
+require "amq/protocol/table.rb"
+require "amq/protocol/frame.rb"
+require "amq/protocol/hacks.rb"
 
 module AMQ
   module Protocol
@@ -35,7 +35,7 @@ module AMQ
     end
 
     class Error < StandardError
-      DEFAULT_MESSAGE ||= "AMQP error"
+      DEFAULT_MESSAGE = "AMQP error".freeze
 
       def self.inherited(subclass)
         @_subclasses ||= []
