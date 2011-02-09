@@ -1911,8 +1911,7 @@ module AMQ
 
         # @return
         # ["nowait = false"]
-        def self.encode(channel)
-          nowait = false
+        def self.encode(channel, nowait)
           pieces = []
           pieces << [85, 10].pack(PACK_CACHE[:n2])
           bit_buffer = 0
