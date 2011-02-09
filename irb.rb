@@ -34,17 +34,21 @@ if __FILE__ == $0
 
   IRB.start(__FILE__)
 else
-  irbrc = File.join(ENV["HOME"], ".irbrc")
-  puts "~ Using #{__FILE__} as a custom .irbrc .."
-  puts "~ Loading original #{irbrc} ..."
-  load irbrc
+  begin
+    irbrc = File.join(ENV["HOME"], ".irbrc")
+    puts "~ Using #{__FILE__} as a custom .irbrc .."
+    puts "~ Loading original #{irbrc} ..."
+    load irbrc
 
-  require_relative "lib/amq/protocol/client.rb"
-  include AMQ::Protocol
+    require_relative "lib/amq/protocol/client.rb"
+    include AMQ::Protocol
 
-  require "stringio"
+    require "stringio"
 
-  def fd(data)
-    Frame.decode(StringIO.new(data))
+    def fd(data)
+      Frame.decode(StringIO.new(data))
+    end
+  rescue Exception => exception # it just discards all the exceptions!
+    abort exception.message + "\n  - " + exception.backtrace.join("\n  - ")
   end
 end
