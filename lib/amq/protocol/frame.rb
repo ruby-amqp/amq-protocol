@@ -115,7 +115,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       @id = 4
     end
 
-    Frame::CLASSES = {method: MethodFrame, headers: HeadersFrame, body: BodyFrame, heartbeat: HeadersFrame}
+    Frame::CLASSES = {method: MethodFrame, headers: HeadersFrame, body: BodyFrame, heartbeat: HeartbeatFrame}
     Frame::CLASSES.default_proc = lambda { |hash, key| hash[Frame::TYPES_REVERSE[key]] if (1..4).include?(key) }
   end
 end
