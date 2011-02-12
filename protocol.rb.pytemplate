@@ -5,15 +5,15 @@
 # IT DIRECTLY ! FOR CHANGES, PLEASE UPDATE CODEGEN.PY
 # IN THE ROOT DIRECTORY OF THE AMQ-PROTOCOL REPOSITORY.<% import codegen_helpers as helpers %><% import re, codegen %>
 
-require_relative "table.rb"
-require_relative "frame.rb"
-require_relative "hacks.rb"
+require "amq/protocol/table.rb"
+require "amq/protocol/frame.rb"
+require "amq/protocol/hacks.rb"
 
 module AMQ
   module Protocol
-    PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}"
-    PREAMBLE = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}"
-    DEFAULT_PORT = ${spec.port}
+    PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}".freeze
+    PREAMBLE         = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}".freeze
+    DEFAULT_PORT     = ${spec.port}.freeze
 
     # caching
     EMPTY_STRING = "".freeze
@@ -25,17 +25,17 @@ module AMQ
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
-      Class.classes
+      Protocol::Class.classes
     end
 
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
-      Method.methods
+      Protocol::Method.methods
     end
 
     class Error < StandardError
-      DEFAULT_MESSAGE ||= "AMQP error"
+      DEFAULT_MESSAGE = "AMQP error".freeze
 
       def self.inherited(subclass)
         @_subclasses ||= []
@@ -59,13 +59,13 @@ module AMQ
       end
     end
 
-    class FrameTypeError < Error
+    class FrameTypeError < Protocol::Error
       def initialize(types)
         super("Must be one of #{types.inspect}")
       end
     end
 
-    class EmptyResponseError < Error
+    class EmptyResponseError < Protocol::Error
       DEFAULT_MESSAGE = "Empty response received from the server."
 
       def initialize(message = self.class::DEFAULT_MESSAGE)
@@ -73,19 +73,19 @@ module AMQ
       end
     end
 
-    class BadResponseError < Error
+    class BadResponseError < Protocol::Error
       def initialize(argument, expected, actual)
         super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
       end
     end
 
-    class SoftError < Error
+    class SoftError < Protocol::Error
       def self.inherited(subclass)
         Error.inherited(subclass)
       end # self.inherited(subclass)
     end
 
-    class HardError < Error
+    class HardError < Protocol::Error
       def self.inherited(subclass)
         Error.inherited(subclass)
       end # self.inherited(subclass)
@@ -116,7 +116,7 @@ module AMQ
     # all these methods would become global which would
     # be a bad, bad thing to do.
     class Class
-      @@classes = Array.new
+      @classes = Array.new
 
       def self.method_id
         @method_id
@@ -127,18 +127,18 @@ module AMQ
       end
 
       def self.inherited(base)
-        if self == Class
-          @@classes << base
+        if self == Protocol::Class
+          @classes << base
         end
       end
 
       def self.classes
-        @@classes
+        @classes
       end
     end
 
     class Method
-      @@methods = Array.new
+      @methods = Array.new
       def self.method_id
         @method_id
       end
@@ -152,13 +152,13 @@ module AMQ
       end
 
       def self.inherited(base)
-        if self == Method
-          @@methods << base
+        if self == Protocol::Method
+          @methods << base
         end
       end
 
       def self.methods
-        @@methods
+        @methods
       end
 
       def self.split_headers(user_headers)
@@ -205,7 +205,7 @@ module AMQ
     end
 
     % for klass in spec.classes :
-    class ${klass.constant_name} < Class
+    class ${klass.constant_name} < Protocol::Class
       @name = "${klass.name}"
       @method_id = ${klass.index}
 
@@ -295,7 +295,7 @@ module AMQ
       % endif
 
       % for method in klass.methods:
-      class ${method.constant_name} < Method
+      class ${method.constant_name} < Protocol::Method
         @name = "${klass.name}.${method.name}"
         @method_id = ${method.index}
         @index = ${method.binary()}
