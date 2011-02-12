@@ -17,7 +17,6 @@ class AmqpSpecObject(AmqpSpec):
     IGNORED_CLASSES = ["access", "tx"]
     IGNORED_FIELDS = {
         'ticket': 0,
-        'nowait': 0,
         'capabilities': '',
         'insist' : 0,
         'out_of_band': '',
