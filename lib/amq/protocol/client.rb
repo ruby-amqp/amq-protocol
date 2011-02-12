@@ -10,9 +10,9 @@ require "amq/protocol/hacks.rb"
 
 module AMQ
   module Protocol
-    PROTOCOL_VERSION = "0.9.1"
-    PREAMBLE = "AMQP\x00\x00\x09\x01"
-    DEFAULT_PORT = 5672
+    PROTOCOL_VERSION = "0.9.1".freeze
+    PREAMBLE         = "AMQP\x00\x00\x09\x01".freeze
+    DEFAULT_PORT     = 5672.freeze
 
     # caching
     EMPTY_STRING = "".freeze
@@ -24,7 +24,7 @@ module AMQ
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
-      Class.classes
+      Protocol::Class.classes
     end
 
     # @version 0.0.1
@@ -58,13 +58,13 @@ module AMQ
       end
     end
 
-    class FrameTypeError < Error
+    class FrameTypeError < Protocol::Error
       def initialize(types)
         super("Must be one of #{types.inspect}")
       end
     end
 
-    class EmptyResponseError < Error
+    class EmptyResponseError < Protocol::Error
       DEFAULT_MESSAGE = "Empty response received from the server."
 
       def initialize(message = self.class::DEFAULT_MESSAGE)
@@ -72,19 +72,19 @@ module AMQ
       end
     end
 
-    class BadResponseError < Error
+    class BadResponseError < Protocol::Error
       def initialize(argument, expected, actual)
         super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
       end
     end
 
-    class SoftError < Error
+    class SoftError < Protocol::Error
       def self.inherited(subclass)
         Error.inherited(subclass)
       end # self.inherited(subclass)
     end
 
-    class HardError < Error
+    class HardError < Protocol::Error
       def self.inherited(subclass)
         Error.inherited(subclass)
       end # self.inherited(subclass)
@@ -178,7 +178,7 @@ module AMQ
     # all these methods would become global which would
     # be a bad, bad thing to do.
     class Class
-      @@classes = Array.new
+      @classes = Array.new
 
       def self.method_id
         @method_id
@@ -189,18 +189,18 @@ module AMQ
       end
 
       def self.inherited(base)
-        if self == Class
-          @@classes << base
+        if self == Protocol::Class
+          @classes << base
         end
       end
 
       def self.classes
-        @@classes
+        @classes
       end
     end
 
     class Method
-      @@methods = Array.new
+      @methods = Array.new
       def self.method_id
         @method_id
       end
@@ -214,13 +214,13 @@ module AMQ
       end
 
       def self.inherited(base)
-        if self == Method
-          @@methods << base
+        if self == Protocol::Method
+          @methods << base
         end
       end
 
       def self.methods
-        @@methods
+        @methods
       end
 
       def self.split_headers(user_headers)
@@ -266,7 +266,7 @@ module AMQ
       end
     end
 
-    class Connection < Class
+    class Connection < Protocol::Class
       @name = "connection"
       @method_id = 10
 
@@ -532,7 +532,7 @@ module AMQ
       end
     end
 
-    class Channel < Class
+    class Channel < Protocol::Class
       @name = "channel"
       @method_id = 20
 
@@ -711,7 +711,7 @@ module AMQ
       end
     end
 
-    class Exchange < Class
+    class Exchange < Protocol::Class
       @name = "exchange"
       @method_id = 40
 
@@ -721,7 +721,7 @@ module AMQ
         @index = 0x0028000A # 40, 10, 2621450
 
         # @return
-        # ["ticket = 0", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"exchange = nil", u"type = u"direct"", u"passive = false", u"durable = false", u"auto_delete = false", u"internal = false", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
           ticket = 0
           pieces = []
@@ -765,7 +765,7 @@ module AMQ
         @index = 0x00280014 # 40, 20, 2621460
 
         # @return
-        # ["ticket = 0", "exchange = nil", "if_unused = false", "nowait = false"]
+        # [u"ticket = 0", u"exchange = nil", u"if_unused = false", u"nowait = false"]
         def self.encode(channel, exchange, if_unused, nowait)
           ticket = 0
           pieces = []
@@ -803,7 +803,7 @@ module AMQ
         @index = 0x0028001E # 40, 30, 2621470
 
         # @return
-        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"destination = nil", u"source = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
           pieces = []
@@ -845,7 +845,7 @@ module AMQ
         @index = 0x00280028 # 40, 40, 2621480
 
         # @return
-        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"destination = nil", u"source = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
           pieces = []
@@ -882,7 +882,7 @@ module AMQ
       end
     end
 
-    class Queue < Class
+    class Queue < Protocol::Class
       @name = "queue"
       @method_id = 50
 
@@ -892,7 +892,7 @@ module AMQ
         @index = 0x0032000A # 50, 10, 3276810
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"queue = EMPTY_STRING", u"passive = false", u"durable = false", u"exclusive = false", u"auto_delete = false", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
           ticket = 0
           pieces = []
@@ -946,7 +946,7 @@ module AMQ
         @index = 0x00320014 # 50, 20, 3276820
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "exchange = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"queue = EMPTY_STRING", u"exchange = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, queue, exchange, routing_key, nowait, arguments)
           ticket = 0
           pieces = []
@@ -988,7 +988,7 @@ module AMQ
         @index = 0x0032001E # 50, 30, 3276830
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "nowait = false"]
+        # [u"ticket = 0", u"queue = EMPTY_STRING", u"nowait = false"]
         def self.encode(channel, queue, nowait)
           ticket = 0
           pieces = []
@@ -1029,7 +1029,7 @@ module AMQ
         @index = 0x00320028 # 50, 40, 3276840
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "if_unused = false", "if_empty = false", "nowait = false"]
+        # [u"ticket = 0", u"queue = EMPTY_STRING", u"if_unused = false", u"if_empty = false", u"nowait = false"]
         def self.encode(channel, queue, if_unused, if_empty, nowait)
           ticket = 0
           pieces = []
@@ -1106,7 +1106,7 @@ module AMQ
       end
     end
 
-    class Basic < Class
+    class Basic < Protocol::Class
       @name = "basic"
       @method_id = 60
 
@@ -1395,7 +1395,7 @@ module AMQ
         @index = 0x003C0014 # 60, 20, 3932180
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "consumer_tag = EMPTY_STRING", "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
+        # [u"ticket = 0", u"queue = EMPTY_STRING", u"consumer_tag = EMPTY_STRING", u"no_local = false", u"no_ack = false", u"exclusive = false", u"nowait = false", u"arguments = {}"]
         def self.encode(channel, queue, consumer_tag, no_local, no_ack, exclusive, nowait, arguments)
           ticket = 0
           pieces = []
@@ -1444,7 +1444,7 @@ module AMQ
         @index = 0x003C001E # 60, 30, 3932190
 
         # @return
-        # ["consumer_tag = nil", "nowait = false"]
+        # [u"consumer_tag = nil", u"nowait = false"]
         def self.encode(channel, consumer_tag, nowait)
           pieces = []
           pieces << [60, 30].pack(PACK_CACHE[:n2])
@@ -1791,7 +1791,7 @@ module AMQ
       end
     end
 
-    class Confirm < Class
+    class Confirm < Protocol::Class
       @name = "confirm"
       @method_id = 85
 
@@ -1815,7 +1815,7 @@ module AMQ
         end
 
         # @return
-        # ["nowait = false"]
+        # [u"nowait = false"]
         def self.encode(channel, nowait)
           pieces = []
           pieces << [85, 10].pack(PACK_CACHE[:n2])

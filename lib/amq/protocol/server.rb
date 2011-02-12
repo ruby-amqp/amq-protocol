@@ -10,9 +10,9 @@ require "amq/protocol/hacks.rb"
 
 module AMQ
   module Protocol
-    PROTOCOL_VERSION = "0.9.1"
-    PREAMBLE = "AMQP\x00\x00\x09\x01"
-    DEFAULT_PORT = 5672
+    PROTOCOL_VERSION = "0.9.1".freeze
+    PREAMBLE         = "AMQP\x00\x00\x09\x01".freeze
+    DEFAULT_PORT     = 5672.freeze
 
     # caching
     EMPTY_STRING = "".freeze
@@ -24,17 +24,17 @@ module AMQ
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
-      Class.classes
+      Protocol::Class.classes
     end
 
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
-      Method.methods
+      Protocol::Method.methods
     end
 
     class Error < StandardError
-      DEFAULT_MESSAGE ||= "AMQP error"
+      DEFAULT_MESSAGE = "AMQP error".freeze
 
       def self.inherited(subclass)
         @_subclasses ||= []
@@ -58,13 +58,13 @@ module AMQ
       end
     end
 
-    class FrameTypeError < Error
+    class FrameTypeError < Protocol::Error
       def initialize(types)
         super("Must be one of #{types.inspect}")
       end
     end
 
-    class EmptyResponseError < Error
+    class EmptyResponseError < Protocol::Error
       DEFAULT_MESSAGE = "Empty response received from the server."
 
       def initialize(message = self.class::DEFAULT_MESSAGE)
@@ -72,19 +72,19 @@ module AMQ
       end
     end
 
-    class BadResponseError < Error
+    class BadResponseError < Protocol::Error
       def initialize(argument, expected, actual)
         super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
       end
     end
 
-    class SoftError < Error
+    class SoftError < Protocol::Error
       def self.inherited(subclass)
         Error.inherited(subclass)
       end # self.inherited(subclass)
     end
 
-    class HardError < Error
+    class HardError < Protocol::Error
       def self.inherited(subclass)
         Error.inherited(subclass)
       end # self.inherited(subclass)
@@ -178,7 +178,7 @@ module AMQ
     # all these methods would become global which would
     # be a bad, bad thing to do.
     class Class
-      @@classes = Array.new
+      @classes = Array.new
 
       def self.method_id
         @method_id
@@ -189,18 +189,18 @@ module AMQ
       end
 
       def self.inherited(base)
-        if self == Class
-          @@classes << base
+        if self == Protocol::Class
+          @classes << base
         end
       end
 
       def self.classes
-        @@classes
+        @classes
       end
     end
 
     class Method
-      @@methods = Array.new
+      @methods = Array.new
       def self.method_id
         @method_id
       end
@@ -214,13 +214,13 @@ module AMQ
       end
 
       def self.inherited(base)
-        if self == Method
-          @@methods << base
+        if self == Protocol::Method
+          @methods << base
         end
       end
 
       def self.methods
-        @@methods
+        @methods
       end
 
       def self.split_headers(user_headers)
@@ -266,11 +266,11 @@ module AMQ
       end
     end
 
-    class Connection < Class
+    class Connection < Protocol::Class
       @name = "connection"
       @method_id = 10
 
-      class Start < Method
+      class Start < Protocol::Method
         @name = "connection.start"
         @method_id = 10
         @index = 0x000A000A # 10, 10, 655370
@@ -293,7 +293,7 @@ module AMQ
         end
       end
 
-      class StartOk < Method
+      class StartOk < Protocol::Method
         @name = "connection.start-ok"
         @method_id = 11
         @index = 0x000A000B # 10, 11, 655371
@@ -327,7 +327,7 @@ module AMQ
         end
       end
 
-      class Secure < Method
+      class Secure < Protocol::Method
         @name = "connection.secure"
         @method_id = 20
         @index = 0x000A0014 # 10, 20, 655380
@@ -345,7 +345,7 @@ module AMQ
         end
       end
 
-      class SecureOk < Method
+      class SecureOk < Protocol::Method
         @name = "connection.secure-ok"
         @method_id = 21
         @index = 0x000A0015 # 10, 21, 655381
@@ -366,7 +366,7 @@ module AMQ
         end
       end
 
-      class Tune < Method
+      class Tune < Protocol::Method
         @name = "connection.tune"
         @method_id = 30
         @index = 0x000A001E # 10, 30, 655390
@@ -385,7 +385,7 @@ module AMQ
         end
       end
 
-      class TuneOk < Method
+      class TuneOk < Protocol::Method
         @name = "connection.tune-ok"
         @method_id = 31
         @index = 0x000A001F # 10, 31, 655391
@@ -410,7 +410,7 @@ module AMQ
         end
       end
 
-      class Open < Method
+      class Open < Protocol::Method
         @name = "connection.open"
         @method_id = 40
         @index = 0x000A0028 # 10, 40, 655400
@@ -440,7 +440,7 @@ module AMQ
         end
       end
 
-      class OpenOk < Method
+      class OpenOk < Protocol::Method
         @name = "connection.open-ok"
         @method_id = 41
         @index = 0x000A0029 # 10, 41, 655401
@@ -458,7 +458,7 @@ module AMQ
         end
       end
 
-      class Close < Method
+      class Close < Protocol::Method
         @name = "connection.close"
         @method_id = 50
         @index = 0x000A0032 # 10, 50, 655410
@@ -507,7 +507,7 @@ module AMQ
         end
       end
 
-      class CloseOk < Method
+      class CloseOk < Protocol::Method
         @name = "connection.close-ok"
         @method_id = 51
         @index = 0x000A0033 # 10, 51, 655411
@@ -533,11 +533,11 @@ module AMQ
       end
     end
 
-    class Channel < Class
+    class Channel < Protocol::Class
       @name = "channel"
       @method_id = 20
 
-      class Open < Method
+      class Open < Protocol::Method
         @name = "channel.open"
         @method_id = 10
         @index = 0x0014000A # 20, 10, 1310730
@@ -558,7 +558,7 @@ module AMQ
         end
       end
 
-      class OpenOk < Method
+      class OpenOk < Protocol::Method
         @name = "channel.open-ok"
         @method_id = 11
         @index = 0x0014000B # 20, 11, 1310731
@@ -575,7 +575,7 @@ module AMQ
         end
       end
 
-      class Flow < Method
+      class Flow < Protocol::Method
         @name = "channel.flow"
         @method_id = 20
         @index = 0x00140014 # 20, 20, 1310740
@@ -607,7 +607,7 @@ module AMQ
         end
       end
 
-      class FlowOk < Method
+      class FlowOk < Protocol::Method
         @name = "channel.flow-ok"
         @method_id = 21
         @index = 0x00140015 # 20, 21, 1310741
@@ -639,7 +639,7 @@ module AMQ
         end
       end
 
-      class Close < Method
+      class Close < Protocol::Method
         @name = "channel.close"
         @method_id = 40
         @index = 0x00140028 # 20, 40, 1310760
@@ -687,7 +687,7 @@ module AMQ
         end
       end
 
-      class CloseOk < Method
+      class CloseOk < Protocol::Method
         @name = "channel.close-ok"
         @method_id = 41
         @index = 0x00140029 # 20, 41, 1310761
@@ -712,11 +712,11 @@ module AMQ
       end
     end
 
-    class Exchange < Class
+    class Exchange < Protocol::Class
       @name = "exchange"
       @method_id = 40
 
-      class Declare < Method
+      class Declare < Protocol::Method
         @name = "exchange.declare"
         @method_id = 10
         @index = 0x0028000A # 40, 10, 2621450
@@ -756,7 +756,7 @@ module AMQ
         end
       end
 
-      class DeclareOk < Method
+      class DeclareOk < Protocol::Method
         @name = "exchange.declare-ok"
         @method_id = 11
         @index = 0x0028000B # 40, 11, 2621451
@@ -771,7 +771,7 @@ module AMQ
         end
       end
 
-      class Delete < Method
+      class Delete < Protocol::Method
         @name = "exchange.delete"
         @method_id = 20
         @index = 0x00280014 # 40, 20, 2621460
@@ -800,7 +800,7 @@ module AMQ
         end
       end
 
-      class DeleteOk < Method
+      class DeleteOk < Protocol::Method
         @name = "exchange.delete-ok"
         @method_id = 21
         @index = 0x00280015 # 40, 21, 2621461
@@ -815,7 +815,7 @@ module AMQ
         end
       end
 
-      class Bind < Method
+      class Bind < Protocol::Method
         @name = "exchange.bind"
         @method_id = 30
         @index = 0x0028001E # 40, 30, 2621470
@@ -856,7 +856,7 @@ module AMQ
         end
       end
 
-      class BindOk < Method
+      class BindOk < Protocol::Method
         @name = "exchange.bind-ok"
         @method_id = 31
         @index = 0x0028001F # 40, 31, 2621471
@@ -871,7 +871,7 @@ module AMQ
         end
       end
 
-      class Unbind < Method
+      class Unbind < Protocol::Method
         @name = "exchange.unbind"
         @method_id = 40
         @index = 0x00280028 # 40, 40, 2621480
@@ -912,7 +912,7 @@ module AMQ
         end
       end
 
-      class UnbindOk < Method
+      class UnbindOk < Protocol::Method
         @name = "exchange.unbind-ok"
         @method_id = 51
         @index = 0x00280033 # 40, 51, 2621491
@@ -928,11 +928,11 @@ module AMQ
       end
     end
 
-    class Queue < Class
+    class Queue < Protocol::Class
       @name = "queue"
       @method_id = 50
 
-      class Declare < Method
+      class Declare < Protocol::Method
         @name = "queue.declare"
         @method_id = 10
         @index = 0x0032000A # 50, 10, 3276810
@@ -967,7 +967,7 @@ module AMQ
         end
       end
 
-      class DeclareOk < Method
+      class DeclareOk < Protocol::Method
         @name = "queue.declare-ok"
         @method_id = 11
         @index = 0x0032000B # 50, 11, 3276811
@@ -986,7 +986,7 @@ module AMQ
         end
       end
 
-      class Bind < Method
+      class Bind < Protocol::Method
         @name = "queue.bind"
         @method_id = 20
         @index = 0x00320014 # 50, 20, 3276820
@@ -1027,7 +1027,7 @@ module AMQ
         end
       end
 
-      class BindOk < Method
+      class BindOk < Protocol::Method
         @name = "queue.bind-ok"
         @method_id = 21
         @index = 0x00320015 # 50, 21, 3276821
@@ -1042,7 +1042,7 @@ module AMQ
         end
       end
 
-      class Purge < Method
+      class Purge < Protocol::Method
         @name = "queue.purge"
         @method_id = 30
         @index = 0x0032001E # 50, 30, 3276830
@@ -1070,7 +1070,7 @@ module AMQ
         end
       end
 
-      class PurgeOk < Method
+      class PurgeOk < Protocol::Method
         @name = "queue.purge-ok"
         @method_id = 31
         @index = 0x0032001F # 50, 31, 3276831
@@ -1086,7 +1086,7 @@ module AMQ
         end
       end
 
-      class Delete < Method
+      class Delete < Protocol::Method
         @name = "queue.delete"
         @method_id = 40
         @index = 0x00320028 # 50, 40, 3276840
@@ -1116,7 +1116,7 @@ module AMQ
         end
       end
 
-      class DeleteOk < Method
+      class DeleteOk < Protocol::Method
         @name = "queue.delete-ok"
         @method_id = 41
         @index = 0x00320029 # 50, 41, 3276841
@@ -1132,7 +1132,7 @@ module AMQ
         end
       end
 
-      class Unbind < Method
+      class Unbind < Protocol::Method
         @name = "queue.unbind"
         @method_id = 50
         @index = 0x00320032 # 50, 50, 3276850
@@ -1169,7 +1169,7 @@ module AMQ
         end
       end
 
-      class UnbindOk < Method
+      class UnbindOk < Protocol::Method
         @name = "queue.unbind-ok"
         @method_id = 51
         @index = 0x00320033 # 50, 51, 3276851
@@ -1185,7 +1185,7 @@ module AMQ
       end
     end
 
-    class Basic < Class
+    class Basic < Protocol::Class
       @name = "basic"
       @method_id = 60
 
@@ -1433,7 +1433,7 @@ module AMQ
         properties
       end
 
-      class Qos < Method
+      class Qos < Protocol::Method
         @name = "basic.qos"
         @method_id = 10
         @index = 0x003C000A # 60, 10, 3932170
@@ -1459,7 +1459,7 @@ module AMQ
         end
       end
 
-      class QosOk < Method
+      class QosOk < Protocol::Method
         @name = "basic.qos-ok"
         @method_id = 11
         @index = 0x003C000B # 60, 11, 3932171
@@ -1474,7 +1474,7 @@ module AMQ
         end
       end
 
-      class Consume < Method
+      class Consume < Protocol::Method
         @name = "basic.consume"
         @method_id = 20
         @index = 0x003C0014 # 60, 20, 3932180
@@ -1513,7 +1513,7 @@ module AMQ
         end
       end
 
-      class ConsumeOk < Method
+      class ConsumeOk < Protocol::Method
         @name = "basic.consume-ok"
         @method_id = 21
         @index = 0x003C0015 # 60, 21, 3932181
@@ -1530,7 +1530,7 @@ module AMQ
         end
       end
 
-      class Cancel < Method
+      class Cancel < Protocol::Method
         @name = "basic.cancel"
         @method_id = 30
         @index = 0x003C001E # 60, 30, 3932190
@@ -1555,7 +1555,7 @@ module AMQ
         end
       end
 
-      class CancelOk < Method
+      class CancelOk < Protocol::Method
         @name = "basic.cancel-ok"
         @method_id = 31
         @index = 0x003C001F # 60, 31, 3932191
@@ -1572,7 +1572,7 @@ module AMQ
         end
       end
 
-      class Publish < Method
+      class Publish < Protocol::Method
         @name = "basic.publish"
         @method_id = 40
         @index = 0x003C0028 # 60, 40, 3932200
@@ -1606,7 +1606,7 @@ module AMQ
         end
       end
 
-      class Return < Method
+      class Return < Protocol::Method
         @name = "basic.return"
         @method_id = 50
         @index = 0x003C0032 # 60, 50, 3932210
@@ -1636,7 +1636,7 @@ module AMQ
         end
       end
 
-      class Deliver < Method
+      class Deliver < Protocol::Method
         @name = "basic.deliver"
         @method_id = 60
         @index = 0x003C003C # 60, 60, 3932220
@@ -1669,7 +1669,7 @@ module AMQ
         end
       end
 
-      class Get < Method
+      class Get < Protocol::Method
         @name = "basic.get"
         @method_id = 70
         @index = 0x003C0046 # 60, 70, 3932230
@@ -1697,7 +1697,7 @@ module AMQ
         end
       end
 
-      class GetOk < Method
+      class GetOk < Protocol::Method
         @name = "basic.get-ok"
         @method_id = 71
         @index = 0x003C0047 # 60, 71, 3932231
@@ -1729,7 +1729,7 @@ module AMQ
         end
       end
 
-      class GetEmpty < Method
+      class GetEmpty < Protocol::Method
         @name = "basic.get-empty"
         @method_id = 72
         @index = 0x003C0048 # 60, 72, 3932232
@@ -1746,7 +1746,7 @@ module AMQ
         end
       end
 
-      class Ack < Method
+      class Ack < Protocol::Method
         @name = "basic.ack"
         @method_id = 80
         @index = 0x003C0050 # 60, 80, 3932240
@@ -1769,7 +1769,7 @@ module AMQ
         end
       end
 
-      class Reject < Method
+      class Reject < Protocol::Method
         @name = "basic.reject"
         @method_id = 90
         @index = 0x003C005A # 60, 90, 3932250
@@ -1792,7 +1792,7 @@ module AMQ
         end
       end
 
-      class RecoverAsync < Method
+      class RecoverAsync < Protocol::Method
         @name = "basic.recover-async"
         @method_id = 100
         @index = 0x003C0064 # 60, 100, 3932260
@@ -1812,7 +1812,7 @@ module AMQ
         end
       end
 
-      class Recover < Method
+      class Recover < Protocol::Method
         @name = "basic.recover"
         @method_id = 110
         @index = 0x003C006E # 60, 110, 3932270
@@ -1832,7 +1832,7 @@ module AMQ
         end
       end
 
-      class RecoverOk < Method
+      class RecoverOk < Protocol::Method
         @name = "basic.recover-ok"
         @method_id = 111
         @index = 0x003C006F # 60, 111, 3932271
@@ -1847,7 +1847,7 @@ module AMQ
         end
       end
 
-      class Nack < Method
+      class Nack < Protocol::Method
         @name = "basic.nack"
         @method_id = 120
         @index = 0x003C0078 # 60, 120, 3932280
@@ -1886,11 +1886,11 @@ module AMQ
       end
     end
 
-    class Confirm < Class
+    class Confirm < Protocol::Class
       @name = "confirm"
       @method_id = 85
 
-      class Select < Method
+      class Select < Protocol::Method
         @name = "confirm.select"
         @method_id = 10
         @index = 0x0055000A # 85, 10, 5570570
@@ -1910,7 +1910,7 @@ module AMQ
         end
 
         # @return
-        # ["nowait = false"]
+        # [u"nowait = false"]
         def self.encode(channel, nowait)
           pieces = []
           pieces << [85, 10].pack(PACK_CACHE[:n2])
@@ -1922,7 +1922,7 @@ module AMQ
         end
       end
 
-      class SelectOk < Method
+      class SelectOk < Protocol::Method
         @name = "confirm.select-ok"
         @method_id = 11
         @index = 0x0055000B # 85, 11, 5570571
