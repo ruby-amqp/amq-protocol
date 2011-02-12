@@ -15,18 +15,6 @@ describe AMQ::Protocol do
     AMQ::Protocol::PREAMBLE.should be_kind_of(String)
   end
 
-  describe ".classes" do
-    it "should include all the AMQP classes" do
-      AMQ::Protocol.classes.should include(AMQ::Protocol::Queue)
-    end
-  end
-
-  describe ".methods" do
-    it "should include all the AMQP methods" do
-      AMQ::Protocol.methods.should include(AMQ::Protocol::Queue::DeclareOk)
-    end
-  end
-
   describe AMQ::Protocol::Error do
     it "should be an exception class" do
       AMQ::Protocol::Error.should < Exception
