@@ -78,9 +78,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Secure.name.should eql("connection.secure")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::Secure.method.should eql("TODO")
+      it "should have method equal to 20" do
+        AMQ::Protocol::Connection::Secure.method_id.should == 20
       end
     end
 
