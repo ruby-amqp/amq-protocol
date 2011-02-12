@@ -30,9 +30,8 @@ describe AMQ::Protocol do
       AMQ::Protocol::Connection.name.should eql("connection")
     end
 
-    it "should have method equal to TODO" do
-      pending
-      AMQ::Protocol::Connection.method.should eql("TODO")
+    it "should have method id equal to 10" do
+      AMQ::Protocol::Connection.method_id.should == 10
     end
 
     describe AMQ::Protocol::Connection::Start do
@@ -44,9 +43,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Start.name.should eql("connection.start")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::Start.method.should eql("TODO")
+      it "should have method id equal to 10" do
+        AMQ::Protocol::Connection::Start.method_id.should == 10
       end
     end
 
@@ -870,7 +868,7 @@ describe AMQ::Protocol do
       it "should have method equal to TODO" do
         pending
         AMQ::Protocol::Basic::RecoverOk.method.should eql("TODO")
-      end
-    end
-  end
-end
+      end # it
+    end # describe AMQ::Protocol::Basic::RecoverOk do
+  end # describe AMQ::Protocol::Basic do
+end # describe AMQ::Protocol do
