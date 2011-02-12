@@ -57,7 +57,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::StartOk.name.should eql("connection.start-ok")
       end
 
-      it "should have method equal to 11" do
+      it "has method id equal to 11" do
         AMQ::Protocol::Connection::StartOk.method_id.should == 11
       end
 
@@ -78,7 +78,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Secure.name.should eql("connection.secure")
       end
 
-      it "should have method equal to 20" do
+      it "has method id equal to 20" do
         AMQ::Protocol::Connection::Secure.method_id.should == 20
       end
     end
@@ -92,7 +92,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::SecureOk.name.should eql("connection.secure-ok")
       end
 
-      it "should have method equal to 21" do
+      it "has method id equal to 21" do
         AMQ::Protocol::Connection::SecureOk.method_id.should == 21
       end
     end
@@ -106,7 +106,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Tune.name.should eql("connection.tune")
       end
 
-      it "should have method equal to 30" do
+      it "has method id equal to 30" do
         AMQ::Protocol::Connection::Tune.method_id.should == 30
       end
     end
@@ -120,7 +120,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::TuneOk.name.should eql("connection.tune-ok")
       end
 
-      it "should have method equal to 31" do
+      it "has method id equal to 31" do
         AMQ::Protocol::Connection::TuneOk.method_id.should == 31
       end
 
@@ -141,7 +141,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Open.name.should eql("connection.open")
       end
 
-      it "should have method equal to 40" do
+      it "has method id equal to 40" do
         AMQ::Protocol::Connection::Open.method_id.should == 40
       end
     end
@@ -155,7 +155,7 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::OpenOk.name.should eql("connection.open-ok")
       end
 
-      it "should have method equal to 41" do
+      it "has method id equal to 41" do
         AMQ::Protocol::Connection::OpenOk.method_id.should == 41
       end
     end
@@ -169,9 +169,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Close.name.should eql("connection.close")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::Close.method.should eql("TODO")
+      it "has method id equal to 50" do
+        AMQ::Protocol::Connection::Close.method_id.should == 50
       end
     end
 
@@ -184,9 +183,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::CloseOk.name.should eql("connection.close-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::CloseOk.method.should eql("TODO")
+      it "has method id equal to 51" do
+        AMQ::Protocol::Connection::CloseOk.method_id.should == 51
       end
     end
   end
@@ -200,9 +198,8 @@ describe AMQ::Protocol do
       AMQ::Protocol::Channel.name.should eql("channel")
     end
 
-    it "should have method equal to TODO" do
-      pending
-      AMQ::Protocol::Channel.method.should eql("TODO")
+    it "has method id equal to 20" do
+      AMQ::Protocol::Channel.method_id.should == 20
     end
 
     describe AMQ::Protocol::Channel::Open do
@@ -214,9 +211,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Channel::Open.name.should eql("channel.open")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Channel::Open.method.should eql("TODO")
+      it "has method id equal to 10" do
+        AMQ::Protocol::Channel::Open.method_id.should == 10
       end
     end
 
@@ -229,9 +225,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Channel::OpenOk.name.should eql("channel.open-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Channel::OpenOk.method.should eql("TODO")
+      it "has method id equal to 11" do
+        AMQ::Protocol::Channel::OpenOk.method_id.should == 11
       end
     end
 
@@ -244,9 +239,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Channel::Flow.name.should eql("channel.flow")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Channel::Flow.method.should eql("TODO")
+      it "has method id equal to 20" do
+        AMQ::Protocol::Channel::Flow.method_id.should == 20
       end
     end
 
@@ -259,9 +253,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Channel::FlowOk.name.should eql("channel.flow-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Channel::FlowOk.method.should eql("TODO")
+      it "has method id equal to 21" do
+        AMQ::Protocol::Channel::FlowOk.method_id.should == 21
       end
     end
 
@@ -274,9 +267,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Channel::Close.name.should eql("channel.close")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Channel::Close.method.should eql("TODO")
+      it "has method id equal to 40" do
+        AMQ::Protocol::Channel::Close.method_id.should == 40
       end
     end
 
@@ -289,9 +281,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Channel::CloseOk.name.should eql("channel.close-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Channel::CloseOk.method.should eql("TODO")
+      it "has method id equal to 41" do
+        AMQ::Protocol::Channel::CloseOk.method_id.should == 41
       end
     end
   end
@@ -305,9 +296,8 @@ describe AMQ::Protocol do
       AMQ::Protocol::Exchange.name.should eql("exchange")
     end
 
-    it "should have method equal to TODO" do
-      pending
-      AMQ::Protocol::Exchange.method.should eql("TODO")
+    it "has method id equal to 40" do
+      AMQ::Protocol::Exchange.method_id.should == 40
     end
 
     describe AMQ::Protocol::Exchange::Declare do
@@ -319,9 +309,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::Declare.name.should eql("exchange.declare")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::Declare.method.should eql("TODO")
+      it "has method id equal to 10" do
+        AMQ::Protocol::Exchange::Declare.method_id.should == 10
       end
     end
 
@@ -334,9 +323,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::DeclareOk.name.should eql("exchange.declare-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::DeclareOk.method.should eql("TODO")
+      it "has method id equal to 11" do
+        AMQ::Protocol::Exchange::DeclareOk.method_id.should == 11
       end
     end
 
@@ -349,9 +337,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::Delete.name.should eql("exchange.delete")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::Delete.method.should eql("TODO")
+      it "has method id equal to 20" do
+        AMQ::Protocol::Exchange::Delete.method_id.should == 20
       end
     end
 
@@ -364,9 +351,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::DeleteOk.name.should eql("exchange.delete-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::DeleteOk.method.should eql("TODO")
+      it "has method id equal to 21" do
+        AMQ::Protocol::Exchange::DeleteOk.method_id.should == 21
       end
     end
 
@@ -379,9 +365,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::Bind.name.should eql("exchange.bind")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::Bind.method.should eql("TODO")
+      it "has method id equal to 30" do
+        AMQ::Protocol::Exchange::Bind.method_id.should == 30
       end
     end
 
@@ -394,9 +379,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::BindOk.name.should eql("exchange.bind-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::BindOk.method.should eql("TODO")
+      it "has method id equal to 31" do
+        AMQ::Protocol::Exchange::BindOk.method_id.should == 31
       end
     end
 
@@ -409,9 +393,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::Unbind.name.should eql("exchange.unbind")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::Unbind.method.should eql("TODO")
+      it "has method id equal to 40" do
+        AMQ::Protocol::Exchange::Unbind.method_id.should == 40
       end
     end
 
@@ -424,9 +407,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Exchange::UnbindOk.name.should eql("exchange.unbind-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Exchange::UnbindOk.method.should eql("TODO")
+      it "has method id equal to 51" do
+        AMQ::Protocol::Exchange::UnbindOk.method_id.should == 51
       end
     end
   end
@@ -440,9 +422,8 @@ describe AMQ::Protocol do
       AMQ::Protocol::Queue.name.should eql("queue")
     end
 
-    it "should have method equal to TODO" do
-      pending
-      AMQ::Protocol::Queue.method.should eql("TODO")
+    it "has method id equal to 50" do
+      AMQ::Protocol::Queue.method_id.should == 50
     end
 
     describe AMQ::Protocol::Queue::Declare do
@@ -454,9 +435,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::Declare.name.should eql("queue.declare")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::Declare.method.should eql("TODO")
+      it "has method id equal to 10" do
+        AMQ::Protocol::Queue::Declare.method_id.should == 10
       end
     end
 
@@ -469,9 +449,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::DeclareOk.name.should eql("queue.declare-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::DeclareOk.method.should eql("TODO")
+      it "has method id equal to 11" do
+        AMQ::Protocol::Queue::DeclareOk.method_id.should == 11
       end
     end
 
@@ -484,9 +463,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::Bind.name.should eql("queue.bind")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::Bind.method.should eql("TODO")
+      it "has method id equal to 20" do
+        AMQ::Protocol::Queue::Bind.method_id.should == 20
       end
     end
 
@@ -499,9 +477,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::BindOk.name.should eql("queue.bind-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::BindOk.method.should eql("TODO")
+      it "has method id equal to 21" do
+        AMQ::Protocol::Queue::BindOk.method_id.should == 21
       end
     end
 
@@ -514,9 +491,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::Purge.name.should eql("queue.purge")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::Purge.method.should eql("TODO")
+      it "has method id equal to 30" do
+        AMQ::Protocol::Queue::Purge.method_id.should == 30
       end
     end
 
@@ -529,9 +505,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::PurgeOk.name.should eql("queue.purge-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::PurgeOk.method.should eql("TODO")
+      it "has method id equal to 31" do
+        AMQ::Protocol::Queue::PurgeOk.method_id.should == 31
       end
     end
 
@@ -544,9 +519,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::Delete.name.should eql("queue.delete")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::Delete.method.should eql("TODO")
+      it "has method id equal to 40" do
+        AMQ::Protocol::Queue::Delete.method_id.should == 40
       end
     end
 
@@ -559,9 +533,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::DeleteOk.name.should eql("queue.delete-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::DeleteOk.method.should eql("TODO")
+      it "has method id equal to 41" do
+        AMQ::Protocol::Queue::DeleteOk.method_id.should == 41
       end
     end
 
@@ -574,9 +547,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::Unbind.name.should eql("queue.unbind")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::Unbind.method.should eql("TODO")
+      it "has method id equal to 50" do
+        AMQ::Protocol::Queue::Unbind.method_id.should == 50
       end
     end
 
@@ -589,9 +561,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Queue::UnbindOk.name.should eql("queue.unbind-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Queue::UnbindOk.method.should eql("TODO")
+      it "has method id equal to 51" do
+        AMQ::Protocol::Queue::UnbindOk.method_id.should == 51
       end
     end
   end
@@ -605,9 +576,8 @@ describe AMQ::Protocol do
       AMQ::Protocol::Basic.name.should eql("basic")
     end
 
-    it "should have method equal to TODO" do
-      pending
-      AMQ::Protocol::Basic.method.should eql("TODO")
+    it "has method id equal to 60" do
+      AMQ::Protocol::Basic.method_id.should == 60
     end
     describe AMQ::Protocol::Basic::Qos do
       it "should be a subclass of Method" do
@@ -618,9 +588,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Qos.name.should eql("basic.qos")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Qos.method.should eql("TODO")
+      it "has method id equal to 10" do
+        AMQ::Protocol::Basic::Qos.method_id.should == 10
       end
     end
 
@@ -633,9 +602,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::QosOk.name.should eql("basic.qos-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::QosOk.method.should eql("TODO")
+      it "has method id equal to 11" do
+        AMQ::Protocol::Basic::QosOk.method_id.should == 11
       end
     end
 
@@ -648,9 +616,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Consume.name.should eql("basic.consume")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Consume.method.should eql("TODO")
+      it "has method id equal to 20" do
+        AMQ::Protocol::Basic::Consume.method_id.should == 20
       end
     end
 
@@ -663,9 +630,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::ConsumeOk.name.should eql("basic.consume-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::ConsumeOk.method.should eql("TODO")
+      it "has method id equal to 21" do
+        AMQ::Protocol::Basic::ConsumeOk.method_id.should == 21
       end
     end
 
@@ -678,9 +644,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Cancel.name.should eql("basic.cancel")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Cancel.method.should eql("TODO")
+      it "has method id equal to 30" do
+        AMQ::Protocol::Basic::Cancel.method_id.should == 30
       end
     end
 
@@ -693,9 +658,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::CancelOk.name.should eql("basic.cancel-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::CancelOk.method.should eql("TODO")
+      it "has method id equal to 31" do
+        AMQ::Protocol::Basic::CancelOk.method_id.should == 31
       end
     end
 
@@ -708,9 +672,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Publish.name.should eql("basic.publish")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Publish.method.should eql("TODO")
+      it "has method id equal to 40" do
+        AMQ::Protocol::Basic::Publish.method_id.should == 40
       end
     end
 
@@ -723,9 +686,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Return.name.should eql("basic.return")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Return.method.should eql("TODO")
+      it "has method id equal to 50" do
+        AMQ::Protocol::Basic::Return.method_id.should == 50
       end
     end
 
@@ -738,9 +700,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Deliver.name.should eql("basic.deliver")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Deliver.method.should eql("TODO")
+      it "has method id equal to 60" do
+        AMQ::Protocol::Basic::Deliver.method_id.should == 60
       end
     end
 
@@ -753,9 +714,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Get.name.should eql("basic.get")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Get.method.should eql("TODO")
+      it "has method id equal to 70" do
+        AMQ::Protocol::Basic::Get.method_id.should == 70
       end
     end
 
@@ -768,9 +728,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::GetOk.name.should eql("basic.get-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::GetOk.method.should eql("TODO")
+      it "has method id equal to 71" do
+        AMQ::Protocol::Basic::GetOk.method_id.should == 71
       end
     end
 
@@ -783,9 +742,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::GetEmpty.name.should eql("basic.get-empty")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::GetEmpty.method.should eql("TODO")
+      it "has method id equal to 72" do
+        AMQ::Protocol::Basic::GetEmpty.method_id.should == 72
       end
     end
 
@@ -798,9 +756,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Ack.name.should eql("basic.ack")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Ack.method.should eql("TODO")
+      it "has method id equal to 80" do
+        AMQ::Protocol::Basic::Ack.method_id.should == 80
       end
     end
 
@@ -813,9 +770,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Reject.name.should eql("basic.reject")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Reject.method.should eql("TODO")
+      it "has method id equal to 90" do
+        AMQ::Protocol::Basic::Reject.method_id.should == 90
       end
     end
 
@@ -828,9 +784,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::RecoverAsync.name.should eql("basic.recover-async")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::RecoverAsync.method.should eql("TODO")
+      it "has method id equal to 100" do
+        AMQ::Protocol::Basic::RecoverAsync.method_id.should == 100
       end
     end
 
@@ -843,9 +798,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::Recover.name.should eql("basic.recover")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::Recover.method.should eql("TODO")
+      it "has method id equal to 110" do
+        AMQ::Protocol::Basic::Recover.method_id.should == 110
       end
     end
 
@@ -858,9 +812,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Basic::RecoverOk.name.should eql("basic.recover-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Basic::RecoverOk.method.should eql("TODO")
+      it "has method id equal to 111" do
+        AMQ::Protocol::Basic::RecoverOk.method_id.should == 111
       end # it
     end # describe AMQ::Protocol::Basic::RecoverOk do
   end # describe AMQ::Protocol::Basic do
