@@ -141,9 +141,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Open.name.should eql("connection.open")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::Open.method.should eql("TODO")
+      it "should have method equal to 40" do
+        AMQ::Protocol::Connection::Open.method_id.should == 40
       end
     end
 
@@ -156,9 +155,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::OpenOk.name.should eql("connection.open-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::OpenOk.method.should eql("TODO")
+      it "should have method equal to 41" do
+        AMQ::Protocol::Connection::OpenOk.method_id.should == 41
       end
     end
 
