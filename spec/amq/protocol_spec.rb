@@ -57,9 +57,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::StartOk.name.should eql("connection.start-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::StartOk.method.should eql("TODO")
+      it "should have method equal to 11" do
+        AMQ::Protocol::Connection::StartOk.method_id.should == 11
       end
 
       describe ".encode" do
