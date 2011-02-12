@@ -106,9 +106,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::Tune.name.should eql("connection.tune")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::Tune.method.should eql("TODO")
+      it "should have method equal to 30" do
+        AMQ::Protocol::Connection::Tune.method_id.should == 30
       end
     end
 
@@ -121,9 +120,8 @@ describe AMQ::Protocol do
         AMQ::Protocol::Connection::TuneOk.name.should eql("connection.tune-ok")
       end
 
-      it "should have method equal to TODO" do
-        pending
-        AMQ::Protocol::Connection::TuneOk.method.should eql("TODO")
+      it "should have method equal to 31" do
+        AMQ::Protocol::Connection::TuneOk.method_id.should == 31
       end
 
       describe ".encode" do
