@@ -28,6 +28,7 @@ require "irb"
 if __FILE__ == $0
   puts "~ Using #{__FILE__} as an executable ..."
 
+
   def IRB.rc_file_generators
     yield Proc.new { |_| __FILE__ }
   end
@@ -40,7 +41,8 @@ else
     puts "~ Loading original #{irbrc} ..."
     load irbrc
 
-    require_relative "lib/amq/protocol/client.rb"
+    file = ENV["FILE"] || "client"
+    require_relative "lib/amq/protocol/#{file}.rb"
     include AMQ::Protocol
 
     require "stringio"
