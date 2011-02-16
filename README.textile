@@ -46,3 +46,4 @@ h1. Links
 * "RDoc.info API Docs":http://rdoc.info/github/ruby-amqp/amq-protocol/master/frames
 * "Examples":https://github.com/ruby-amqp/amq-protocol/tree/master/examples/
 * "Bug reporting":http://github.com/ruby-amqp/amq-protocol/issues
+* "Jenkins CI Server":http://jenkins.101ideas.cz/job/AMQ%20Protocol
