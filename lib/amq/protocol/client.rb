@@ -303,12 +303,20 @@ module AMQ
           @mechanisms = mechanisms
           @locales = locales
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class StartOk < Protocol::Method
         @name = "connection.start-ok"
         @method_id = 11
         @index = 0x000A000B # 10, 11, 655371
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"client_properties = nil", u"mechanism = u"PLAIN"", u"response = nil", u"locale = u"en_US""]
@@ -347,12 +355,20 @@ module AMQ
         def initialize(challenge)
           @challenge = challenge
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class SecureOk < Protocol::Method
         @name = "connection.secure-ok"
         @method_id = 21
         @index = 0x000A0015 # 10, 21, 655381
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"response = nil"]
@@ -390,12 +406,20 @@ module AMQ
           @frame_max = frame_max
           @heartbeat = heartbeat
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class TuneOk < Protocol::Method
         @name = "connection.tune-ok"
         @method_id = 31
         @index = 0x000A001F # 10, 31, 655391
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"channel_max = false", u"frame_max = false", u"heartbeat = false"]
@@ -415,6 +439,10 @@ module AMQ
         @name = "connection.open"
         @method_id = 40
         @index = 0x000A0028 # 10, 40, 655400
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"virtual_host = u"/"", u"capabilities = EMPTY_STRING", u"insist = false"]
@@ -455,6 +483,10 @@ module AMQ
         def initialize(known_hosts)
           @known_hosts = known_hosts
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Close < Protocol::Method
@@ -490,6 +522,10 @@ module AMQ
           @method_id = method_id
         end
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"class_id = nil", u"method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
@@ -520,6 +556,10 @@ module AMQ
         def initialize()
         end
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # []
         def self.encode()
@@ -540,6 +580,10 @@ module AMQ
         @name = "channel.open"
         @method_id = 10
         @index = 0x0014000A # 20, 10, 1310730
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"out_of_band = EMPTY_STRING"]
@@ -572,6 +616,10 @@ module AMQ
         def initialize(channel_id)
           @channel_id = channel_id
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Flow < Protocol::Method
@@ -591,6 +639,10 @@ module AMQ
         attr_reader :active
         def initialize(active)
           @active = active
+        end
+
+        def self.has_content?
+          false
         end
 
         # @return
@@ -623,6 +675,10 @@ module AMQ
         attr_reader :active
         def initialize(active)
           @active = active
+        end
+
+        def self.has_content?
+          false
         end
 
         # @return
@@ -671,6 +727,10 @@ module AMQ
           @method_id = method_id
         end
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"class_id = nil", u"method_id = nil"]
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
@@ -700,6 +760,10 @@ module AMQ
         def initialize()
         end
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # []
         def self.encode(channel)
@@ -719,6 +783,10 @@ module AMQ
         @name = "exchange.declare"
         @method_id = 10
         @index = 0x0028000A # 40, 10, 2621450
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"exchange = nil", u"type = u"direct"", u"passive = false", u"durable = false", u"auto_delete = false", u"internal = false", u"nowait = false", u"arguments = {}"]
@@ -757,12 +825,20 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Delete < Protocol::Method
         @name = "exchange.delete"
         @method_id = 20
         @index = 0x00280014 # 40, 20, 2621460
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"exchange = nil", u"if_unused = false", u"nowait = false"]
@@ -795,12 +871,20 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Bind < Protocol::Method
         @name = "exchange.bind"
         @method_id = 30
         @index = 0x0028001E # 40, 30, 2621470
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"destination = nil", u"source = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
@@ -837,12 +921,20 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Unbind < Protocol::Method
         @name = "exchange.unbind"
         @method_id = 40
         @index = 0x00280028 # 40, 40, 2621480
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"destination = nil", u"source = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
@@ -879,6 +971,10 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
     end
 
@@ -890,6 +986,10 @@ module AMQ
         @name = "queue.declare"
         @method_id = 10
         @index = 0x0032000A # 50, 10, 3276810
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"passive = false", u"durable = false", u"exclusive = false", u"auto_delete = false", u"nowait = false", u"arguments = {}"]
@@ -938,12 +1038,20 @@ module AMQ
           @message_count = message_count
           @consumer_count = consumer_count
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Bind < Protocol::Method
         @name = "queue.bind"
         @method_id = 20
         @index = 0x00320014 # 50, 20, 3276820
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"exchange = nil", u"routing_key = EMPTY_STRING", u"nowait = false", u"arguments = {}"]
@@ -980,12 +1088,20 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Purge < Protocol::Method
         @name = "queue.purge"
         @method_id = 30
         @index = 0x0032001E # 50, 30, 3276830
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"nowait = false"]
@@ -1021,12 +1137,20 @@ module AMQ
         def initialize(message_count)
           @message_count = message_count
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Delete < Protocol::Method
         @name = "queue.delete"
         @method_id = 40
         @index = 0x00320028 # 50, 40, 3276840
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"if_unused = false", u"if_empty = false", u"nowait = false"]
@@ -1064,12 +1188,20 @@ module AMQ
         def initialize(message_count)
           @message_count = message_count
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Unbind < Protocol::Method
         @name = "queue.unbind"
         @method_id = 50
         @index = 0x00320032 # 50, 50, 3276850
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"exchange = nil", u"routing_key = EMPTY_STRING", u"arguments = {}"]
@@ -1102,6 +1234,10 @@ module AMQ
         end
 
         def initialize()
+        end
+
+        def self.has_content?
+          false
         end
       end
     end
@@ -1359,6 +1495,10 @@ module AMQ
         @method_id = 10
         @index = 0x003C000A # 60, 10, 3932170
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # [u"prefetch_size = false", u"prefetch_count = false", u"global = false"]
         def self.encode(channel, prefetch_size, prefetch_count, global)
@@ -1387,12 +1527,20 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Consume < Protocol::Method
         @name = "basic.consume"
         @method_id = 20
         @index = 0x003C0014 # 60, 20, 3932180
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"consumer_tag = EMPTY_STRING", u"no_local = false", u"no_ack = false", u"exclusive = false", u"nowait = false", u"arguments = {}"]
@@ -1436,12 +1584,20 @@ module AMQ
         def initialize(consumer_tag)
           @consumer_tag = consumer_tag
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Cancel < Protocol::Method
         @name = "basic.cancel"
         @method_id = 30
         @index = 0x003C001E # 60, 30, 3932190
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"consumer_tag = nil", u"nowait = false"]
@@ -1477,12 +1633,20 @@ module AMQ
         def initialize(consumer_tag)
           @consumer_tag = consumer_tag
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Publish < Protocol::Method
         @name = "basic.publish"
         @method_id = 40
         @index = 0x003C0028 # 60, 40, 3932200
+
+        def self.has_content?
+          true
+        end
 
         # @return
         # [u"ticket = 0", u"exchange = EMPTY_STRING", u"routing_key = EMPTY_STRING", u"mandatory = false", u"immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
@@ -1544,6 +1708,10 @@ module AMQ
           @exchange = exchange
           @routing_key = routing_key
         end
+
+        def self.has_content?
+          true
+        end
       end
 
       class Deliver < Protocol::Method
@@ -1582,12 +1750,20 @@ module AMQ
           @exchange = exchange
           @routing_key = routing_key
         end
+
+        def self.has_content?
+          true
+        end
       end
 
       class Get < Protocol::Method
         @name = "basic.get"
         @method_id = 70
         @index = 0x003C0046 # 60, 70, 3932230
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"ticket = 0", u"queue = EMPTY_STRING", u"no_ack = false"]
@@ -1640,6 +1816,10 @@ module AMQ
           @routing_key = routing_key
           @message_count = message_count
         end
+
+        def self.has_content?
+          true
+        end
       end
 
       class GetEmpty < Protocol::Method
@@ -1661,12 +1841,20 @@ module AMQ
         def initialize(cluster_id)
           @cluster_id = cluster_id
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Ack < Protocol::Method
         @name = "basic.ack"
         @method_id = 80
         @index = 0x003C0050 # 60, 80, 3932240
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"delivery_tag = false", u"multiple = false"]
@@ -1687,6 +1875,10 @@ module AMQ
         @method_id = 90
         @index = 0x003C005A # 60, 90, 3932250
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # [u"delivery_tag = nil", u"requeue = true"]
         def self.encode(channel, delivery_tag, requeue)
@@ -1706,6 +1898,10 @@ module AMQ
         @method_id = 100
         @index = 0x003C0064 # 60, 100, 3932260
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # [u"requeue = false"]
         def self.encode(channel, requeue)
@@ -1723,6 +1919,10 @@ module AMQ
         @name = "basic.recover"
         @method_id = 110
         @index = 0x003C006E # 60, 110, 3932270
+
+        def self.has_content?
+          false
+        end
 
         # @return
         # [u"requeue = false"]
@@ -1750,6 +1950,10 @@ module AMQ
 
         def initialize()
         end
+
+        def self.has_content?
+          false
+        end
       end
 
       class Nack < Protocol::Method
@@ -1773,6 +1977,10 @@ module AMQ
           @delivery_tag = delivery_tag
           @multiple = multiple
           @requeue = requeue
+        end
+
+        def self.has_content?
+          false
         end
 
         # @return
@@ -1814,6 +2022,10 @@ module AMQ
           @nowait = nowait
         end
 
+        def self.has_content?
+          false
+        end
+
         # @return
         # [u"nowait = false"]
         def self.encode(channel, nowait)
@@ -1839,6 +2051,10 @@ module AMQ
         end
 
         def initialize()
+        end
+
+        def self.has_content?
+          false
         end
 
         # @return

@@ -328,6 +328,14 @@ module AMQ
         end
         % endif
 
+        def self.has_content?
+          % if method.hasContent:
+          true
+          % else:
+          false
+          % endif
+        end
+
         % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")):
         # @return
         # ${method.params()}
