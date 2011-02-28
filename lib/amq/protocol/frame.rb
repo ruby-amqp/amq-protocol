@@ -82,10 +82,16 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       @id = 1
 
       def method_class
-        klass_id, method_id = self.payload.unpack(PACK_CACHE[:n2])
-        index = klass_id << 16 | method_id
-        AMQ::Protocol::METHODS[index]
+        @method_class ||= begin
+                            klass_id, method_id = self.payload.unpack(PACK_CACHE[:n2])
+                            index               = klass_id << 16 | method_id
+                            AMQ::Protocol::METHODS[index]
+                          end
       end
+
+      def final?
+        !self.method_class.has_content?
+      end # final?
 
       def decode_payload
         self.method_class.decode(@payload[4..-1])
@@ -114,6 +120,10 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
     class HeartbeatFrame < FrameSubclass
       @id = 4
+
+      def final?
+        true
+      end # final?
     end
 
     Frame::CLASSES = Hash.new do |hash, key|
