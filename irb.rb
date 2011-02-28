@@ -45,6 +45,18 @@ else
     require_relative "lib/amq/protocol/#{file}.rb"
     include AMQ::Protocol
 
+    begin
+      require "amq/client/io/string"
+
+      class AMQ::Protocol::Frame
+        def self.decode(string)
+          AMQ::Client::StringAdapter::Frame.decode(string)
+        end
+      end
+    rescue LoadError
+      warn "~ AMQ Client isn't available."
+    end
+
     require "stringio"
 
     def fd(data)
