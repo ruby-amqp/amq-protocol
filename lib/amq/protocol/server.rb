@@ -17,7 +17,8 @@ module AMQ
     # caching
     EMPTY_STRING = "".freeze
     PACK_CACHE = Hash.new { |hash, key| hash[key] = key.to_s }
-    # At the beginning, the PACK_CACHE is empty. When we query the cache, we"ll get back the key as a string. So instead of creating a lot of strings in each pack/unpack call, we just query the cache and get back what we need.
+    # At the beginning, the PACK_CACHE is empty. When we query the cache, we"ll get back the key as a string.
+    # So instead of creating a lot of strings in each pack/unpack call, we just query the cache and get back what we need.
     # PACK_CACHE[:n2Q] # => "n2Q" # via the PACK_CACHE.default_proc
     # PACK_CACHE[:n2Q] # => "n2Q" # standard hash query
 
@@ -226,7 +227,8 @@ module AMQ
       def self.split_headers(user_headers)
         properties, headers = {}, {}
         user_headers.each do |key, value|
-          if Basic::PROPERTIES.include?(key) # key MUST be a symbol! we can"t just randomly call #to_sym, otherwise we might end up will over-fulled RAM after a DDOS attack
+					# key MUST be a symbol since symbols are not garbage-collected
+          if Basic::PROPERTIES.include?(key)
             properties[key] = value
           else
             headers[key] = value
