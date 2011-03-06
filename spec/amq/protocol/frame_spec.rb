@@ -64,4 +64,23 @@ describe AMQ::Protocol::Frame do
       lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(NotImplementedError)
     end
   end
+
+  describe AMQ::Protocol::HeadersFrame do
+    subject { AMQ::Protocol::HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
+    it "should decode body_size from payload" do
+      subject.body_size.should == 10
+    end
+
+    it "should decode klass_id from payload" do
+      subject.klass_id.should == 60
+    end
+
+    it "should decode weight from payload" do
+      subject.weight.should == 0
+    end
+
+    it "should decode properties from payload" do
+      pending("Broken")
+    end
+  end
 end

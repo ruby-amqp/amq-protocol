@@ -101,12 +101,19 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
     class HeadersFrame < FrameSubclass
       @id = 2
 
-      attr_reader :body_size, :weight, :klass_id # TODO: lazy-loading, so we don't have to call decode_payload first
+      [:body_size, :weight, :klass_id].each do |method|
+        define_method method do
+          decode_payload
+          instance_variable_get("@#{method}")
+        end
+      end
 
       def decode_payload
+        return if @decoded_payload # you don't need to decode the payload more than once
+        @decoded_payload = true
         @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
         @body_size = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames.
-        Basic.decode_properties(@payload[11..-1])
+        # Basic.decode_properties(@payload[11..-1])
       end
     end
 
