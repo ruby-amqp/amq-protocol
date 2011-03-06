@@ -22,7 +22,7 @@ module AMQ
       end
 
       def self.unpack_64_big_endian(data)
-        data = data[-1] + data[0..-2]
+        data = data.slice(-1, 1) + data[0..-2]
         data.unpack(Q)
       end
     end

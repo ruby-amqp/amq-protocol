@@ -42,6 +42,7 @@ describe AMQ::Protocol::Frame do
     end
   end
 
+
   describe ".new" do
     before(:each) do
       @data = AMQ::Protocol::Frame.encode(:body, "test", 5)
@@ -65,8 +66,14 @@ describe AMQ::Protocol::Frame do
     end
   end
 
+
   describe AMQ::Protocol::HeadersFrame do
-    subject { AMQ::Protocol::HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
+    if RUBY_VERSION =~ /^1.9/
+      subject { AMQ::Protocol::HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
+    else
+      subject { AMQ::Protocol::HeadersFrame.new("\000<\000\000\000\000\000\000\000\000\000\n\230\000\030application/octet-stream\002\000", nil) }
+    end
+
     it "should decode body_size from payload" do
       subject.body_size.should == 10
     end
