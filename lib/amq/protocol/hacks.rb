@@ -5,7 +5,7 @@
 module AMQ
   module Hacks
     BIG_ENDIAN = ([1].pack("s") == "\x00\x01")
-    Q = "Q"
+    Q = "Q".freeze
 
     if BIG_ENDIAN
       def self.pack_64_big_endian(long_long)
@@ -18,7 +18,7 @@ module AMQ
     else
       def self.pack_64_big_endian(long_long)
         result = [long_long].pack(Q)
-        result[1..-1] + result[0]
+        result[1..-1] + result.slice(0, 1)
       end
 
       def self.unpack_64_big_endian(data)
