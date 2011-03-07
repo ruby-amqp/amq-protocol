@@ -101,11 +101,19 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
     class HeadersFrame < FrameSubclass
       @id = 2
 
-      [:body_size, :weight, :klass_id].each do |method|
-        define_method method do
-          decode_payload
-          instance_variable_get("@#{method}")
-        end
+      def body_size
+        self.decode_payload
+        @body_size
+      end
+
+      def weight
+        self.decode_payload
+        @weight
+      end
+
+      def klass_id
+        self.decode_payload
+        @klass_id
       end
 
       def decode_payload
