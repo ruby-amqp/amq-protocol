@@ -4,9 +4,9 @@
 # IT DIRECTLY ! FOR CHANGES, PLEASE UPDATE CODEGEN.PY
 # IN THE ROOT DIRECTORY OF THE AMQ-PROTOCOL REPOSITORY.
 
-require "amq/protocol/table.rb"
-require "amq/protocol/frame.rb"
-require "amq/protocol/hacks.rb"
+require "amq/protocol/table"
+require "amq/protocol/frame"
+require "amq/protocol/hacks"
 
 module AMQ
   module Protocol
