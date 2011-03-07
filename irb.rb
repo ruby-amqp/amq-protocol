@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# encoding: utf-8
+# encoding: binary
 
 # This file is supposed to make inspecting AMQ protocol easier.
 
@@ -55,6 +55,19 @@ else
       end
     rescue LoadError
       warn "~ AMQ Client isn't available."
+    end
+
+    # "0123456789".chunks(1, 1, 2, 3)
+    # => ["0", "1", "23", "456"]
+    class String
+      def chunks(*parts)
+        offset = 0
+        parts.map do |number_of_characters|
+          self[offset..(offset + number_of_characters - 1)].tap do
+            offset += number_of_characters
+          end
+        end << self[offset..-1]
+      end
     end
 
     require "stringio"
