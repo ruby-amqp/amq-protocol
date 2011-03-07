@@ -1,13 +1,10 @@
 # encoding: binary
 
 require "rspec"
-require "pathname"
 
-__dir = Pathname.new(File.expand_path(File.dirname(__FILE__)))
+$: << File.expand_path('../../lib', __FILE__)
 
-$:.unshift(__dir.parent) unless $:.include?(__dir.parent)
-
-require "lib/amq/protocol.rb"
+require "amq/protocol.rb"
 
 module RubyVersionsSUpport
   def one_point_eight?
