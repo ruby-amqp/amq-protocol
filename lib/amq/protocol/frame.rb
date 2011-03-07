@@ -117,12 +117,12 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end
 
       def decode_payload
-        return if @decoded_payload # you don't need to decode the payload more than once
-        @decoded_payload = true
-        @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
-        @body_size = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames. So this is NOT related to this very header frame!
-        @data = @payload[12..-1]
-        Basic.decode_properties(@data)
+        @decoded_payload ||= begin
+          @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
+          @body_size = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames. So this is NOT related to this very header frame!
+          @data = @payload[12..-1]
+          Basic.decode_properties(@data)
+        end
       end
     end
 
