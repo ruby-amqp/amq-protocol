@@ -4,7 +4,7 @@ require "rspec"
 
 $: << File.expand_path('../../lib', __FILE__)
 
-require "amq/protocol.rb"
+require "amq/protocol"
 
 module RubyVersionsSUpport
   def one_point_eight?
