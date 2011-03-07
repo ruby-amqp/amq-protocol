@@ -3,8 +3,8 @@
 source "http://gemcutter.org"
 
 group(:development) do
-  gem "nake"
-  gem "contributors"
+  gem "nake",         :platform => :ruby_19
+  gem "contributors", :platform => :ruby_19
 end
 
 group(:test) do
