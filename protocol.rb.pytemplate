@@ -252,18 +252,18 @@ module AMQ
 
 
       # DECODE PROPERTIES
-      # % for f in klass.fields:
-      # # <% i = klass.fields.index(f) %>1 << ${15 - i}
-      # def self.decode_${f.ruby_name}(data)
-      #   pieces = []
-      #   % for line in helpers.genSingleEncode(spec, "value", f.domain):
-      #   ${line}
-      #   % endfor
-      #   [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join("")]
-      # end
-      #
-      # % endfor
-      #
+      % for f in klass.fields:
+      # <% i = klass.fields.index(f) %>1 << ${15 - i}
+      def self.decode_${f.ruby_name}(data)
+        pieces = []
+        % for line in helpers.genSingleEncode(spec, "value", f.domain):
+        ${line}
+        % endfor
+        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join("")]
+      end
+
+      % endfor
+
       # THIS DECODES ONLY FLAGS
       DECODE_PROPERTIES = {
         % for f in klass.fields:
@@ -281,11 +281,10 @@ module AMQ
       % endfor
 
       def self.decode_properties(data)
-        property_flags = data.unpack("n")
-        offset, data_length, properties = 1, data.length, {}
+        offset, data_length, properties = 0, data.bytesize, {}
 
         while data_length > offset
-          index, size = data[offset..-1].unpack(PACK_CACHE[:nc])
+          index, size = data[offset..(offset + 3)].unpack(PACK_CACHE[:nc])
           name = DECODE_PROPERTIES[index] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
           offset += 3
           result = self.send(:"decode_#{name}", data[offset..(offset + size)])
