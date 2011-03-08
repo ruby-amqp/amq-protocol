@@ -271,6 +271,13 @@ module AMQ
         % endfor
       }
 
+      DECODE_PROPERTIES_TYPE = {
+        % for f in klass.fields:
+        ${"0x%04x" % ( 1 << (15 - klass.fields.index(f)),)} => :${spec.resolveDomain(f.domain)},
+        % endfor
+      }
+
+
       % for f in klass.fields:
       def self.decode_${f.ruby_name}(data)
         % for line in helpers.genSingleSimpleDecode(spec, f):
@@ -283,13 +290,28 @@ module AMQ
       def self.decode_properties(data)
         offset, data_length, properties = 0, data.bytesize, {}
 
+        compressed_index = data[offset, 2].unpack(PACK_CACHE[:n])[0]
+        offset += 2
         while data_length > offset
-          index, size = data[offset..(offset + 3)].unpack(PACK_CACHE[:nc])
-          name = DECODE_PROPERTIES[index] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
-          offset += 3
-          result = self.send(:"decode_#{name}", data[offset..(offset + size)])
-          properties[name] = result
-          offset += size
+          DECODE_PROPERTIES.keys.sort.reverse.each do |key|
+            next unless compressed_index >= key
+            compressed_index -= key
+            name = DECODE_PROPERTIES[key] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
+            case DECODE_PROPERTIES_TYPE[key]
+            when :shortstr
+              size = data[offset, 1].unpack(PACK_CACHE[:c])[0]
+              offset += 1
+            when :octet
+              size = 1
+            when :timestamp
+              size = 4
+            else
+              # I don't know, really
+            end
+            result = self.send(:"decode_#{name}", data[offset..(offset + size)])
+            properties[name] = result
+            offset += size
+          end
         end
 
         properties
