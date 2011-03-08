@@ -68,11 +68,7 @@ describe AMQ::Protocol::Frame do
 
 
   describe AMQ::Protocol::HeadersFrame do
-    if RUBY_VERSION =~ /^1.9/
-      subject { AMQ::Protocol::HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
-    else
-      subject { AMQ::Protocol::HeadersFrame.new("\000<\000\000\000\000\000\000\000\000\000\n\230\000\030application/octet-stream\002\000", nil) }
-    end
+    subject { AMQ::Protocol::HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
 
     it "should decode body_size from payload" do
       subject.body_size.should == 10
