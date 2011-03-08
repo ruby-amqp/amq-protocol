@@ -1689,7 +1689,7 @@ module AMQ
             else
               # I don"t know, really
             end
-            result = self.send(:"decode_#{name}", data[offset..(offset + size)])
+            result = self.send(:"decode_#{name}", data[offset, size])
             properties[name] = result
             offset += size
           end
