@@ -19,8 +19,7 @@ module AMQ
       UC_N2 = 'N2'.freeze
       UC_S  = 'S'.freeze
       UC_T  = 'T'.freeze
-      
-      TEN = BigDecimal.new('10')
+      TEN   = '10'.freeze
 
       def self.encode(table)
         buffer = String.new
@@ -98,7 +97,7 @@ module AMQ
           when UC_D then
             decimals, raw = data.slice(offset, 5).unpack(UC_CN)
             offset += 5
-            value = BigDecimal.new(raw.to_s) * (TEN ** -decimals)
+            value = BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
           when UC_T then
             # TODO: what is the first unpacked value??? Zone, maybe? It's 0, so it'd make sense.
             timestamp = data.slice(offset, 8).unpack(UC_N2).last
