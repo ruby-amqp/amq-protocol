@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo -e "\n\n==== Setup ===="
+source /etc/profile
 git fetch && git reset origin/master --hard
 
 echo -e "\n\n==== Ruby 1.9.2 Head ===="
