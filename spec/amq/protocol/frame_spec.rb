@@ -83,7 +83,8 @@ describe AMQ::Protocol::Frame do
     end
 
     it "should decode properties from payload" do
-      pending("Broken")
+      subject.properties[:delivery_mode].should == 2
+      subject.properties[:priority].should == 0
     end
   end
 end

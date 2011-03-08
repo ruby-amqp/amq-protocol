@@ -102,26 +102,31 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       @id = 2
 
       def body_size
-        self.decode_payload
+        decode_payload
         @body_size
       end
 
       def weight
-        self.decode_payload
+        decode_payload
         @weight
       end
 
       def klass_id
-        self.decode_payload
+        decode_payload
         @klass_id
+      end
+
+      def properties
+        decode_payload
+        @properties
       end
 
       def decode_payload
         @decoded_payload ||= begin
           @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
-          @body_size = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames. So this is NOT related to this very header frame!
-          @data = @payload[12..-1]
-          Basic.decode_properties(@data)
+          @body_size         = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames. So this is NOT related to this very header frame!
+          @data              = @payload[12..-1]
+          @properties        = Basic.decode_properties(@data)
         end
       end
     end
