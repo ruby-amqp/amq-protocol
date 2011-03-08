@@ -304,9 +304,10 @@ module AMQ
             when :octet
               size = 1
             when :timestamp
-              size = 4
-            else
-              # I don't know, really
+              size = 8
+            when :table
+              size = data[offset, 4].unpack(PACK_CACHE[:N])[0]
+              offset += 4
             end
             result = self.send(:"decode_#{name}", data[offset, size])
             properties[name] = result
