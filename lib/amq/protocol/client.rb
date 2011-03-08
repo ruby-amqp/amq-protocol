@@ -1533,6 +1533,25 @@ module AMQ
         0x0004 => :shortstr,
       }
 
+      # Hash doesn"t give any guarantees on keys order, we will do it in a
+      # straightforward way
+      DECODE_PROPERTIES_KEYS = [
+        0x8000,
+        0x4000,
+        0x2000,
+        0x1000,
+        0x0800,
+        0x0400,
+        0x0200,
+        0x0100,
+        0x0080,
+        0x0040,
+        0x0020,
+        0x0010,
+        0x0008,
+        0x0004,
+      ]
+
       def self.decode_content_type(data)
         data
       end
@@ -1595,7 +1614,7 @@ module AMQ
         compressed_index = data[offset, 2].unpack(PACK_CACHE[:n])[0]
         offset += 2
         while data_length > offset
-          DECODE_PROPERTIES.keys.sort.reverse.each do |key|
+          DECODE_PROPERTIES_KEYS.each do |key|
             next unless compressed_index >= key
             compressed_index -= key
             name = DECODE_PROPERTIES[key] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
