@@ -1516,6 +1516,23 @@ module AMQ
         0x0004 => :cluster_id,
       }
 
+      DECODE_PROPERTIES_TYPE = {
+        0x8000 => :shortstr,
+        0x4000 => :shortstr,
+        0x2000 => :table,
+        0x1000 => :octet,
+        0x0800 => :octet,
+        0x0400 => :shortstr,
+        0x0200 => :shortstr,
+        0x0100 => :shortstr,
+        0x0080 => :timestamp,
+        0x0040 => :shortstr,
+        0x0020 => :shortstr,
+        0x0010 => :shortstr,
+        0x0008 => :shortstr,
+        0x0004 => :shortstr
+      }
+
       def self.decode_content_type(data)
         data
       end
@@ -1575,13 +1592,28 @@ module AMQ
       def self.decode_properties(data)
         offset, data_length, properties = 0, data.bytesize, {}
 
+        compressed_index = data[offset, 2].unpack(PACK_CACHE[:n])[0]
+        offset += 2
         while data_length > offset
-          index, size = data[offset..(offset + 3)].unpack(PACK_CACHE[:nc])
-          name = DECODE_PROPERTIES[index] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
-          offset += 3
-          result = self.send(:"decode_#{name}", data[offset..(offset + size)])
-          properties[name] = result
-          offset += size
+          DECODE_PROPERTIES.keys.sort.reverse.each do |key|
+            next unless compressed_index >= key
+            compressed_index -= key
+            name = DECODE_PROPERTIES[key] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
+            case DECODE_PROPERTIES_TYPE[key]
+            when :shortstr
+              size = data[offset, 1].unpack(PACK_CACHE[:c])[0]
+              offset += 1
+            when :octet
+              size = 1
+            when :timestamp
+              size = 4
+            else
+              # I don't know, really
+            end
+            result = self.send(:"decode_#{name}", data[offset..(offset + size)])
+            properties[name] = result
+            offset += size
+          end
         end
 
         properties
