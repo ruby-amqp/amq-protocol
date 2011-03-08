@@ -27,40 +27,40 @@ module AMQ
         table ||= {}
         table.each do |key, value|
           key = key.to_s # it can be a symbol as well
-          buffer += key.bytesize.chr + key
+          buffer << key.bytesize.chr + key
 
           case value
           when String then
-            buffer += UC_S
-            buffer += [value.bytesize].pack(UC_N)
-            buffer += value
+            buffer << UC_S
+            buffer << [value.bytesize].pack(UC_N)
+            buffer << value
           when Integer then
-            buffer += UC_I
-            buffer += [value].pack(UC_N)
+            buffer << UC_I
+            buffer << [value].pack(UC_N)
           when TrueClass, FalseClass then
             value = value ? 1 : 0
-            buffer += UC_I
-            buffer += [value].pack(UC_N)
+            buffer << UC_I
+            buffer << [value].pack(UC_N)
           when Hash then
-            buffer += UC_F # it will work as long as the encoding is ASCII-8BIT
-            buffer += self.encode(value)
+            buffer << UC_F # it will work as long as the encoding is ASCII-8BIT
+            buffer << self.encode(value)
           when Time then
             # TODO: encode timezone?
-            buffer += UC_T
-            buffer += [value.to_i].pack(LC_Q).reverse # Don't ask. It works.
+            buffer << UC_T
+            buffer << [value.to_i].pack(LC_Q).reverse # Don't ask. It works.
           else
             # We don't want to require these libraries.
             if defined?(BigDecimal) && value.is_a?(BigDecimal)
-              buffer += UC_D
+              buffer << UC_D
               if value.exponent < 0
                 decimals = -value.exponent
                 # p [value.exponent] # normalize
                 raw = (value * (decimals ** 10)).to_i
                 #pieces.append(struct.pack('>cBI', 'D', decimals, raw)) # byte integer
-                buffer += [decimals + 1, raw].pack(UC_CN) # somewhat like floating point
+                buffer << [decimals + 1, raw].pack(UC_CN) # somewhat like floating point
               else
                 # per spec, the "decimals" octet is unsigned (!)
-                buffer += [0, value.to_i].pack(UC_CN)
+                buffer << [0, value.to_i].pack(UC_CN)
               end
             else
               raise InvalidTableError.new(key, value)
