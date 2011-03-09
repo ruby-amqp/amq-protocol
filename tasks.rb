@@ -1,7 +1,7 @@
 #!/usr/bin/env nake
 # encoding: utf-8
 
-load "contributors.nake"
+# load "contributors.nake"
 
 Task.new(:generate) do |task|
   task.description = "Generate lib/amq/protocol/client.rb"
