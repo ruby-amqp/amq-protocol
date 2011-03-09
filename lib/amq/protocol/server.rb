@@ -282,7 +282,7 @@ module AMQ
         end
 
         # @return
-        # [u"version_major = false", u"version_minor = 9", u"server properties = nil", u"mechanisms = u"PLAIN"", u"locales = u"en_US""]
+        # ["version_major = false", "version_minor = 9", "server properties = nil", "mechanisms = "PLAIN"", "locales = "en_US""]
         def self.encode(version_major, version_minor, server_properties, mechanisms, locales)
           channel = 0
           pieces = []
@@ -347,7 +347,7 @@ module AMQ
         end
 
         # @return
-        # [u"challenge = nil"]
+        # ["challenge = nil"]
         def self.encode(challenge)
           channel = 0
           pieces = []
@@ -394,7 +394,7 @@ module AMQ
         end
 
         # @return
-        # [u"channel_max = false", u"frame_max = false", u"heartbeat = false"]
+        # ["channel_max = false", "frame_max = false", "heartbeat = false"]
         def self.encode(channel_max, frame_max, heartbeat)
           channel = 0
           pieces = []
@@ -480,7 +480,7 @@ module AMQ
         end
 
         # @return
-        # [u"known_hosts = EMPTY_STRING"]
+        # ["known_hosts = EMPTY_STRING"]
         def self.encode(known_hosts)
           channel = 0
           pieces = []
@@ -530,7 +530,7 @@ module AMQ
         end
 
         # @return
-        # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"class_id = nil", u"method_id = nil"]
+        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
         def self.encode(reply_code, reply_text, class_id, method_id)
           channel = 0
           pieces = []
@@ -614,7 +614,7 @@ module AMQ
         end
 
         # @return
-        # [u"channel_id = EMPTY_STRING"]
+        # ["channel_id = EMPTY_STRING"]
         def self.encode(channel, channel_id)
           pieces = []
           pieces << [20, 11].pack(PACK_CACHE[:n2])
@@ -649,7 +649,7 @@ module AMQ
         end
 
         # @return
-        # [u"active = nil"]
+        # ["active = nil"]
         def self.encode(channel, active)
           pieces = []
           pieces << [20, 20].pack(PACK_CACHE[:n2])
@@ -685,7 +685,7 @@ module AMQ
         end
 
         # @return
-        # [u"active = nil"]
+        # ["active = nil"]
         def self.encode(channel, active)
           pieces = []
           pieces << [20, 21].pack(PACK_CACHE[:n2])
@@ -735,7 +735,7 @@ module AMQ
         end
 
         # @return
-        # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"class_id = nil", u"method_id = nil"]
+        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
           pieces = []
           pieces << [20, 40].pack(PACK_CACHE[:n2])
@@ -1079,7 +1079,7 @@ module AMQ
         end
 
         # @return
-        # [u"queue = nil", u"message_count = nil", u"consumer_count = nil"]
+        # ["queue = nil", "message_count = nil", "consumer_count = nil"]
         def self.encode(channel, queue, message_count, consumer_count)
           pieces = []
           pieces << [50, 11].pack(PACK_CACHE[:n2])
@@ -1198,7 +1198,7 @@ module AMQ
         end
 
         # @return
-        # [u"message_count = nil"]
+        # ["message_count = nil"]
         def self.encode(channel, message_count)
           pieces = []
           pieces << [50, 31].pack(PACK_CACHE[:n2])
@@ -1252,7 +1252,7 @@ module AMQ
         end
 
         # @return
-        # [u"message_count = nil"]
+        # ["message_count = nil"]
         def self.encode(channel, message_count)
           pieces = []
           pieces << [50, 41].pack(PACK_CACHE[:n2])
@@ -1416,7 +1416,7 @@ module AMQ
       # 1 << 6
       def self.encode_timestamp(value)
         pieces = []
-        AMQ::Hacks.pack_64_big_endian(value)
+        pieces << AMQ::Hacks.pack_64_big_endian(value)
         [9, 0x0040, pieces.join(EMPTY_STRING)]
       end
 
@@ -1541,7 +1541,7 @@ module AMQ
       # 1 << 6
       def self.decode_timestamp(data)
         pieces = []
-        AMQ::Hacks.pack_64_big_endian(value)
+        pieces << AMQ::Hacks.pack_64_big_endian(value)
         [9, 0x0040, pieces.join("")]
       end
 
@@ -1820,7 +1820,7 @@ module AMQ
         end
 
         # @return
-        # [u"consumer_tag = nil"]
+        # ["consumer_tag = nil"]
         def self.encode(channel, consumer_tag)
           pieces = []
           pieces << [60, 21].pack(PACK_CACHE[:n2])
@@ -1870,7 +1870,7 @@ module AMQ
         end
 
         # @return
-        # [u"consumer_tag = nil"]
+        # ["consumer_tag = nil"]
         def self.encode(channel, consumer_tag)
           pieces = []
           pieces << [60, 31].pack(PACK_CACHE[:n2])
@@ -1929,7 +1929,7 @@ module AMQ
         end
 
         # @return
-        # [u"reply_code = nil", u"reply_text = EMPTY_STRING", u"exchange = nil", u"routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["reply_code = nil", "reply_text = EMPTY_STRING", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, reply_code, reply_text, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 50].pack(PACK_CACHE[:n2])
@@ -1963,13 +1963,13 @@ module AMQ
         end
 
         # @return
-        # [u"consumer_tag = nil", u"delivery_tag = nil", u"redelivered = false", u"exchange = nil", u"routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["consumer_tag = nil", "delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, consumer_tag, delivery_tag, redelivered, exchange, routing_key, frame_size)
           pieces = []
           pieces << [60, 60].pack(PACK_CACHE[:n2])
           pieces << consumer_tag.bytesize.chr
           pieces << consumer_tag
-          AMQ::Hacks.pack_64_big_endian(delivery_tag)
+          pieces << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
           pieces << [bit_buffer].pack(PACK_CACHE[:c])
@@ -2032,11 +2032,11 @@ module AMQ
         end
 
         # @return
-        # [u"delivery_tag = nil", u"redelivered = false", u"exchange = nil", u"routing_key = nil", u"message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # ["delivery_tag = nil", "redelivered = false", "exchange = nil", "routing_key = nil", "message_count = nil", "user_headers = nil", "payload = """, "frame_size = nil"]
         def self.encode(channel, payload, user_headers, delivery_tag, redelivered, exchange, routing_key, message_count, frame_size)
           pieces = []
           pieces << [60, 71].pack(PACK_CACHE[:n2])
-          AMQ::Hacks.pack_64_big_endian(delivery_tag)
+          pieces << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if redelivered
           pieces << [bit_buffer].pack(PACK_CACHE[:c])
@@ -2068,7 +2068,7 @@ module AMQ
         end
 
         # @return
-        # [u"cluster_id = EMPTY_STRING"]
+        # ["cluster_id = EMPTY_STRING"]
         def self.encode(channel, cluster_id)
           pieces = []
           pieces << [60, 72].pack(PACK_CACHE[:n2])
@@ -2228,11 +2228,11 @@ module AMQ
         end
 
         # @return
-        # [u"delivery_tag = false", u"multiple = false", u"requeue = true"]
+        # ["delivery_tag = false", "multiple = false", "requeue = true"]
         def self.encode(channel, delivery_tag, multiple, requeue)
           pieces = []
           pieces << [60, 120].pack(PACK_CACHE[:n2])
-          AMQ::Hacks.pack_64_big_endian(delivery_tag)
+          pieces << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
           bit_buffer = bit_buffer | (1 << 1) if requeue
@@ -2271,7 +2271,7 @@ module AMQ
         end
 
         # @return
-        # [u"nowait = false"]
+        # ["nowait = false"]
         def self.encode(channel, nowait)
           pieces = []
           pieces << [85, 10].pack(PACK_CACHE[:n2])

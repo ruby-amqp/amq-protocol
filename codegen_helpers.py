@@ -16,9 +16,9 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'long':
         buffer.append("pieces << [%s].pack(PACK_CACHE[:N])" % (cValue,))
     elif type == 'longlong':
-        buffer.append("AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
+        buffer.append("pieces << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
     elif type == 'timestamp':
-        buffer.append("AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
+        buffer.append("pieces << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':
