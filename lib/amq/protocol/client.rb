@@ -2010,7 +2010,7 @@ module AMQ
         def self.encode(channel, delivery_tag, multiple)
           pieces = []
           pieces << [60, 80].pack(PACK_CACHE[:n2])
-          AMQ::Hacks.pack_64_big_endian(delivery_tag)
+          pieces << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
           pieces << [bit_buffer].pack(PACK_CACHE[:c])
