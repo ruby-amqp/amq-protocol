@@ -14,7 +14,7 @@ except ImportError:
 
 # main class
 class AmqpSpecObject(AmqpSpec):
-    IGNORED_CLASSES = ["access", "tx"]
+    IGNORED_CLASSES = ["access"]
     IGNORED_FIELDS = {
         'ticket': 0,
         'capabilities': '',
