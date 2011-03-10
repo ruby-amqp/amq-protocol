@@ -4,8 +4,8 @@ module AMQ
   module Protocol
     class Frame
       TYPES         = Hash.new do |hash, key|
-        key if (1..4).include?(key)
-      end.merge({ :method => 1, :headers => 2, :body => 3, :heartbeat => 4 })
+        key if [1, 2, 3, 8].include?(key)
+      end.merge({ :method => 1, :headers => 2, :body => 3, :heartbeat => 8 })
 
       TYPES_REVERSE = TYPES.inject({}) { |hash, pair| hash.merge!(pair[1] => pair[0]) }
       TYPES_OPTIONS = TYPES.keys
@@ -15,7 +15,7 @@ module AMQ
       # The channel number is 0 for all frames which are global to the connection and 1-65535 for frames that refer to specific channels.
       def self.encode(type, payload, channel)
         raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type) or (type = TYPES[type])
-        raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535") unless CHANNEL_RANGE.include?(channel)
+        raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
         [TYPES[type], channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload + FINAL_OCTET
       end
@@ -25,9 +25,9 @@ module AMQ
       end
 
       def self.new(original_type, *args)
-        type  = TYPES[original_type]
-        klass = CLASSES[type]
-        raise "Type must be an integer in range 1..4 or #{TYPES_OPTIONS.inspect}, was #{original_type.inspect}" if klass.nil?
+        type  = TYPES[original_type] || original_type
+        klass = CLASSES[original_type]
+        raise "Type must be one of (1, 2, 3, 8) or #{TYPES_OPTIONS.inspect}, was #{original_type.inspect}" if klass.nil?
         klass.new(*args)
       end
 
@@ -43,6 +43,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
         raise EmptyResponseError.new if header.nil?
         type_id, channel, size = header.unpack(PACK_CACHE[:cnN])
         type = TYPES_REVERSE[type_id]
+
         raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type)
         [type, channel, size]
       end
@@ -101,6 +102,10 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
     class HeadersFrame < FrameSubclass
       @id = 2
 
+      def final?
+        false
+      end
+
       def body_size
         decode_payload
         @body_size
@@ -124,7 +129,10 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       def decode_payload
         @decoded_payload ||= begin
           @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
-          @body_size         = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first # the total size of the content body, that is, the sum of the body sizes for the following content body frames. Zero indicates that there are no content body frames. So this is NOT related to this very header frame!
+          # the total size of the content body, that is, the sum of the body sizes for the
+          # following content body frames. Zero indicates that there are no content body frames.
+          # So this is NOT related to this very header frame!
+          @body_size         = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first
           @data              = @payload[12..-1]
           @properties        = Basic.decode_properties(@data)
         end
@@ -140,15 +148,19 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
     end
 
     class HeartbeatFrame < FrameSubclass
-      @id = 4
+      @id = 8
 
       def final?
         true
       end # final?
+
+      def self.encode
+        super(Protocol::EMPTY_STRING, 0)
+      end
     end
 
     Frame::CLASSES = Hash.new do |hash, key|
       hash[Frame::TYPES_REVERSE[key]] if (1..4).include?(key)
-    end.merge({ :method => MethodFrame, :headers => HeadersFrame, :body => BodyFrame, :heartbeat => HeadersFrame })
+    end.merge({ :method => MethodFrame, :headers => HeadersFrame, :body => BodyFrame, :heartbeat => HeartbeatFrame })
   end
 end
