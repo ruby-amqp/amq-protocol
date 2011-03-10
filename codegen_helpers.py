@@ -58,7 +58,7 @@ def genSingleDecode(spec, field):
         buffer.append("%s = data[offset..(offset + 4)].unpack(PACK_CACHE[:N]).first" % (cLvalue,))
         buffer.append("offset += 4")
     elif type == 'longlong':
-        buffer.append("%s = AMQ::Hacks.unpack_64_big_endian(data).first" % (cLvalue,))
+        buffer.append("%s = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'timestamp':
         buffer.append("%s = data[offset..(offset + 8)].unpack(PACK_CACHE[:N2]).first" % (cLvalue,))
