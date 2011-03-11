@@ -10,11 +10,11 @@ describe AMQ::Protocol::Frame do
     end
 
     it "should raise RuntimeError if channel isn't 0 or an integer in range 1..65535" do
-      lambda { AMQ::Protocol::Frame.encode(:method, "", -1) }.should raise_error(RuntimeError, "Channel has to be 0 or an integer in range 1..65535")
-      lambda { AMQ::Protocol::Frame.encode(:method, "", 65536) }.should raise_error(RuntimeError, "Channel has to be 0 or an integer in range 1..65535")
-      lambda { AMQ::Protocol::Frame.encode(:method, "", 65535) }.should_not raise_error(RuntimeError, "Channel has to be 0 or an integer in range 1..65535")
-      lambda { AMQ::Protocol::Frame.encode(:method, "", 0) }.should_not raise_error(RuntimeError, "Channel has to be 0 or an integer in range 1..65535")
-      lambda { AMQ::Protocol::Frame.encode(:method, "", 1) }.should_not raise_error(RuntimeError, "Channel has to be 0 or an integer in range 1..65535")
+      lambda { AMQ::Protocol::Frame.encode(:method, "", -1) }.should raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+      lambda { AMQ::Protocol::Frame.encode(:method, "", 65536) }.should raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+      lambda { AMQ::Protocol::Frame.encode(:method, "", 65535) }.should_not raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+      lambda { AMQ::Protocol::Frame.encode(:method, "", 0) }.should_not raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+      lambda { AMQ::Protocol::Frame.encode(:method, "", 1) }.should_not raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
     end
 
     it "should raise RuntimeError if payload is nil" do
