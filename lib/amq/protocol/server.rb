@@ -247,7 +247,7 @@ module AMQ
 
         Array.new.tap do |array|
           while body
-            payload, body = body[0..limit], body[limit..-1]
+            payload, body = body[0, limit + 1], body[limit, body.length - limit]
             # array << [0x03, payload]
             array << BodyFrame.new(payload, channel)
           end
