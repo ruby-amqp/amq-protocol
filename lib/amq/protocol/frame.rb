@@ -14,7 +14,7 @@ module AMQ
 
       # The channel number is 0 for all frames which are global to the connection and 1-65535 for frames that refer to specific channels.
       def self.encode(type, payload, channel)
-        raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type) or (type = TYPES[type])
+        raise FrameTypeError.new(TYPES_OPTIONS) if type == nil || !(TYPES_OPTIONS.include?(type) || type == TYPES[type])
         raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
         [TYPES[type], channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload + FINAL_OCTET
