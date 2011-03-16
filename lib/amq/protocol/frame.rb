@@ -3,21 +3,17 @@
 module AMQ
   module Protocol
     class Frame
-      TYPES         = Hash.new do |hash, key|
-        key if [1, 2, 3, 8].include?(key)
-      end.merge({ :method => 1, :headers => 2, :body => 3, :heartbeat => 8 })
-
-      TYPES_REVERSE = TYPES.inject({}) { |hash, pair| hash.merge!(pair[1] => pair[0]) }
-      TYPES_OPTIONS = TYPES.keys
-      CHANNEL_RANGE = (0..65535)
-      FINAL_OCTET   = "\xCE" # 206
+      TYPES = {:method => 1, :headers => 2, :body => 3, :heartbeat => 8}.freeze
+      TYPES_REVERSE = TYPES.invert.freeze
+      TYPES_OPTIONS = TYPES.keys.freeze
+      CHANNEL_RANGE = (0..65535).freeze
+      FINAL_OCTET   = "\xCE".freeze # 206
 
       # The channel number is 0 for all frames which are global to the connection and 1-65535 for frames that refer to specific channels.
       def self.encode(type, payload, channel)
-        raise FrameTypeError.new(TYPES_OPTIONS) if type == nil || !(TYPES_OPTIONS.include?(type) || type == TYPES[type])
         raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
-        [TYPES[type], channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload + FINAL_OCTET
+        [find_type(type), channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload + FINAL_OCTET
       end
 
       class << self
@@ -25,10 +21,15 @@ module AMQ
       end
 
       def self.new(original_type, *args)
-        type  = TYPES[original_type] || original_type
-        klass = CLASSES[original_type]
-        raise "Type must be one of (1, 2, 3, 8) or #{TYPES_OPTIONS.inspect}, was #{original_type.inspect}" if klass.nil?
+        type_id = find_type(original_type)
+        klass = CLASSES[type_id]
         klass.new(*args)
+      end
+      
+      def self.find_type(type)
+        type_id = if Symbol === type then TYPES[type] else type end
+        raise FrameTypeError.new(TYPES_OPTIONS) if type == nil || !TYPES_REVERSE.has_key?(type_id)
+        type_id
       end
 
       def self.decode(*)
@@ -159,8 +160,11 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end
     end
 
-    Frame::CLASSES = Hash.new do |hash, key|
-      hash[Frame::TYPES_REVERSE[key]] if (1..4).include?(key)
-    end.merge({ :method => MethodFrame, :headers => HeadersFrame, :body => BodyFrame, :heartbeat => HeartbeatFrame })
+    Frame::CLASSES = {
+      Frame::TYPES[:method] => MethodFrame, 
+      Frame::TYPES[:headers] => HeadersFrame, 
+      Frame::TYPES[:body] => BodyFrame, 
+      Frame::TYPES[:heartbeat] => HeartbeatFrame
+    }
   end
 end

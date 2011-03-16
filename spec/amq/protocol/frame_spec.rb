@@ -72,6 +72,10 @@ describe AMQ::Protocol::Frame do
       readable = StringIO.new(invalid_data)
       lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(NotImplementedError)
     end
+    
+    it "should raise FrameTypeError if the type is not one of the accepted" do
+      expect { AMQ::Protocol::Frame.new(10) }.to raise_error(FrameTypeError)
+    end
   end
 
 
