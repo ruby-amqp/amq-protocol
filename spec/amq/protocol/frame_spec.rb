@@ -80,8 +80,12 @@ describe AMQ::Protocol::Frame do
   end
   
   describe '#decode_header' do
-    it "should raise FrameTypeError if the decoded type is not one of the accepted" do
+    it 'raises FrameTypeError if the decoded type is not one of the accepted' do
       expect { AMQ::Protocol::Frame.decode_header("\n\x00\x01\x00\x00\x00\x05") }.to raise_error(FrameTypeError)
+    end
+    
+    it 'raises EmptyResponseError if the header is nil' do
+      expect { AMQ::Protocol::Frame.decode_header(nil) }.to raise_error(EmptyResponseError)
     end
   end
 
