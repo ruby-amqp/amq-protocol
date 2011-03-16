@@ -44,8 +44,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
         raise EmptyResponseError.new if header.nil?
         type_id, channel, size = header.unpack(PACK_CACHE[:cnN])
         type = TYPES_REVERSE[type_id]
-
-        raise FrameTypeError.new(TYPES_OPTIONS) unless TYPES_OPTIONS.include?(type)
+        raise FrameTypeError.new(TYPES_OPTIONS) unless type
         [type, channel, size]
       end
     end

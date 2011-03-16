@@ -52,6 +52,12 @@ describe AMQ::Protocol::Frame do
 
 
   describe ".new" do
+    it "should raise FrameTypeError if the type is not one of the accepted" do
+      expect { AMQ::Protocol::Frame.new(10) }.to raise_error(FrameTypeError)
+    end
+  end
+  
+  describe ".decode" do
     before(:each) do
       @data = AMQ::Protocol::Frame.encode(:body, "test", 5)
       @readable = StringIO.new(@data.to_s)
@@ -67,17 +73,17 @@ describe AMQ::Protocol::Frame do
 
     it "should raise RuntimeError if the size is smaller than the actual size" do
       invalid_data = @data.dup
-
       invalid_data[3..6] = [3].pack("N")
       readable = StringIO.new(invalid_data)
       lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(NotImplementedError)
     end
-    
-    it "should raise FrameTypeError if the type is not one of the accepted" do
-      expect { AMQ::Protocol::Frame.new(10) }.to raise_error(FrameTypeError)
+  end
+  
+  describe '#decode_header' do
+    it "should raise FrameTypeError if the decoded type is not one of the accepted" do
+      expect { AMQ::Protocol::Frame.decode_header("\n\x00\x01\x00\x00\x00\x05") }.to raise_error(FrameTypeError)
     end
   end
-
 
   describe AMQ::Protocol::HeadersFrame do
     subject { AMQ::Protocol::HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
