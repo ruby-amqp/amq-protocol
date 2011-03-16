@@ -5,6 +5,7 @@ GEM
     diff-lcs (1.1.2)
     nake (0.0.8)
       term-ansicolor
+    perftools.rb (0.5.6)
     rspec (2.5.0)
       rspec-core (~> 2.5.0)
       rspec-expectations (~> 2.5.0)
@@ -21,4 +22,5 @@ PLATFORMS
 DEPENDENCIES
   contributors
   nake
+  perftools.rb
   rspec (>= 2.0.0)
