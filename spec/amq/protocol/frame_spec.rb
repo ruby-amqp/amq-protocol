@@ -9,6 +9,14 @@ describe AMQ::Protocol::Frame do
       lambda { AMQ::Protocol::Frame.encode(nil, "", 0) }.should raise_error(AMQ::Protocol::FrameTypeError)
     end
 
+    it "should raise FrameTypeError if type isn't valid (when type is a symbol)" do
+      expect { AMQ::Protocol::Frame.encode(:xyz, "test", 12) }.to raise_error(AMQ::Protocol::FrameTypeError)
+    end
+
+    it "should raise FrameTypeError if type isn't valid (when type is a number)" do
+      expect { AMQ::Protocol::Frame.encode(16, "test", 12) }.to raise_error(AMQ::Protocol::FrameTypeError)
+    end
+
     it "should raise RuntimeError if channel isn't 0 or an integer in range 1..65535" do
       lambda { AMQ::Protocol::Frame.encode(:method, "", -1) }.should raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
       lambda { AMQ::Protocol::Frame.encode(:method, "", 65536) }.should raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
