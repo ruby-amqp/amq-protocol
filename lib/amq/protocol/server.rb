@@ -308,7 +308,7 @@ module AMQ
         def self.decode(data)
           offset = 0
           table_length = Table.length(data[offset, 5])
-          client_properties = Table.decode(data[offset, table_length - offset])
+          client_properties = Table.decode(data[offset, table_length - offset + 1])
           length = data[offset, 2].unpack(PACK_CACHE[:c])[0]
           offset += 1
           mechanism = data[offset, length]
@@ -804,7 +804,7 @@ module AMQ
           offset += 1
           passive = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
         end
 
@@ -923,7 +923,7 @@ module AMQ
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, destination, source, routing_key, nowait, arguments)
         end
 
@@ -987,7 +987,7 @@ module AMQ
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, destination, source, routing_key, nowait, arguments)
         end
 
@@ -1048,7 +1048,7 @@ module AMQ
           offset += 1
           passive = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
         end
 
@@ -1118,7 +1118,7 @@ module AMQ
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, queue, exchange, routing_key, nowait, arguments)
         end
 
@@ -1285,7 +1285,7 @@ module AMQ
           routing_key = data[offset, length]
           offset += length
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, queue, exchange, routing_key, arguments)
         end
 
@@ -1789,7 +1789,7 @@ module AMQ
           offset += 1
           no_local = (bit_buffer & (1 << 0)) != 0
           table_length = Table.length(data[offset, 5])
-          arguments = Table.decode(data[offset, table_length - offset])
+          arguments = Table.decode(data[offset, table_length - offset + 1])
           self.new(ticket, queue, consumer_tag, no_local, no_ack, exclusive, nowait, arguments)
         end
 

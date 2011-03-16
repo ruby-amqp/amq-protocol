@@ -285,7 +285,7 @@ module AMQ
           version_minor = data[offset, 1].unpack(PACK_CACHE[:c]).first
           offset += 1
           table_length = Table.length(data[offset, 5])
-          server_properties = Table.decode(data[offset, table_length - offset])
+          server_properties = Table.decode(data[offset, table_length - offset + 1])
           length = data[offset, 5].unpack(PACK_CACHE[:N]).first
           offset += 4
           mechanisms = data[offset, length]
