@@ -32,6 +32,20 @@ module AMQ
           end
         end
       end
+      
+      describe Secure do
+        pending do
+          describe '.decode' do
+          end
+        end
+      end
+    
+      describe SecureOk do
+        pending do
+          describe '.encode' do
+          end
+        end
+      end
     
       describe Tune do
         describe '.decode' do
@@ -53,6 +67,47 @@ module AMQ
             heartbeat = 1
             method_frame = TuneOk.encode(channel_max, frame_max, heartbeat)
             method_frame.payload.should == "\x00\n\x00\x1F\x00\x00\x00\x01\x00\x00\x00\x01"
+          end
+        end
+      end
+      
+      describe Open do
+        describe '.encode' do
+          it 'encodes the parameters into a MethodFrame' do
+            vhost = '/test'
+            method_frame = Open.encode(vhost)
+            method_frame.payload.should == "\x00\n\x00(\x05/test\x00\x00"
+          end
+        end
+      end
+      
+      describe OpenOk do
+        describe '.decode' do
+          subject do
+            OpenOk.decode("\x00")
+          end
+          
+          its(:known_hosts) { should == '' }
+        end
+      end
+      
+      describe Close do
+        pending do
+          describe '.decode' do
+          end
+        end
+        
+        pending do
+          describe '.encode' do
+          end
+        end
+      end
+      
+      describe CloseOk do
+        describe '.encode' do
+          it 'encodes a MethodFrame' do
+            method_frame = CloseOk.encode
+            method_frame.payload.should == "\x00\n\x003"
           end
         end
       end
