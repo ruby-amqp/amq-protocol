@@ -9,6 +9,7 @@ buffer = ARGF.inject(String.new) do |buffer, line|
   # line filters
   line.gsub!(/\s*\n$/, "\n")
   line.gsub!("'", '"')
+  line.gsub!('u"', '"')
 
   buffer += line
 end
