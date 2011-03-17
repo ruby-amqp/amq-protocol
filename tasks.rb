@@ -12,8 +12,9 @@ Task.new(:generate) do |task|
         sh "git submodule update --init"
       end
     end
-
-    %w{client server}.each do |type|
+    
+    targets = %w{client} # add "server" to generate server code
+    targets.each do |type|
       path = "lib/amq/protocol/#{type}.rb"
       sh "./codegen.py #{type} #{spec} #{path}"
       if File.file?(path)
