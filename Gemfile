@@ -6,7 +6,8 @@ group(:development) do
   gem "nake",         :platform => :ruby_19
   gem "contributors", :platform => :ruby_19
 
-  gem "perftools.rb"
+  # excludes Windows and JRuby
+  gem "perftools.rb", :platform => :ruby
 end
 
 group(:test) do

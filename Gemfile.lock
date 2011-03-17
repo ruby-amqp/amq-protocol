@@ -17,6 +17,7 @@ GEM
     term-ansicolor (1.0.5)
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES
