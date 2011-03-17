@@ -75,5 +75,17 @@ module AMQ
         its(:heartbeat) { should == 0}
       end
     end
+
+    describe Connection::TuneOk do
+      describe '.encode' do
+        it 'encodes the parameters into a MethodFrame' do
+          channel_max = 0
+          frame_max = 65536
+          heartbeat = 1
+          method_frame = Connection::TuneOk.encode(channel_max, frame_max, heartbeat)
+          method_frame.payload.should == "\x00\n\x00\x1F\x00\x00\x00\x01\x00\x00\x00\x01"
+        end
+      end
+    end
   end
 end
