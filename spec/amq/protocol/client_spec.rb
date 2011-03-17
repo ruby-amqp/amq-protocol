@@ -63,5 +63,17 @@ module AMQ
         end
       end
     end
+    
+    describe Connection::Tune do
+      describe '.decode' do
+        subject do
+          Connection::Tune.decode("\x00\x00\x00\x02\x00\x00\x00\x00")
+        end
+
+        its(:channel_max) { should == 0 }
+        its(:frame_max) { should == 131072 }
+        its(:heartbeat) { should == 0}
+      end
+    end
   end
 end
