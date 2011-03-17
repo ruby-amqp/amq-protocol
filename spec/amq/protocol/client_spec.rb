@@ -42,12 +42,25 @@ module AMQ
         subject do
           Connection::Start.decode("\x00\t\x00\x00\x00\xFB\tcopyrightS\x00\x00\x00gCopyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.\vinformationS\x00\x00\x005Licensed under the MPL.  See http://www.rabbitmq.com/\bplatformS\x00\x00\x00\nErlang/OTP\aproductS\x00\x00\x00\bRabbitMQ\aversionS\x00\x00\x00\x052.2.0\x00\x00\x00\x0EPLAIN AMQPLAIN\x00\x00\x00\x05en_US")
         end
-        
+
         its(:version_major) { should == 0 }
         its(:version_minor) { should == 9 }
         its(:server_properties) { should == {'copyright' => 'Copyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.', 'information' => 'Licensed under the MPL.  See http://www.rabbitmq.com/', 'platform' => 'Erlang/OTP', 'product' => 'RabbitMQ', 'version' => '2.2.0'} }
         its(:mechanisms) { should == 'PLAIN AMQPLAIN' }
         its(:locales) { should == 'en_US' }
+      end
+    end
+
+    describe Connection::StartOk do
+      describe '.encode' do
+        it 'encodes the parameters into a MethodFrame' do
+          client_properties = {:platform => 'Ruby 1.9.2', :product => 'AMQ Client', :information => 'http://github.com/ruby-amqp/amq-client', :version => '0.2.0'}
+          mechanism = 'PLAIN'
+          response = "\u0000guest\u0000guest"
+          locale = 'en_GB'
+          method_frame = Connection::StartOk.encode(client_properties, mechanism, response, locale)
+          method_frame.payload.should == "\x00\n\x00\v\x00\x00\x00x\bplatformS\x00\x00\x00\nRuby 1.9.2\aproductS\x00\x00\x00\nAMQ Client\vinformationS\x00\x00\x00&http://github.com/ruby-amqp/amq-client\aversionS\x00\x00\x00\x050.2.0\x05PLAIN\x00\x00\x00\f\x00guest\x00guest\x05en_GB"
+        end
       end
     end
   end
