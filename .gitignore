@@ -2,3 +2,5 @@
 .rvmrc
 tmp
 *.pyc
+vendor/bundle
+vendor/cache
