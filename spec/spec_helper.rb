@@ -1,6 +1,14 @@
 # encoding: binary
 
-require "rspec"
+require 'bundler/setup'
+require 'rspec'
+
+begin
+  require 'simplecov'
+  
+  SimpleCov.start
+rescue LoadError
+end
 
 $: << File.expand_path('../../lib', __FILE__)
 
