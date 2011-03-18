@@ -19,40 +19,28 @@ module AMQ
       end
 
       describe OpenOk do
-        pending do
-          describe '.decode' do
-          end
+        describe '.decode' do
         end
       end
 
       describe Flow do
-        pending do
-          describe '.decode' do
-          end
+        describe '.decode' do
         end
-        
-        pending do
-          describe '.encode' do
-          end
+
+        describe '.encode' do
         end
       end
 
       describe FlowOk do
-        pending do
-          describe '.decode' do
-          end
+        describe '.decode' do
         end
       end
 
       describe Close do
-        pending do
-          describe '.decode' do
-          end
+        describe '.decode' do
         end
-        
-        pending do
-          describe '.encode' do
-          end
+
+        describe '.encode' do
         end
       end
 

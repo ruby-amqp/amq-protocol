@@ -34,16 +34,12 @@ module AMQ
       end
       
       describe Secure do
-        pending do
-          describe '.decode' do
-          end
+        describe '.decode' do
         end
       end
     
       describe SecureOk do
-        pending do
-          describe '.encode' do
-          end
+        describe '.encode' do
         end
       end
     
@@ -92,14 +88,10 @@ module AMQ
       end
       
       describe Close do
-        pending do
-          describe '.decode' do
-          end
+        describe '.decode' do
         end
         
-        pending do
-          describe '.encode' do
-          end
+        describe '.encode' do
         end
       end
       
