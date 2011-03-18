@@ -1,4 +1,4 @@
-# encoding: utf-8
+# encoding: binary
 
 require File.expand_path('../../../spec_helper', __FILE__)
 
