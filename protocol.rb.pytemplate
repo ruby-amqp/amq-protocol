@@ -271,16 +271,6 @@ module AMQ
         % endfor
       ]
 
-
-      % for f in klass.fields:
-      def self.decode_${f.ruby_name}(data)
-        % for line in helpers.genSingleSimpleDecode(spec, f):
-        ${line}
-        % endfor
-      end
-
-      % endfor
-
       def self.decode_properties(data)
         offset, data_length, properties = 0, data.bytesize, {}
 
@@ -295,14 +285,17 @@ module AMQ
             when :shortstr
               size = data[offset, 1].unpack(PACK_CACHE[:c])[0]
               offset += 1
+              result = data[offset, size]
             when :octet
               size = 1
+              result = data[offset, size].unpack(PACK_CACHE[:c]).first
             when :timestamp
               size = 8
+              result = Time.at(data[offset, size].unpack(PACK_CACHE[:N2]).last)
             when :table
               size = 4 + data[offset, 4].unpack(PACK_CACHE[:N])[0]
+              result = Table.decode(data[offset, size])
             end
-            result = self.send(:"decode_#{name}", data[offset, size])
             properties[name] = result
             offset += size
           end

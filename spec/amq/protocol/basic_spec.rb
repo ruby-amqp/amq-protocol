@@ -12,11 +12,11 @@ module AMQ
         end
       end
       
-      describe '.decode_timestamp' do
-        it 'decodes the timestamp from a 64 byte big endian integer and returns a Time object' do
-          Basic.decode_timestamp("\x00\x00\x00\x00\x00\x0009").should == Time.at(12345)
-        end
-      end
+      # describe '.decode_timestamp' do
+      #   it 'decodes the timestamp from a 64 byte big endian integer and returns a Time object' do
+      #     Basic.decode_timestamp("\x00\x00\x00\x00\x00\x0009").should == Time.at(12345)
+      #   end
+      # end
       
       describe '.encode_headers' do
         it 'encodes the headers as a table' do
@@ -24,11 +24,11 @@ module AMQ
         end
       end
       
-      describe '.decode_headers' do
-        it 'decodes the headers from a table' do
-          Basic.decode_headers("\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world").should == {'hello' => 'world'}
-        end
-      end
+      # describe '.decode_headers' do
+      #   it 'decodes the headers from a table' do
+      #     Basic.decode_headers("\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world").should == {'hello' => 'world'}
+      #   end
+      # end
       
       describe '.encode_properties' do
         it 'packs the parameters into a byte array using the other encode_* methods' do
@@ -56,12 +56,12 @@ module AMQ
           end
         end
 
-        describe ".decode_#{method}" do
-          it 'returns the string' do
-            # the length has been stripped in .decode_properties
-            Basic.send("decode_#{method}", 'hello world').should == 'hello world'
-          end
-        end
+        # describe ".decode_#{method}" do
+        #   it 'returns the string' do
+        #     # the length has been stripped in .decode_properties
+        #     Basic.send("decode_#{method}", 'hello world').should == 'hello world'
+        #   end
+        # end
       end
       
       %w(delivery_mode priority).each do |method|
@@ -71,11 +71,11 @@ module AMQ
           end
         end
 
-        describe ".decode_#{method}" do
-          it 'decodes the value from a char' do
-            Basic.send("decode_#{method}", "\x10").should == 16
-          end
-        end
+        # describe ".decode_#{method}" do
+        #   it 'decodes the value from a char' do
+        #     Basic.send("decode_#{method}", "\x10").should == 16
+        #   end
+        # end
       end
     end
     
@@ -241,9 +241,9 @@ module AMQ
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
-            delivery_tag = 'foot'
+            delivery_tag = 6
             multiple = false
-            method_frame = Ack.encode(channel, 6, multiple)
+            method_frame = Ack.encode(channel, delivery_tag, multiple)
             method_frame.payload.should == "\x00<\x00P\x00\x00\x00\x00\x00\x00\x00\x06\x00"
             method_frame.channel.should == 1
           end

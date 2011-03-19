@@ -1444,62 +1444,6 @@ module AMQ
         0x0004,
       ]
 
-      def self.decode_content_type(data)
-        data
-      end
-
-      def self.decode_content_encoding(data)
-        data
-      end
-
-      def self.decode_headers(data)
-        Table.decode(data)
-      end
-
-      def self.decode_delivery_mode(data)
-        data.unpack(PACK_CACHE[:c]).first
-      end
-
-      def self.decode_priority(data)
-        data.unpack(PACK_CACHE[:c]).first
-      end
-
-      def self.decode_correlation_id(data)
-        data
-      end
-
-      def self.decode_reply_to(data)
-        data
-      end
-
-      def self.decode_expiration(data)
-        data
-      end
-
-      def self.decode_message_id(data)
-        data
-      end
-
-      def self.decode_timestamp(data)
-        Time.at(data.unpack(PACK_CACHE[:N2]).last)
-      end
-
-      def self.decode_type(data)
-        data
-      end
-
-      def self.decode_user_id(data)
-        data
-      end
-
-      def self.decode_app_id(data)
-        data
-      end
-
-      def self.decode_cluster_id(data)
-        data
-      end
-
       def self.decode_properties(data)
         offset, data_length, properties = 0, data.bytesize, {}
 
@@ -1514,14 +1458,17 @@ module AMQ
             when :shortstr
               size = data[offset, 1].unpack(PACK_CACHE[:c])[0]
               offset += 1
+              result = data[offset, size]
             when :octet
               size = 1
+              result = data[offset, size].unpack(PACK_CACHE[:c]).first
             when :timestamp
               size = 8
+              result = Time.at(data[offset, size].unpack(PACK_CACHE[:N2]).last)
             when :table
               size = 4 + data[offset, 4].unpack(PACK_CACHE[:N])[0]
+              result = Table.decode(data[offset, size])
             end
-            result = self.send(:"decode_#{name}", data[offset, size])
             properties[name] = result
             offset += size
           end
