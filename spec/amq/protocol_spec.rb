@@ -60,13 +60,6 @@ describe AMQ::Protocol do
       it "has method id equal to 11" do
         AMQ::Protocol::Connection::StartOk.method_id.should == 11
       end
-
-      describe ".encode" do
-        it do
-          frame = AMQ::Protocol::Connection::StartOk.encode({ :client => "AMQ Protocol" }, "PLAIN", "LOGINSguesPASSWORDSguest", "en_GB")
-          frame.payload.should eql("\x00\n\x00\v\x00\x00\x00\x18\x06clientS\x00\x00\x00\fAMQ Protocol\x05PLAIN\x00\x00\x00\x18LOGINSguesPASSWORDSguest\x05en_GB")
-        end
-      end
     end
 
     describe AMQ::Protocol::Connection::Secure do

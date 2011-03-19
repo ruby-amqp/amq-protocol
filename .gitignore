@@ -1,6 +1,7 @@
 /*.gem
-.rvmrc
+/.rvmrc
 tmp
 *.pyc
-vendor/bundle
-vendor/cache
+/vendor/bundle
+/vendor/cache
+/coverage
