@@ -165,7 +165,7 @@ module AMQ
       def self.split_headers(user_headers)
         properties, headers = {}, {}
         user_headers.each do |key, value|
-					# key MUST be a symbol since symbols are not garbage-collected
+          # key MUST be a symbol since symbols are not garbage-collected
           if Basic::PROPERTIES.include?(key)
             properties[key] = value
           else
@@ -232,7 +232,7 @@ module AMQ
 
       % endif
 
-			## TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
+      ## TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
       % if klass.name == "basic" :
       def self.encode_properties(body_size, properties)
         pieces, flags = [], 0
@@ -249,20 +249,6 @@ module AMQ
         result += [flags].pack(PACK_CACHE[:n])
         result + pieces.join(EMPTY_STRING)
       end
-
-
-      # DECODE PROPERTIES
-      % for f in klass.fields:
-      # <% i = klass.fields.index(f) %>1 << ${15 - i}
-      def self.decode_${f.ruby_name}(data)
-        pieces = []
-        % for line in helpers.genSingleEncode(spec, "value", f.domain):
-        ${line}
-        % endfor
-        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join("")]
-      end
-
-      % endfor
 
       # THIS DECODES ONLY FLAGS
       DECODE_PROPERTIES = {

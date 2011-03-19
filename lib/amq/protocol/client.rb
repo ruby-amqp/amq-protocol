@@ -227,7 +227,7 @@ module AMQ
       def self.split_headers(user_headers)
         properties, headers = {}, {}
         user_headers.each do |key, value|
-					# key MUST be a symbol since symbols are not garbage-collected
+          # key MUST be a symbol since symbols are not garbage-collected
           if Basic::PROPERTIES.include?(key)
             properties[key] = value
           else
@@ -1387,115 +1387,6 @@ module AMQ
         result += AMQ::Hacks.pack_64_big_endian(body_size)
         result += [flags].pack(PACK_CACHE[:n])
         result + pieces.join(EMPTY_STRING)
-      end
-
-      # DECODE PROPERTIES
-      # 1 << 15
-      def self.decode_content_type(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [0, 0x8000, pieces.join("")]
-      end
-
-      # 1 << 14
-      def self.decode_content_encoding(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [1, 0x4000, pieces.join("")]
-      end
-
-      # 1 << 13
-      def self.decode_headers(data)
-        pieces = []
-        pieces << AMQ::Protocol::Table.encode(value)
-        [2, 0x2000, pieces.join("")]
-      end
-
-      # 1 << 12
-      def self.decode_delivery_mode(data)
-        pieces = []
-        pieces << [value].pack(PACK_CACHE[:c])
-        [3, 0x1000, pieces.join("")]
-      end
-
-      # 1 << 11
-      def self.decode_priority(data)
-        pieces = []
-        pieces << [value].pack(PACK_CACHE[:c])
-        [4, 0x0800, pieces.join("")]
-      end
-
-      # 1 << 10
-      def self.decode_correlation_id(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [5, 0x0400, pieces.join("")]
-      end
-
-      # 1 << 9
-      def self.decode_reply_to(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [6, 0x0200, pieces.join("")]
-      end
-
-      # 1 << 8
-      def self.decode_expiration(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [7, 0x0100, pieces.join("")]
-      end
-
-      # 1 << 7
-      def self.decode_message_id(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [8, 0x0080, pieces.join("")]
-      end
-
-      # 1 << 6
-      def self.decode_timestamp(data)
-        pieces = []
-        pieces << AMQ::Hacks.pack_64_big_endian(value)
-        [9, 0x0040, pieces.join("")]
-      end
-
-      # 1 << 5
-      def self.decode_type(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [10, 0x0020, pieces.join("")]
-      end
-
-      # 1 << 4
-      def self.decode_user_id(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [11, 0x0010, pieces.join("")]
-      end
-
-      # 1 << 3
-      def self.decode_app_id(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [12, 0x0008, pieces.join("")]
-      end
-
-      # 1 << 2
-      def self.decode_cluster_id(data)
-        pieces = []
-        pieces << value.bytesize.chr
-        pieces << value
-        [13, 0x0004, pieces.join("")]
       end
 
       # THIS DECODES ONLY FLAGS
