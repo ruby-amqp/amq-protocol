@@ -6,136 +6,71 @@ require File.expand_path('../../../spec_helper', __FILE__)
 module AMQ
   module Protocol
     describe Basic do
-      describe '.encode_content_type' do
-      end
-
-      describe '.encode_content_encoding' do
-      end
-
-      describe '.encode_headers' do
-      end
-
-      describe '.encode_delivery_mode' do
-      end
-
-      describe '.encode_priority' do
-      end
-
-      describe '.encode_correlation_id' do
-      end
-
-      describe '.encode_reply_to' do
-      end
-
-      describe '.encode_expiration' do
-      end
-
-      describe '.encode_message_id' do
-      end
-
       describe '.encode_timestamp' do
+        it 'encodes the timestamp as a 64 byte big endian integer' do
+          Basic.encode_timestamp(12345).last.should == "\x00\x00\x00\x00\x00\x0009"
+        end
       end
-
-      describe '.encode_type' do
+      
+      describe '.decode_timestamp' do
+        it 'decodes the timestamp from a 64 byte big endian integer and returns a Time object' do
+          Basic.decode_timestamp("\x00\x00\x00\x00\x00\x0009").should == Time.at(12345)
+        end
       end
-
-      describe '.encode_user_id' do
+      
+      describe '.encode_headers' do
+        it 'encodes the headers as a table' do
+          Basic.encode_headers(:hello => 'world').last.should == "\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world"
+        end
       end
-
-      describe '.encode_app_id' do
+      
+      describe '.decode_headers' do
+        it 'decodes the headers from a table' do
+          Basic.decode_headers("\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world").should == {'hello' => 'world'}
+        end
       end
-
-      describe '.encode_cluster_id' do
-      end
-
+      
       describe '.encode_properties' do
+        it 'packs the parameters into a byte array using the other encode_* methods' do
+          result = Basic.encode_properties(10, {:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream'})
+          result.should == "\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x98\x00\x18application/octet-stream\x02\x00"
+        end
       end
-
-      describe '.decode_content_type' do
-      end
-
-      describe '.decode_content_encoding' do
-      end
-
-      describe '.decode_headers' do
-      end
-
-      describe '.decode_delivery_mode' do
-      end
-
-      describe '.decode_priority' do
-      end
-
-      describe '.decode_correlation_id' do
-      end
-
-      describe '.decode_reply_to' do
-      end
-
-      describe '.decode_expiration' do
-      end
-
-      describe '.decode_message_id' do
-      end
-
-      describe '.decode_timestamp' do
-      end
-
-      describe '.decode_type' do
-      end
-
-      describe '.decode_user_id' do
-      end
-
-      describe '.decode_app_id' do
-      end
-
-      describe '.decode_cluster_id' do
-      end
-
-      describe '.decode_content_type' do
-      end
-
-      describe '.decode_content_encoding' do
-      end
-
-      describe '.decode_headers' do
-      end
-
-      describe '.decode_delivery_mode' do
-      end
-
-      describe '.decode_priority' do
-      end
-
-      describe '.decode_correlation_id' do
-      end
-
-      describe '.decode_reply_to' do
-      end
-
-      describe '.decode_expiration' do
-      end
-
-      describe '.decode_message_id' do
-      end
-
-      describe '.decode_timestamp' do
-      end
-
-      describe '.decode_type' do
-      end
-
-      describe '.decode_user_id' do
-      end
-
-      describe '.decode_app_id' do
-      end
-
-      describe '.decode_cluster_id' do
-      end
-
+      
       describe '.decode_properties' do
+        it 'unpacks the properties from a byte array using the decode_* methods' do
+          result = Basic.decode_properties("\x98\x00\x18application/octet-stream\x02\x00")
+          result.should == {:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream'}
+        end
+      end
+      
+      %w(content_type content_encoding correlation_id reply_to expiration message_id type user_id app_id cluster_id).each do |method|
+        describe ".encode_#{method}" do
+          it 'encodes the parameter as a Pascal string' do
+            Basic.send("encode_#{method}", 'hello world').last.should == "\x0bhello world"
+          end
+        end
+
+        describe ".decode_#{method}" do
+          it 'returns the string' do
+            # the length has been stripped in .decode_properties
+            Basic.send("decode_#{method}", 'hello world').should == 'hello world'
+          end
+        end
+      end
+      
+      %w(delivery_mode priority).each do |method|
+        describe ".encode_#{method}" do
+          it 'encodes the parameter as a char' do
+            Basic.send("encode_#{method}", 10).last.should == "\x0a"
+          end
+        end
+
+        describe ".decode_#{method}" do
+          it 'decodes the value from a char' do
+            Basic.send("decode_#{method}", "\x10").should == 16
+          end
+        end
       end
     end
     
