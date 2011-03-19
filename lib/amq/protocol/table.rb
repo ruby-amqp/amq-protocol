@@ -14,6 +14,19 @@ module AMQ
         end
       end
 
+      TYPE_STRING = 'S'.freeze
+      TYPE_INTEGER = 'I'.freeze
+      TYPE_HASH = 'F'.freeze
+      TYPE_TIME = 'T'.freeze
+      TYPE_DECIMAL = 'D'.freeze
+      TYPE_BOOLEAN = 't'.freeze
+      TYPE_SIGNED_8BIT = 'b'.freeze
+      TYPE_SIGNED_16BIT = 's'.freeze
+      TYPE_SIGNED_64BIT = 'l'.freeze
+      TYPE_32BIT_FLOAT = 'f'.freeze
+      TYPE_64BIT_FLOAT = 'd'.freeze
+      TYPE_VOID = 'V'.freeze
+      TYPE_BYTE_ARRAY = 'x'.freeze
       TEN = '10'.freeze
 
       def self.encode(table)
@@ -25,36 +38,36 @@ module AMQ
 
           case value
           when String then
-            buffer << PACK_CACHE[:S]
-            buffer << [value.bytesize].pack(PACK_CACHE[:N])
+            buffer << TYPE_STRING
+            buffer << [value.bytesize].pack(PACK_UINT32)
             buffer << value
           when Integer then
-            buffer << PACK_CACHE[:I]
-            buffer << [value].pack(PACK_CACHE[:N])
+            buffer << TYPE_INTEGER
+            buffer << [value].pack(PACK_UINT32)
           when TrueClass, FalseClass then
             value = value ? 1 : 0
-            buffer << PACK_CACHE[:I]
-            buffer << [value].pack(PACK_CACHE[:N])
+            buffer << TYPE_INTEGER
+            buffer << [value].pack(PACK_UINT32)
           when Hash then
-            buffer << PACK_CACHE[:F] # it will work as long as the encoding is ASCII-8BIT
+            buffer << TYPE_HASH # it will work as long as the encoding is ASCII-8BIT
             buffer << self.encode(value)
           when Time then
             # TODO: encode timezone?
-            buffer << PACK_CACHE[:T]
-            buffer << [value.to_i].pack(PACK_CACHE[:q]).reverse # Don't ask. It works.
+            buffer << TYPE_TIME
+            buffer << [value.to_i].pack(PACK_INT64).reverse # Don't ask. It works.
           else
             # We don't want to require these libraries.
             if defined?(BigDecimal) && value.is_a?(BigDecimal)
-              buffer << PACK_CACHE[:D]
+              buffer << TYPE_DECIMAL
               if value.exponent < 0
                 decimals = -value.exponent
                 # p [value.exponent] # normalize
                 raw = (value * (decimals ** 10)).to_i
                 #pieces.append(struct.pack('>cBI', 'D', decimals, raw)) # byte integer
-                buffer << [decimals + 1, raw].pack(PACK_CACHE[:CN]) # somewhat like floating point
+                buffer << [decimals + 1, raw].pack(PACK_UCHAR_UINT32) # somewhat like floating point
               else
                 # per spec, the "decimals" octet is unsigned (!)
-                buffer << [0, value.to_i].pack(PACK_CACHE[:CN])
+                buffer << [0, value.to_i].pack(PACK_UCHAR_UINT32)
               end
             else
               raise InvalidTableError.new(key, value)
@@ -62,64 +75,59 @@ module AMQ
           end
         end
 
-        [buffer.bytesize].pack(PACK_CACHE[:N]) + buffer
+        [buffer.bytesize].pack(PACK_UINT32) + buffer
       end
 
       def self.length(data)
-        data.unpack(PACK_CACHE[:N]).first
+        data.unpack(PACK_UINT32).first
       end
 
       def self.decode(data)
         table = Hash.new
-        size = data.unpack(PACK_CACHE[:N]).first
+        size = data.unpack(PACK_UINT32).first
         offset = 4
         while offset < size
-          key_length = data.slice(offset, 1).unpack(PACK_CACHE[:c]).first
+          key_length = data.slice(offset, 1).unpack(PACK_CHAR).first
           offset += 1
           key = data.slice(offset, key_length)
           offset += key_length
           type = data.slice(offset, 1)
           offset += 1
           case type
-          when PACK_CACHE[:S] then
-            length = data.slice(offset, 4).unpack(PACK_CACHE[:N]).first
+          when TYPE_STRING
+            length = data.slice(offset, 4).unpack(PACK_UINT32).first
             offset += 4
             value = data.slice(offset, length)
             offset += length
-          when PACK_CACHE[:I] then
-            value = data.slice(offset, 4).unpack(PACK_CACHE[:N]).first
+          when TYPE_INTEGER
+            value = data.slice(offset, 4).unpack(PACK_UINT32).first
             offset += 4
-          when PACK_CACHE[:D] then
-            decimals, raw = data.slice(offset, 5).unpack(PACK_CACHE[:CN])
+          when TYPE_DECIMAL
+            decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
             offset += 5
             value = BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
-          when PACK_CACHE[:T] then
+          when TYPE_TIME
             # TODO: what is the first unpacked value??? Zone, maybe? It's 0, so it'd make sense.
-            timestamp = data.slice(offset, 8).unpack(PACK_CACHE[:N2]).last
+            timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
             value = Time.at(timestamp)
             offset += 8
-          when PACK_CACHE[:F] then
-            length = data.slice(offset, 4).unpack(PACK_CACHE[:N]).first
+          when TYPE_HASH
+            length = data.slice(offset, 4).unpack(PACK_UINT32).first
             value = self.decode(data.slice(offset, length + 4))
             offset += 4 + length
-          when PACK_CACHE[:t] then # boolean
+          when TYPE_BOOLEAN
             value  = data.slice(offset, 2)
-            integer = value.unpack(PACK_CACHE[:C]).first # 0 or 1
+            integer = value.unpack(PACK_CHAR).first # 0 or 1
             value = integer == 1
             offset += 1
-          when PACK_CACHE[:b] then # signed 8-bit
-            raise NotImplementedError.new
-          when PACK_CACHE[:s] then # signed 16-bit
-            raise NotImplementedError.new
-          when PACK_CACHE[:l] then # signed 64-bit
-            raise NotImplementedError.new
-          when PACK_CACHE[:f] then # 32-bit float
-            raise NotImplementedError.new
-          when PACK_CACHE[:d] then # 64-bit float
-            raise NotImplementedError.new
-          when PACK_CACHE[:V] then # void
+          when TYPE_SIGNED_8BIT then raise NotImplementedError.new
+          when TYPE_SIGNED_16BIT then raise NotImplementedError.new
+          when TYPE_SIGNED_64BIT then raise NotImplementedError.new
+          when TYPE_32BIT_FLOAT then raise NotImplementedError.new
+          when TYPE_64BIT_FLOAT then raise NotImplementedError.new
+          when TYPE_VOID
             value = nil
-          when PACK_CACHE[:x] then # byte array
+          when TYPE_BYTE_ARRAY
           else
             raise "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{size}\nProcessed data: #{table.inspect}"
           end
