@@ -225,11 +225,11 @@ module AMQ
       % for f in klass.fields:
       # <% i = klass.fields.index(f) %>1 << ${15 - i}
       def self.encode_${f.ruby_name}(value)
-        pieces = []
+        buffer = ''
         % for line in helpers.genSingleEncode(spec, "value", f.domain):
         ${line}
         % endfor
-        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join(EMPTY_STRING)]
+        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, buffer]
       end
 
       % endfor
@@ -365,12 +365,11 @@ module AMQ
           % if klass.name == "connection":
           channel = 0
           % endif
-          pieces = []
-          pieces << [${klass.index}, ${method.index}].pack(PACK_UINT16_X2)
+          buffer = ''
+          buffer << [${klass.index}, ${method.index}].pack(PACK_UINT16_X2)
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
-          buffer = pieces.join(EMPTY_STRING)
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer, channel)]
           % if "user_headers" in method.args():
