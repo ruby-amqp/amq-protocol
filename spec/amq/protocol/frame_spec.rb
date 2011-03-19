@@ -48,15 +48,18 @@ describe AMQ::Protocol::Frame do
     it "should include final octet" do
       AMQ::Protocol::Frame.encode(:body, "test", 12).should =~ /\xCE$/
     end
-  end
 
+    it "should encode unicode strings" do
+      expect { AMQ::Protocol::Frame.encode(:body, "à bientôt!", 12) }.to_not raise_error
+    end
+  end
 
   describe ".new" do
     it "should raise FrameTypeError if the type is not one of the accepted" do
       expect { AMQ::Protocol::Frame.new(10) }.to raise_error(FrameTypeError)
     end
   end
-  
+
   describe ".decode" do
     before(:each) do
       @data = AMQ::Protocol::Frame.encode(:body, "test", 5)
@@ -78,12 +81,12 @@ describe AMQ::Protocol::Frame do
       lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(NotImplementedError)
     end
   end
-  
+
   describe '#decode_header' do
     it 'raises FrameTypeError if the decoded type is not one of the accepted' do
       expect { AMQ::Protocol::Frame.decode_header("\n\x00\x01\x00\x00\x00\x05") }.to raise_error(FrameTypeError)
     end
-    
+
     it 'raises EmptyResponseError if the header is nil' do
       expect { AMQ::Protocol::Frame.decode_header(nil) }.to raise_error(EmptyResponseError)
     end

@@ -2,6 +2,7 @@
 
 module AMQ
   module Protocol
+    SIMPLE_BYTE_PACK = 'c*'
     class Frame
       TYPES = {:method => 1, :headers => 2, :body => 3, :heartbeat => 8}.freeze
       TYPES_REVERSE = TYPES.invert.freeze
@@ -13,7 +14,7 @@ module AMQ
       def self.encode(type, payload, channel)
         raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
-        [find_type(type), channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload + FINAL_OCTET
+        [find_type(type), channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
       end
 
       class << self
@@ -25,7 +26,7 @@ module AMQ
         klass = CLASSES[type_id]
         klass.new(*args)
       end
-      
+
       def self.find_type(type)
         type_id = if Symbol === type then TYPES[type] else type end
         raise FrameTypeError.new(TYPES_OPTIONS) if type == nil || !TYPES_REVERSE.has_key?(type_id)
@@ -75,7 +76,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end
 
       def encode
-        [self.class.id, @channel, self.size].pack(PACK_CACHE[:cnN]) + @payload + FINAL_OCTET
+        [self.class.id, @channel, self.size].pack(PACK_CACHE[:cnN]) + @payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
       end
     end
 
@@ -160,9 +161,9 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
     end
 
     Frame::CLASSES = {
-      Frame::TYPES[:method] => MethodFrame, 
-      Frame::TYPES[:headers] => HeadersFrame, 
-      Frame::TYPES[:body] => BodyFrame, 
+      Frame::TYPES[:method] => MethodFrame,
+      Frame::TYPES[:headers] => HeadersFrame,
+      Frame::TYPES[:body] => BodyFrame,
       Frame::TYPES[:heartbeat] => HeartbeatFrame
     }
   end
