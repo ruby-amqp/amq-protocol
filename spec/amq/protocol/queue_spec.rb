@@ -113,8 +113,8 @@ module AMQ
             exchange = 'foo.bar'
             routing_key = 'xyz'
             arguments = nil
-            method_frame = Delete.encode(channel, queue, exchange, routing_key, arguments)
-            method_frame.payload.should == "\x002\x00(\x00\x00\vhello.world\x03"
+            method_frame = Unbind.encode(channel, queue, exchange, routing_key, arguments)
+            method_frame.payload.should == "\x002\x002\x00\x00\vhello.world\afoo.bar\x03xyz\x00\x00\x00\x00"
             method_frame.channel.should == 1
           end
         end
