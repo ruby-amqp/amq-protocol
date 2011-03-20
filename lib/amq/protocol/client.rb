@@ -12,7 +12,7 @@ module AMQ
   module Protocol
     PROTOCOL_VERSION = "0.9.1".freeze
     PREAMBLE         = "AMQP\x00\x00\x09\x01".freeze
-    DEFAULT_PORT     = 5672.freeze
+    DEFAULT_PORT     = 5672
 
     # caching
     EMPTY_STRING = "".freeze

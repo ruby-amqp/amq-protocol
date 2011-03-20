@@ -13,7 +13,7 @@ module AMQ
   module Protocol
     PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}".freeze
     PREAMBLE         = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}".freeze
-    DEFAULT_PORT     = ${spec.port}.freeze
+    DEFAULT_PORT     = ${spec.port}
 
     # caching
     EMPTY_STRING = "".freeze
