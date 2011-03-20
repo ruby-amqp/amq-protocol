@@ -44,7 +44,7 @@ def genSingleDecode(spec, field):
         buffer.append("%s = data[offset, length]" % (cLvalue,))
         buffer.append("offset += length")
     elif type == 'longstr':
-        buffer.append("length = data[offset, 5].unpack(PACK_CACHE[:N]).first")
+        buffer.append("length = data[offset, 4].unpack(PACK_CACHE[:N]).first")
         buffer.append("offset += 4")
         buffer.append("%s = data[offset, length]" % (cLvalue,))
         buffer.append("offset += length")
@@ -52,21 +52,21 @@ def genSingleDecode(spec, field):
         buffer.append("%s = data[offset, 1].unpack(PACK_CACHE[:c]).first" % (cLvalue,))
         buffer.append("offset += 1")
     elif type == 'short':
-        buffer.append("%s = data[offset, 3].unpack(PACK_CACHE[:n]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 2].unpack(PACK_CACHE[:n]).first" % (cLvalue,))
         buffer.append("offset += 2")
     elif type == 'long':
-        buffer.append("%s = data[offset, 5].unpack(PACK_CACHE[:N]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 4].unpack(PACK_CACHE[:N]).first" % (cLvalue,))
         buffer.append("offset += 4")
     elif type == 'longlong':
         buffer.append("%s = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'timestamp':
-        buffer.append("%s = data[offset, 7].unpack(PACK_CACHE[:N2]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 8].unpack(PACK_CACHE[:N2]).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'bit':
         raise "Can't decode bit in genSingleDecode"
     elif type == 'table':
-        buffer.append("table_length = Table.length(data[offset, 5])")
+        buffer.append("table_length = Table.length(data[offset, 4])")
         buffer.append("%s = Table.decode(data[offset, table_length + 4])" % (cLvalue,))
         buffer.append("offset += table_length + 4")
     else:

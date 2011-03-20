@@ -284,14 +284,14 @@ module AMQ
           offset += 1
           version_minor = data[offset, 1].unpack(PACK_CACHE[:c]).first
           offset += 1
-          table_length = Table.length(data[offset, 5])
+          table_length = Table.length(data[offset, 4])
           server_properties = Table.decode(data[offset, table_length + 4])
           offset += table_length + 4
-          length = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          length = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           mechanisms = data[offset, length]
           offset += length
-          length = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          length = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           locales = data[offset, length]
           offset += length
@@ -347,7 +347,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          length = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           challenge = data[offset, length]
           offset += length
@@ -394,11 +394,11 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          channel_max = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          channel_max = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
-          frame_max = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          frame_max = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
-          heartbeat = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          heartbeat = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
           self.new(channel_max, frame_max, heartbeat)
         end
@@ -500,15 +500,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          reply_code = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
           length = data[offset, 2].unpack(PACK_CACHE[:c])[0]
           offset += 1
           reply_text = data[offset, length]
           offset += length
-          class_id = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          class_id = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
-          method_id = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          method_id = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
           if reply_code.eql?(200)
             self.new(reply_code, reply_text, class_id, method_id)
@@ -608,7 +608,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          length = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           channel_id = data[offset, length]
           offset += length
@@ -705,15 +705,15 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          reply_code = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
           length = data[offset, 2].unpack(PACK_CACHE[:c])[0]
           offset += 1
           reply_text = data[offset, length]
           offset += length
-          class_id = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          class_id = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
-          method_id = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          method_id = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
           if reply_code.eql?(200)
             self.new(reply_code, reply_text, class_id, method_id)
@@ -1028,9 +1028,9 @@ module AMQ
           offset += 1
           queue = data[offset, length]
           offset += length
-          message_count = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          message_count = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
-          consumer_count = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          consumer_count = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           self.new(queue, message_count, consumer_count)
         end
@@ -1131,7 +1131,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          message_count = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          message_count = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           self.new(message_count)
         end
@@ -1182,7 +1182,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          message_count = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          message_count = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           self.new(message_count)
         end
@@ -1725,7 +1725,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          reply_code = data[offset, 3].unpack(PACK_CACHE[:n]).first
+          reply_code = data[offset, 2].unpack(PACK_CACHE[:n]).first
           offset += 2
           length = data[offset, 2].unpack(PACK_CACHE[:c])[0]
           offset += 1
@@ -1844,7 +1844,7 @@ module AMQ
           offset += 1
           routing_key = data[offset, length]
           offset += length
-          message_count = data[offset, 5].unpack(PACK_CACHE[:N]).first
+          message_count = data[offset, 4].unpack(PACK_CACHE[:N]).first
           offset += 4
           self.new(delivery_tag, redelivered, exchange, routing_key, message_count)
         end
