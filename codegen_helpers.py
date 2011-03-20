@@ -67,7 +67,8 @@ def genSingleDecode(spec, field):
         raise "Can't decode bit in genSingleDecode"
     elif type == 'table':
         buffer.append("table_length = Table.length(data[offset, 5])")
-        buffer.append("%s = Table.decode(data[offset, table_length - offset + 1])" % (cLvalue,))
+        buffer.append("%s = Table.decode(data[offset, table_length + 4])" % (cLvalue,))
+        buffer.append("offset += table_length + 4")
     else:
         raise StandardError("Illegal domain '" + type + "' in genSingleDecode")
 

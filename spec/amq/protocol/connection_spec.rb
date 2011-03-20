@@ -12,13 +12,11 @@ module AMQ
             Start.decode("\x00\t\x00\x00\x00\xFB\tcopyrightS\x00\x00\x00gCopyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.\vinformationS\x00\x00\x005Licensed under the MPL.  See http://www.rabbitmq.com/\bplatformS\x00\x00\x00\nErlang/OTP\aproductS\x00\x00\x00\bRabbitMQ\aversionS\x00\x00\x00\x052.2.0\x00\x00\x00\x0EPLAIN AMQPLAIN\x00\x00\x00\x05en_US")
           end
 
-          pending 'offsetting problems in Start.decode' do
-            its(:version_major) { should == 0 }
-            its(:version_minor) { should == 9 }
-            its(:server_properties) { should == {'copyright' => 'Copyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.', 'information' => 'Licensed under the MPL.  See http://www.rabbitmq.com/', 'platform' => 'Erlang/OTP', 'product' => 'RabbitMQ', 'version' => '2.2.0'} }
-            its(:mechanisms) { should == 'PLAIN AMQPLAIN' }
-            its(:locales) { should == 'en_US' }
-          end
+          its(:version_major) { should == 0 }
+          its(:version_minor) { should == 9 }
+          its(:server_properties) { should == {'copyright' => 'Copyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.', 'information' => 'Licensed under the MPL.  See http://www.rabbitmq.com/', 'platform' => 'Erlang/OTP', 'product' => 'RabbitMQ', 'version' => '2.2.0'} }
+          its(:mechanisms) { should == 'PLAIN AMQPLAIN' }
+          its(:locales) { should == 'en_US' }
         end
       end
 
