@@ -6,7 +6,7 @@
 
 require "amq/protocol/table"
 require "amq/protocol/frame"
-require "amq/protocol/hacks"
+require "amq/hacks"
 
 module AMQ
   module Protocol
