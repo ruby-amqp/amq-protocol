@@ -72,8 +72,8 @@ module AMQ
         end
       end
 
-      describe HeadersFrame do
-        subject { HeadersFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
+      describe HeaderFrame do
+        subject { HeaderFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
 
         it "should decode body_size from payload" do
           subject.body_size.should == 10

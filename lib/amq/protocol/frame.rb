@@ -100,7 +100,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end
     end
 
-    class HeadersFrame < FrameSubclass
+    class HeaderFrame < FrameSubclass
       @id = 2
 
       def final?
@@ -162,7 +162,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
     Frame::CLASSES = {
       Frame::TYPES[:method] => MethodFrame,
-      Frame::TYPES[:headers] => HeadersFrame,
+      Frame::TYPES[:headers] => HeaderFrame,
       Frame::TYPES[:body] => BodyFrame,
       Frame::TYPES[:heartbeat] => HeartbeatFrame
     }

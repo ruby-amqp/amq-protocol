@@ -1711,7 +1711,7 @@ module AMQ
             raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
           end
           properties_payload = Basic.encode_properties(payload.bytesize, properties)
-          frames << HeadersFrame.new(properties_payload, channel)
+          frames << HeaderFrame.new(properties_payload, channel)
           frames + self.encode_body(payload, channel, frame_size)
         end
       end
