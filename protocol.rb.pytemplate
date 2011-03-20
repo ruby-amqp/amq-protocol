@@ -314,6 +314,7 @@ module AMQ
         @name = "${klass.name}.${method.name}"
         @method_id = ${method.index}
         @index = ${method.binary()}
+        @packed_indexes = [${klass.index}, ${method.index}].pack(PACK_UINT16_X2).freeze
 
         % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server")):
         # @return
@@ -366,7 +367,7 @@ module AMQ
           channel = 0
           % endif
           buffer = ''
-          buffer << [${klass.index}, ${method.index}].pack(PACK_UINT16_X2)
+          buffer << @packed_indexes
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
