@@ -298,11 +298,9 @@ module AMQ
             Nack.decode("\x00\x00\x00\x00\x00\x00\x00\x09\x03")
           end
           
-          pending '"requeue" is not defined' do
-            its(:delivery_tag) { should == 9 }
-            its(:multiple) { should == true }
-            its(:requeue) { should == true }
-          end
+          its(:delivery_tag) { should == 9 }
+          its(:multiple) { should == true }
+          its(:requeue) { should == true }
         end
         
         describe '.encode' do

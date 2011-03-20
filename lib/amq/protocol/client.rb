@@ -2009,6 +2009,7 @@ module AMQ
           bit_buffer = data[offset, 2].unpack(PACK_CACHE[:c]).first
           offset += 1
           multiple = (bit_buffer & (1 << 0)) != 0
+          requeue = (bit_buffer & (1 << 1)) != 0
           self.new(delivery_tag, multiple, requeue)
         end
 

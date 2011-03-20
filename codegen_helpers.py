@@ -159,6 +159,8 @@ def genDecodeMethodDefinition(spec, m):
                 buffer.append("offset += 1")
                 buffer.append("%s = (bit_buffer & (1 << %d)) != 0" % (f.ruby_name, bitindex))
                 #### TODO: ADD bitindex TO THE buffer
+            else:
+                buffer.append("%s = (bit_buffer & (1 << %d)) != 0" % (f.ruby_name, bitindex))
             bitindex = bitindex + 1
         else:
             bitindex = None
