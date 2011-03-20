@@ -25,10 +25,17 @@ module AMQ
           it 'encodes the parameters into a MethodFrame' do
             client_properties = {:platform => 'Ruby 1.9.2', :product => 'AMQ Client', :information => 'http://github.com/ruby-amqp/amq-client', :version => '0.2.0'}
             mechanism = 'PLAIN'
-            response = "\u0000guest\u0000guest"
+            response = "\x00guest\x00guest"
             locale = 'en_GB'
             method_frame = StartOk.encode(client_properties, mechanism, response, locale)
-            method_frame.payload.should == "\x00\n\x00\v\x00\x00\x00x\bplatformS\x00\x00\x00\nRuby 1.9.2\aproductS\x00\x00\x00\nAMQ Client\vinformationS\x00\x00\x00&http://github.com/ruby-amqp/amq-client\aversionS\x00\x00\x00\x050.2.0\x05PLAIN\x00\x00\x00\f\x00guest\x00guest\x05en_GB"
+            # the order of the table parts isn't deterministic in Ruby 1.8
+            method_frame.payload[0, 8].should == "\x00\n\x00\v\x00\x00\x00x"
+            method_frame.payload.should include("\bplatformS\x00\x00\x00\nRuby 1.9.2")
+            method_frame.payload.should include("\aproductS\x00\x00\x00\nAMQ Client")
+            method_frame.payload.should include("\vinformationS\x00\x00\x00&http://github.com/ruby-amqp/amq-client")
+            method_frame.payload.should include("\aversionS\x00\x00\x00\x050.2.0")
+            method_frame.payload[-28, 28].should == "\x05PLAIN\x00\x00\x00\f\x00guest\x00guest\x05en_GB"
+            method_frame.payload.length.should == 156
           end
         end
       end
