@@ -1519,8 +1519,7 @@ module AMQ
             when :timestamp
               size = 8
             when :table
-              size = data[offset, 4].unpack(PACK_CACHE[:N])[0]
-              offset += 4
+              size = 4 + data[offset, 4].unpack(PACK_CACHE[:N])[0]
             end
             result = self.send(:"decode_#{name}", data[offset, size])
             properties[name] = result

@@ -43,13 +43,9 @@ module AMQ
           result.should == {:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream', :timestamp => Time.at(123)}
         end
 
-        pending 'cannot construct a byte array with a table that passes' do
-          it 'unpacks the properties from a byte array using the decode_* methods, including a table' do
-            # the first of the two line below causes an infinite loop, the second an error
-            result = Basic.decode_properties("\xB8\x00\x18application/octet-stream\x00\x00\x00\x10\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world\x02\x00")
-            result = Basic.decode_properties("\xB8\x00\x18application/octet-stream\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world\x02\x00")
-            result.should == {:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream', :timestamp => Time.at(123), :headers => {'hello' => 'world'}}
-          end
+        it 'unpacks the properties from a byte array using the decode_* methods, including a table' do
+          result = Basic.decode_properties("\xB8@\x18application/octet-stream\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world\x02\x00\x00\x00\x00\x00\x00\x00\x00{")
+          result.should == {:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream', :timestamp => Time.at(123), :headers => {'hello' => 'world'}}
         end
       end
       
