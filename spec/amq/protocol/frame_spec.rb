@@ -60,28 +60,6 @@ describe AMQ::Protocol::Frame do
     end
   end
 
-  describe ".decode" do
-    before(:each) do
-      @data = AMQ::Protocol::Frame.encode(:body, "test", 5)
-      @readable = StringIO.new(@data.to_s)
-    end
-
-    it "should raise RuntimeError if the size is bigger than the actual size" do
-      pending
-      invalid_data = @data.dup
-      invalid_data[3..6] = [5].pack("N")
-      readable = StringIO.new(invalid_data)
-      lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(RuntimeError, "describe AMQ::Protocol::Frame doesn't end with \xCE as it must, which means the size is miscalculated.")
-    end
-
-    it "should raise RuntimeError if the size is smaller than the actual size" do
-      invalid_data = @data.dup
-      invalid_data[3..6] = [3].pack("N")
-      readable = StringIO.new(invalid_data)
-      lambda { AMQ::Protocol::Frame.decode(readable) }.should raise_error(NotImplementedError)
-    end
-  end
-
   describe '#decode_header' do
     it 'raises FrameTypeError if the decoded type is not one of the accepted' do
       expect { AMQ::Protocol::Frame.decode_header("\n\x00\x01\x00\x00\x00\x05") }.to raise_error(FrameTypeError)
