@@ -9,20 +9,18 @@ module AMQ
       describe Declare do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
-            pending 'encoding issues when using Fixnum#chr' do
-              channel = 1
-              exchange = 'amqclient.adapters.em.exchange1'
-              type = 'fanout'
-              passive = false,
-              durable = false
-              auto_delete = false
-              internal = false
-              nowait = false
-              arguments = nil
-              method_frame = Declare.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
-              method_frame.payload.should == "\x00(\x00\n\x00\x00\x1Famqclient.adapters.em.exchange1\x06fanout\x00\x00\x00\x00\x00"
-              method_frame.channel.should == 1
-            end
+            channel = 1
+            exchange = 'amqclient.adapters.em.exchange1'
+            type = 'fanout'
+            passive = false
+            durable = false
+            auto_delete = false
+            internal = false
+            nowait = false
+            arguments = nil
+            method_frame = Declare.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
+            method_frame.payload.should == "\x00(\x00\n\x00\x00\x1Famqclient.adapters.em.exchange1\x06fanout\x00\x00\x00\x00\x00"
+            method_frame.channel.should == 1
           end
         end
       end
