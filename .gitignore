@@ -3,5 +3,4 @@
 tmp
 *.pyc
 /vendor/bundle
-/vendor/cache
 /coverage
