@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.has_rdoc = true
 
   # files
-  s.files = `git ls-files`.split("\n")
+  s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
   s.require_paths = ["lib"]
 
   # Ruby version
