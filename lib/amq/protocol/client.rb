@@ -1892,6 +1892,23 @@ module AMQ
         @method_id = 80
         @index = 0x003C0050 # 60, 80, 3932240
 
+        # @return
+        def self.decode(data)
+          offset = 0
+          delivery_tag = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first
+          offset += 8
+          bit_buffer = data[offset, 2].unpack(PACK_CACHE[:c]).first
+          offset += 1
+          multiple = (bit_buffer & (1 << 0)) != 0
+          self.new(delivery_tag, multiple)
+        end
+
+        attr_reader :delivery_tag, :multiple
+        def initialize(delivery_tag, multiple)
+          @delivery_tag = delivery_tag
+          @multiple = multiple
+        end
+
         def self.has_content?
           false
         end
