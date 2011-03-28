@@ -1,8 +1,10 @@
 # encoding: binary
 
-require 'amq/protocol/client'
+require "amq/protocol/client"
 
-
+# We will need to introduce concept of mappings, because
+# AMQP 0.9, 0.9.1 and RabbitMQ uses different letters for entities
+# http://dev.rabbitmq.com/wiki/Amqp091Errata#section_3
 module AMQ
   module Protocol
     class Table
@@ -97,9 +99,29 @@ module AMQ
             value = Time.at(timestamp)
             offset += 8
           when PACK_CACHE[:F] then
-            value = self.decode(data.slice(offset, data.bytesize - offset))
+            length = data.slice(offset, 4).unpack(PACK_CACHE[:N]).first
+            value = self.decode(data.slice(offset, length + 4))
+            offset += 4 + length
+          when PACK_CACHE[:t] then # boolean
+            value  = data.slice(offset, 2)
+            integer = value.unpack(PACK_CACHE[:C]).first # 0 or 1
+            value = integer == 1
+            offset += 1
+          when PACK_CACHE[:b] then # signed 8-bit
+            raise NotImplementedError.new
+          when PACK_CACHE[:s] then # signed 16-bit
+            raise NotImplementedError.new
+          when PACK_CACHE[:l] then # signed 64-bit
+            raise NotImplementedError.new
+          when PACK_CACHE[:f] then # 32-bit float
+            raise NotImplementedError.new
+          when PACK_CACHE[:d] then # 64-bit float
+            raise NotImplementedError.new
+          when PACK_CACHE[:V] then # void
+            value = nil
+          when PACK_CACHE[:x] then # byte array
           else
-            raise "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}"
+            raise "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{size}\nProcessed data: #{table.inspect}"
           end
           table[key] = value
         end
