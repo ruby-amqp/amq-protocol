@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Documentation for Mako templates:
+# http://www.makotemplates.org/docs/syntax.html
+
 import os, sys, re
 
 sys.path.append(os.path.join("vendor", "rabbitmq-codegen"))
