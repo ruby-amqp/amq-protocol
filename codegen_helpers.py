@@ -39,7 +39,7 @@ def genSingleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        buffer.append("length = data[offset, 2].unpack(PACK_CHAR).first")
+        buffer.append("length = data[offset, 1].unpack(PACK_CHAR).first")
         buffer.append("offset += 1")
         buffer.append("%s = data[offset, length]" % (cLvalue,))
         buffer.append("offset += length")
@@ -155,7 +155,7 @@ def genDecodeMethodDefinition(spec, m):
             if bitindex >= 8:
                 bitindex = 0
             if bitindex == 0:
-                buffer.append("bit_buffer = data[offset, 2].unpack(PACK_CHAR).first")
+                buffer.append("bit_buffer = data[offset, 1].unpack(PACK_CHAR).first")
                 buffer.append("offset += 1")
                 buffer.append("%s = (bit_buffer & (1 << %d)) != 0" % (f.ruby_name, bitindex))
                 #### TODO: ADD bitindex TO THE buffer

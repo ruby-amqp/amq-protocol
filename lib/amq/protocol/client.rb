@@ -483,7 +483,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           known_hosts = data[offset, length]
           offset += length
@@ -511,7 +511,7 @@ module AMQ
           offset = 0
           reply_code = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           reply_text = data[offset, length]
           offset += length
@@ -643,7 +643,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset, 2].unpack(PACK_CHAR).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
           self.new(active)
@@ -679,7 +679,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset, 2].unpack(PACK_CHAR).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
           self.new(active)
@@ -717,7 +717,7 @@ module AMQ
           offset = 0
           reply_code = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           reply_text = data[offset, length]
           offset += length
@@ -1038,7 +1038,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           queue = data[offset, length]
           offset += length
@@ -1580,7 +1580,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
           offset += length
@@ -1630,7 +1630,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
           offset += length
@@ -1695,15 +1695,15 @@ module AMQ
           offset = 0
           reply_code = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           reply_text = data[offset, length]
           offset += length
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           exchange = data[offset, length]
           offset += length
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           routing_key = data[offset, length]
           offset += length
@@ -1732,20 +1732,20 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
           offset += length
           delivery_tag = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first
           offset += 8
-          bit_buffer = data[offset, 2].unpack(PACK_CHAR).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           redelivered = (bit_buffer & (1 << 0)) != 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           exchange = data[offset, length]
           offset += length
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           routing_key = data[offset, length]
           offset += length
@@ -1803,14 +1803,14 @@ module AMQ
           offset = 0
           delivery_tag = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first
           offset += 8
-          bit_buffer = data[offset, 2].unpack(PACK_CHAR).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           redelivered = (bit_buffer & (1 << 0)) != 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           exchange = data[offset, length]
           offset += length
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           routing_key = data[offset, length]
           offset += length
@@ -1842,7 +1842,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          length = data[offset, 2].unpack(PACK_CHAR).first
+          length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           cluster_id = data[offset, length]
           offset += length
@@ -1870,7 +1870,7 @@ module AMQ
           offset = 0
           delivery_tag = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first
           offset += 8
-          bit_buffer = data[offset, 2].unpack(PACK_CACHE[:c]).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           multiple = (bit_buffer & (1 << 0)) != 0
           self.new(delivery_tag, multiple)
@@ -1997,7 +1997,7 @@ module AMQ
           offset = 0
           delivery_tag = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first
           offset += 8
-          bit_buffer = data[offset, 2].unpack(PACK_CHAR).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           multiple = (bit_buffer & (1 << 0)) != 0
           requeue = (bit_buffer & (1 << 1)) != 0
@@ -2165,7 +2165,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          bit_buffer = data[offset, 2].unpack(PACK_CHAR).first
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
           self.new(nowait)
