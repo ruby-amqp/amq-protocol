@@ -4,25 +4,25 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     buffer = []
     type = spec.resolveDomain(unresolved_domain)
     if type == 'shortstr':
-        buffer.append("pieces << %s.bytesize.chr" % (cValue,))
-        buffer.append("pieces << %s" % (cValue,))
+        buffer.append("buffer << %s.bytesize.chr" % (cValue,))
+        buffer.append("buffer << %s" % (cValue,))
     elif type == 'longstr':
-        buffer.append("pieces << [%s.bytesize].pack(PACK_CACHE[:N])" % (cValue,))
-        buffer.append("pieces << %s" % (cValue,))
+        buffer.append("buffer << [%s.bytesize].pack(PACK_UINT32)" % (cValue,))
+        buffer.append("buffer << %s" % (cValue,))
     elif type == 'octet':
-        buffer.append("pieces << [%s].pack(PACK_CACHE[:c])" % (cValue,))
+        buffer.append("buffer << [%s].pack(PACK_CHAR)" % (cValue,))
     elif type == 'short':
-        buffer.append("pieces << [%s].pack(PACK_CACHE[:n])" % (cValue,))
+        buffer.append("buffer << [%s].pack(PACK_UINT16)" % (cValue,))
     elif type == 'long':
-        buffer.append("pieces << [%s].pack(PACK_CACHE[:N])" % (cValue,))
+        buffer.append("buffer << [%s].pack(PACK_UINT32)" % (cValue,))
     elif type == 'longlong':
-        buffer.append("pieces << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
+        buffer.append("buffer << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
     elif type == 'timestamp':
-        buffer.append("pieces << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
+        buffer.append("buffer << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':
-        buffer.append("pieces << AMQ::Protocol::Table.encode(%s)" % (cValue,))
+        buffer.append("buffer << AMQ::Protocol::Table.encode(%s)" % (cValue,))
     else:
         raise "Illegal domain in genSingleEncode", type
 
@@ -39,29 +39,29 @@ def genSingleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        buffer.append("length = data[offset, 2].unpack(PACK_CACHE[:c])[0]")
+        buffer.append("length = data[offset, 2].unpack(PACK_CHAR).first")
         buffer.append("offset += 1")
         buffer.append("%s = data[offset, length]" % (cLvalue,))
         buffer.append("offset += length")
     elif type == 'longstr':
-        buffer.append("length = data[offset, 4].unpack(PACK_CACHE[:N]).first")
+        buffer.append("length = data[offset, 4].unpack(PACK_UINT32).first")
         buffer.append("offset += 4")
         buffer.append("%s = data[offset, length]" % (cLvalue,))
         buffer.append("offset += length")
     elif type == 'octet':
-        buffer.append("%s = data[offset, 1].unpack(PACK_CACHE[:c]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 1].unpack(PACK_CHAR).first" % (cLvalue,))
         buffer.append("offset += 1")
     elif type == 'short':
-        buffer.append("%s = data[offset, 2].unpack(PACK_CACHE[:n]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 2].unpack(PACK_UINT16).first" % (cLvalue,))
         buffer.append("offset += 2")
     elif type == 'long':
-        buffer.append("%s = data[offset, 4].unpack(PACK_CACHE[:N]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 4].unpack(PACK_UINT32).first" % (cLvalue,))
         buffer.append("offset += 4")
     elif type == 'longlong':
         buffer.append("%s = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'timestamp':
-        buffer.append("%s = data[offset, 8].unpack(PACK_CACHE[:N2]).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 8].unpack(PACK_UINT32_X2).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'bit':
         raise "Can't decode bit in genSingleDecode"
@@ -87,27 +87,27 @@ def genSingleSimpleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        # buffer.append("length = data.unpack(PACK_CACHE[:c])[0]")
+        # buffer.append("length = data.unpack(PACK_CHAR)[0]")
         # buffer.append("result = data[offset..-1]")
         # buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
         # buffer.append("result")
         buffer.append("data")
     elif type == 'longstr':
-        # buffer.append("length = data.unpack(PACK_CACHE[:N])[0]")
+        # buffer.append("length = data.unpack(PACK_CHAR)[0]")
         # buffer.append("result = data[offset..-1]")
         # buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
         # buffer.append("result")
         buffer.append("data")
     elif type == 'octet':
-        buffer.append("data.unpack(PACK_CACHE[:c]).first")
+        buffer.append("data.unpack(PACK_CHAR).first")
     elif type == 'short':
-        buffer.append("data.unpack(PACK_CACHE[:n]).first")
+        buffer.append("data.unpack(PACK_UINT16).first")
     elif type == 'long':
-        buffer.append("data.unpack(PACK_CACHE[:N]).first")
+        buffer.append("data.unpack(PACK_UINT32).first")
     elif type == 'longlong':
         buffer.append("AMQ::Hacks.unpack_64_big_endian(data).first")
     elif type == 'timestamp':
-        buffer.append("Time.at(data.unpack(PACK_CACHE[:N2]).last)")
+        buffer.append("Time.at(data.unpack(PACK_UINT32_X2).last)")
     elif type == 'bit':
         raise "Can't decode bit in genSingleDecode"
     elif type == 'table':
@@ -121,7 +121,7 @@ def genSingleSimpleDecode(spec, field):
 def genEncodeMethodDefinition(spec, m):
     def finishBits():
         if bit_index is not None:
-            buffer.append("pieces << [bit_buffer].pack(PACK_CACHE[:c])")
+            buffer.append("buffer << [bit_buffer].pack(PACK_CHAR)")
 
     bit_index = None
     buffer = []
@@ -155,7 +155,7 @@ def genDecodeMethodDefinition(spec, m):
             if bitindex >= 8:
                 bitindex = 0
             if bitindex == 0:
-                buffer.append("bit_buffer = data[offset, 2].unpack(PACK_CACHE[:c]).first")
+                buffer.append("bit_buffer = data[offset, 2].unpack(PACK_CHAR).first")
                 buffer.append("offset += 1")
                 buffer.append("%s = (bit_buffer & (1 << %d)) != 0" % (f.ruby_name, bitindex))
                 #### TODO: ADD bitindex TO THE buffer

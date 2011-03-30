@@ -14,7 +14,7 @@ module AMQ
       def self.encode(type, payload, channel)
         raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
-        [find_type(type), channel, payload.bytesize].pack(PACK_CACHE[:cnN]) + payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
+        [find_type(type), channel, payload.bytesize].pack(PACK_CHAR_UINT16_UINT32) + payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
       end
 
       class << self
@@ -43,7 +43,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
       def self.decode_header(header)
         raise EmptyResponseError if header == nil
-        type_id, channel, size = header.unpack(PACK_CACHE[:cnN])
+        type_id, channel, size = header.unpack(PACK_CHAR_UINT16_UINT32)
         type = TYPES_REVERSE[type_id]
         raise FrameTypeError.new(TYPES_OPTIONS) unless type
         [type, channel, size]
@@ -76,7 +76,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end
 
       def encode
-        [self.class.id, @channel, self.size].pack(PACK_CACHE[:cnN]) + @payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
+        [self.class.id, @channel, self.size].pack(PACK_CHAR_UINT16_UINT32) + @payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
       end
     end
 
@@ -85,7 +85,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
       def method_class
         @method_class ||= begin
-                            klass_id, method_id = self.payload.unpack(PACK_CACHE[:n2])
+                            klass_id, method_id = self.payload.unpack(PACK_UINT16_X2)
                             index               = klass_id << 16 | method_id
                             AMQ::Protocol::METHODS[index]
                           end
@@ -129,7 +129,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
       def decode_payload
         @decoded_payload ||= begin
-          @klass_id, @weight = @payload.unpack(PACK_CACHE[:n2])
+          @klass_id, @weight = @payload.unpack(PACK_UINT16_X2)
           # the total size of the content body, that is, the sum of the body sizes for the
           # following content body frames. Zero indicates that there are no content body frames.
           # So this is NOT related to this very header frame!

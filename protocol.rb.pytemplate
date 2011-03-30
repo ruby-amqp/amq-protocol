@@ -17,11 +17,15 @@ module AMQ
 
     # caching
     EMPTY_STRING = "".freeze
-    PACK_CACHE = Hash.new { |hash, key| hash[key] = key.to_s }
-    # At the beginning, the PACK_CACHE is empty. When we query the cache, we'll get back the key as a string.
-    # So instead of creating a lot of strings in each pack/unpack call, we just query the cache and get back what we need.
-    # PACK_CACHE[:n2Q] # => "n2Q" # via the PACK_CACHE.default_proc
-    # PACK_CACHE[:n2Q] # => "n2Q" # standard hash query
+
+    PACK_CHAR               = 'c'.freeze
+    PACK_UINT16             = 'n'.freeze
+    PACK_UINT16_X2          = 'n2'.freeze
+    PACK_UINT32             = 'N'.freeze
+    PACK_UINT32_X2          = 'N2'.freeze
+    PACK_INT64              = 'q'.freeze
+    PACK_UCHAR_UINT32       = 'CN'.freeze
+    PACK_CHAR_UINT16_UINT32 = 'cnN'.freeze
 
     # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
@@ -221,11 +225,11 @@ module AMQ
       % for f in klass.fields:
       # <% i = klass.fields.index(f) %>1 << ${15 - i}
       def self.encode_${f.ruby_name}(value)
-        pieces = []
+        buffer = ''
         % for line in helpers.genSingleEncode(spec, "value", f.domain):
         ${line}
         % endfor
-        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, pieces.join(EMPTY_STRING)]
+        [${i}, ${"0x%04x" % ( 1 << (15-i),)}, buffer]
       end
 
       % endfor
@@ -243,10 +247,10 @@ module AMQ
           pieces[i] = result
         end
 
-        # result = [${klass.index}, 0, body_size, flags].pack(PACK_CACHE[:n2Qn])
-        result = [${klass.index}, 0].pack(PACK_CACHE[:n2])
+        # result = [${klass.index}, 0, body_size, flags].pack('n2Qn')
+        result = [${klass.index}, 0].pack(PACK_UINT16_X2)
         result += AMQ::Hacks.pack_64_big_endian(body_size)
-        result += [flags].pack(PACK_CACHE[:n])
+        result += [flags].pack(PACK_UINT16)
         result + pieces.join(EMPTY_STRING)
       end
 
@@ -271,20 +275,10 @@ module AMQ
         % endfor
       ]
 
-
-      % for f in klass.fields:
-      def self.decode_${f.ruby_name}(data)
-        % for line in helpers.genSingleSimpleDecode(spec, f):
-        ${line}
-        % endfor
-      end
-
-      % endfor
-
       def self.decode_properties(data)
         offset, data_length, properties = 0, data.bytesize, {}
 
-        compressed_index = data[offset, 2].unpack(PACK_CACHE[:n])[0]
+        compressed_index = data[offset, 2].unpack(PACK_UINT16)[0]
         offset += 2
         while data_length > offset
           DECODE_PROPERTIES_KEYS.each do |key|
@@ -293,16 +287,19 @@ module AMQ
             name = DECODE_PROPERTIES[key] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
             case DECODE_PROPERTIES_TYPE[key]
             when :shortstr
-              size = data[offset, 1].unpack(PACK_CACHE[:c])[0]
+              size = data[offset, 1].unpack(PACK_CHAR)[0]
               offset += 1
+              result = data[offset, size]
             when :octet
               size = 1
+              result = data[offset, size].unpack(PACK_CHAR).first
             when :timestamp
               size = 8
+              result = Time.at(data[offset, size].unpack(PACK_UINT32_X2).last)
             when :table
-              size = 4 + data[offset, 4].unpack(PACK_CACHE[:N])[0]
+              size = 4 + data[offset, 4].unpack(PACK_UINT32)[0]
+              result = Table.decode(data[offset, size])
             end
-            result = self.send(:"decode_#{name}", data[offset, size])
             properties[name] = result
             offset += size
           end
@@ -317,6 +314,7 @@ module AMQ
         @name = "${klass.name}.${method.name}"
         @method_id = ${method.index}
         @index = ${method.binary()}
+        @packed_indexes = [${klass.index}, ${method.index}].pack(PACK_UINT16_X2).freeze
 
         % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server")):
         # @return
@@ -368,12 +366,11 @@ module AMQ
           % if klass.name == "connection":
           channel = 0
           % endif
-          pieces = []
-          pieces << [${klass.index}, ${method.index}].pack(PACK_CACHE[:n2])
+          buffer = ''
+          buffer << @packed_indexes
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
-          buffer = pieces.join(EMPTY_STRING)
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer, channel)]
           % if "user_headers" in method.args():
