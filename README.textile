@@ -3,13 +3,19 @@ h1. About amq-protocol.
 amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an AMQP client: amq-protocol only handles serialization
 and deserialization. If you want to write your own AMQP client, this gem can help you with that.
 
-h2. Usage
+h2. How amq-client does relate to amqp gem, amq-protocol and libraries like bunny?
+
+See "this page about AMQP gems family":https://github.com/ruby-amqp/amq-client/blob/master/README.textile
+
+
+h2. Installation
+
+If you use Bundler and want to use the very latest version, add this to your Gemfile:
 
 <pre>
-  gem install amq-protocol
+gem 'amq-protocol', :git => 'https://github.com/ruby-amqp/amq-protocol.git'
 </pre>
 
-Check the @examples@ directory for some examples.
 
 h2. Development
 
@@ -22,30 +28,17 @@ wget http://gems.101ideas.cz/amq-protocol-nightly.gem
 gem install amq-protocol-nightly.gem
 </pre>
 
-_*NOTE:* This could be better achieved by a gem server, but it's just utterly broken._
-
-h3. Git Repository
-
-<pre>
-git clone git://github.com/ruby-amqp/amq-protocol.git --recursive
-</pre>
-
-Or, if you are on an older version of Git:
-
-<pre>
-git clone git://github.com/ruby-amqp/amq-protocol.git
-git submodule update --init
-</pre>
+h3. Contributing
 
 If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, but in @protocol.rb.pytemplate@
 which is a template file for @codegen.py@. You can re-generate the code by @nake ./tasks.rb generate@.
-This assumes you have nake gem installed.
+This assumes you have nake gem installed (which is Ruby 1.9.2 only).
 
 h2. Links
 
-* "RDoc.info API Docs":http://rdoc.info/github/ruby-amqp/amq-protocol/master/frames
+* "API Documentation":http://rdoc.info/github/ruby-amqp/amq-protocol/master/frames
 * "Examples":https://github.com/ruby-amqp/amq-protocol/tree/master/examples/
-* Jabber chat [amqp-dev@conf.netlab.cz](xmpp://amqp-dev@conf.netlab.cz)
+* "Jabber room for contributors":xmpp://amqp-dev@conf.netlab.cz
 * "Ruby AMQP mailing list":http://groups.google.com/group/ruby-amqp
-* "Bug reporting":http://github.com/ruby-amqp/amq-protocol/issues
-* "Jenkins CI Server":http://jenkins.101ideas.cz/job/AMQ%20Protocol
+* "Issue tracker":http://github.com/ruby-amqp/amq-protocol/issues
+* "Continous integration server":http://jenkins.101ideas.cz/job/AMQ%20Protocol
