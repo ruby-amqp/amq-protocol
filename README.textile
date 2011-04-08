@@ -4,7 +4,7 @@ amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an
 AMQP client: amq-protocol only handles serialization and deserialization.
 If you want to write your own AMQP client, this gem can help you with that.
 
-h2. How amq-client does relate to amqp gem, amq-protocol and libraries like bunny?
+h2. How does amq-protocol relate to amqp gem, amq-protocol and libraries like bunny?
 
 See "this page about AMQP gems family":https://github.com/ruby-amqp/amq-client/blob/master/README.textile
 
