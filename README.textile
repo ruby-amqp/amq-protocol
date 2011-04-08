@@ -1,19 +1,19 @@
-h1. About
+h1. About amq-protocol.
 
-This is an AMQP parser for AMQP 0.9.1. It isn't an AMQP client, just the parser, so if you want to write your own
-AMQP client without digging into the protocol, this gem can help you with that.
+amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an AMQP client: amq-protocol only handles serialization
+and deserialization. If you want to write your own AMQP client, this gem can help you with that.
 
-h1. Usage
+h2. Usage
 
 <pre>
-gem install amq-protocol
+  gem install amq-protocol
 </pre>
 
 Check the @examples@ directory for some examples.
 
-h1. Development
+h2. Development
 
-h2. Nightly Builds
+h3. Nightly Builds
 
 You can always find nightly builds at "gems.101ideas.cz":http://gems.101ideas.cz. You can install them thusly:
 
@@ -24,7 +24,7 @@ gem install amq-protocol-nightly.gem
 
 _*NOTE:* This could be better achieved by a gem server, but it's just utterly broken._
 
-h2. Git Repository
+h3. Git Repository
 
 <pre>
 git clone git://github.com/ruby-amqp/amq-protocol.git --recursive
@@ -41,7 +41,7 @@ If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, bu
 which is a template file for @codegen.py@. You can re-generate the code by @nake ./tasks.rb generate@.
 This assumes you have nake gem installed.
 
-h1. Links
+h2. Links
 
 * "RDoc.info API Docs":http://rdoc.info/github/ruby-amqp/amq-protocol/master/frames
 * "Examples":https://github.com/ruby-amqp/amq-protocol/tree/master/examples/
