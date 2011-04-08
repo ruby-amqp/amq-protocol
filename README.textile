@@ -1,7 +1,8 @@
 h1. About amq-protocol.
 
-amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an AMQP client: amq-protocol only handles serialization
-and deserialization. If you want to write your own AMQP client, this gem can help you with that.
+amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an
+AMQP client: amq-protocol only handles serialization and deserialization.
+If you want to write your own AMQP client, this gem can help you with that.
 
 h2. How amq-client does relate to amqp gem, amq-protocol and libraries like bunny?
 
@@ -21,7 +22,9 @@ h2. Development
 
 h3. Nightly Builds
 
-You can always find nightly builds at "gems.101ideas.cz":http://gems.101ideas.cz. You can install them thusly:
+You can always find nightly builds at "gems.101ideas.cz":http://gems.101ideas.cz.
+
+You can install them thusly:
 
 <pre>
 wget http://gems.101ideas.cz/amq-protocol-nightly.gem
@@ -30,9 +33,11 @@ gem install amq-protocol-nightly.gem
 
 h3. Contributing
 
-If you want to change some code, don't do so in @lib/amq/protocol/client.rb@, but in @protocol.rb.pytemplate@
-which is a template file for @codegen.py@. You can re-generate the code by @nake ./tasks.rb generate@.
-This assumes you have nake gem installed (which is Ruby 1.9.2 only).
+If you want to change some code, don't edit @lib/amq/protocol/client.rb@ —
+that file is generated from @protocol.rb.pytemplate@
+which is a template file used by @codegen.py@. You can re-generate by running
+<pre>nake ./tasks.rb generate</pre>
+Please note that nake gem only runs on Ruby 1.9.2.
 
 h2. Links
 
