@@ -27,13 +27,6 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.textile"] + Dir.glob("doc/*")
 
 
-  begin
-    require "changelog"
-    s.post_install_message = CHANGELOG.new.version_changes
-  rescue LoadError
-    # warn "You have to have changelog gem installed for post install message"
-  end
-
   # RubyForge
   s.rubyforge_project = "amq-protocol"
 end
