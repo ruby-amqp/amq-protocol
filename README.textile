@@ -46,4 +46,4 @@ h2. Links
 * "Jabber room for contributors":xmpp://amqp-dev@conf.netlab.cz
 * "Ruby AMQP mailing list":http://groups.google.com/group/ruby-amqp
 * "Issue tracker":http://github.com/ruby-amqp/amq-protocol/issues
-* "Continous integration server":http://jenkins.101ideas.cz/job/AMQ%20Protocol
+* "Continous integration server":http://travis-ci.org/#!/ruby-amqp/amq-protocol
