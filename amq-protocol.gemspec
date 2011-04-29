@@ -18,7 +18,6 @@ Gem::Specification.new do |s|
   DESC
   s.cert_chain = nil
   s.email = ["bWljaGFlbEBub3ZlbWJlcmFpbi5jb20=\n", "c3Rhc3RueUAxMDFpZGVhcy5jeg==\n"].map { |i| Base64.decode64(i) }
-  s.has_rdoc = true
 
   # files
   s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
