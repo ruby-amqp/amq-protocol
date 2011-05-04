@@ -519,11 +519,7 @@ module AMQ
           offset += 2
           method_id = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
-          if reply_code.eql?(200)
-            self.new(reply_code, reply_text, class_id, method_id)
-          else
-            raise Error[reply_code].new(reply_text)
-          end
+          self.new(reply_code, reply_text, class_id, method_id)
         end
 
         attr_reader :reply_code, :reply_text, :class_id, :method_id
@@ -725,11 +721,7 @@ module AMQ
           offset += 2
           method_id = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
-          if reply_code.eql?(200)
-            self.new(reply_code, reply_text, class_id, method_id)
-          else
-            raise Error[reply_code].new(reply_text)
-          end
+          self.new(reply_code, reply_text, class_id, method_id)
         end
 
         attr_reader :reply_code, :reply_text, :class_id, :method_id

@@ -82,8 +82,8 @@ module AMQ
           end
           
           context 'with an error code' do
-            it 'raises the corresponding error' do
-              expect { Close.decode("\x01\x38\x08NO_ROUTE\x00\x00") }.to raise_error(NoRoute, 'NO_ROUTE')
+            it 'returns frame and lets calling code handle the issue' do
+              Close.decode("\x01\x38\x08NO_ROUTE\x00\x00")
             end
           end
         end
