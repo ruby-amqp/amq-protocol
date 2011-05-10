@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   AMQP client: amq-protocol only handles serialization and deserialization.
   If you want to write your own AMQP client, this gem can help you with that.
   DESC
-  s.cert_chain = nil
   s.email = ["bWljaGFlbEBub3ZlbWJlcmFpbi5jb20=\n", "c3Rhc3RueUAxMDFpZGVhcy5jeg==\n"].map { |i| Base64.decode64(i) }
 
   # files
