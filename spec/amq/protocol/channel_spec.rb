@@ -23,7 +23,7 @@ module AMQ
           subject do
             OpenOk.decode("\x00\x00\x00\x03foo")
           end
-          
+
           its(:channel_id) { should == 'foo' }
         end
       end
@@ -33,7 +33,7 @@ module AMQ
           subject do
             Flow.decode("\x01")
           end
-          
+
           its(:active) { should be_true }
         end
 
@@ -53,10 +53,10 @@ module AMQ
           subject do
             FlowOk.decode("\x00")
           end
-          
+
           its(:active) { should be_false }
         end
-        
+
         describe '.encode' do
           it 'encodes the parameters as a MethodFrame' do
             channel = 1
@@ -74,20 +74,20 @@ module AMQ
             subject do
               Close.decode("\x00\xc8\x07KTHXBAI\x00\x05\x00\x06")
             end
-          
+
             its(:reply_code) { should == 200 }
             its(:reply_text) { should == 'KTHXBAI' }
             its(:class_id) { should == 5 }
             its(:method_id) { should == 6 }
           end
-          
+
           context 'with an error code' do
             it 'returns frame and lets calling code handle the issue' do
               Close.decode("\x01\x38\x08NO_ROUTE\x00\x00")
             end
           end
         end
-        
+
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
