@@ -4,3 +4,4 @@ tmp
 *.pyc
 /vendor/bundle
 /coverage
+Gemfile.lock
