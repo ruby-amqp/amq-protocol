@@ -18,7 +18,7 @@ module AMQ
     # caching
     EMPTY_STRING = "".freeze
 
-    PACK_CHAR               = 'c'.freeze
+    PACK_CHAR               = 'C'.freeze
     PACK_UINT16             = 'n'.freeze
     PACK_UINT16_X2          = 'n2'.freeze
     PACK_UINT32             = 'N'.freeze
