@@ -81,6 +81,19 @@ module AMQ
             its(:method_id) { should == 6 }
           end
 
+
+          context 'with code 404 and reply_text length > 127 characters' do
+            subject do
+              raw = "\x01\x94\x80NOT_FOUND - no binding 123456789012345678901234567890123 between exchange 'amq.topic' in vhost '/' and queue 'test' in vhost '/'\x002\x002"
+              Close.decode(raw)
+            end
+
+            its(:reply_code) { should == 404 }
+            its(:reply_text) { should == %q{NOT_FOUND - no binding 123456789012345678901234567890123 between exchange 'amq.topic' in vhost '/' and queue 'test' in vhost '/'} }
+            its(:class_id) { should == 50 }
+            its(:method_id) { should == 50 }
+          end
+
           context 'with an error code' do
             it 'returns frame and lets calling code handle the issue' do
               Close.decode("\x01\x38\x08NO_ROUTE\x00\x00")
