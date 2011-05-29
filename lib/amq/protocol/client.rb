@@ -26,13 +26,15 @@ module AMQ
     PACK_UCHAR_UINT32       = "CN".freeze
     PACK_CHAR_UINT16_UINT32 = "cnN".freeze
 
-    # @version 0.0.1
+    PACK_32BIT_FLOAT        = 'f'.freeze
+    PACK_64BIT_FLOAT        = 'd'.freeze
+
+
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
       Protocol::Class.classes
     end
 
-    # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
       Protocol::Method.methods

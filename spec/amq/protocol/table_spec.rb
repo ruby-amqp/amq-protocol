@@ -17,6 +17,7 @@ module AMQ
         {
           {}                       => "\000\000\000\000",
           {"test" => 1}            => "\000\000\000\n\004testI\000\000\000\001",
+          {"float" => 1.0}         => "\000\000\000\v\005floatf\000\000\200?",
           {"test" => "string"}     => "\000\000\000\020\004testS\000\000\000\006string",
           {"test" => {}}           => "\000\000\000\n\004testF\000\000\000\000",
           {"test" => bigdecimal_1} => "\000\000\000\v\004testD\000\000\000\000\001",
@@ -27,6 +28,7 @@ module AMQ
         {
           {}                       => "\x00\x00\x00\x00",
           {"test" => 1}            => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",
+          {"float" => 1.0}         => "\000\000\000\v\005floatf\000\000\200?",
           {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
           {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
           {"test" => bigdecimal_1} => "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01",
@@ -46,8 +48,12 @@ module AMQ
           Table.encode(nil).should eql(encoded_value)
         end
 
-        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for {test: true}" do
+        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :test => true }" do
           Table.encode(:test => true).should eql("\x00\x00\x00\n\x04testI\x00\x00\x00\x01")
+        end
+
+        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :latitude  => 59.35, :longitude => 18.066667 } }" do
+          Table.encode(:coordinates => { :latitude  => 59.35, :longitude => 18.066667 }).should eql("\x00\x00\x00.\vcoordinatesF\x00\x00\x00\x1D\blatitudefffmB\tlongitudef\x89\x88\x90A")
         end
 
         DATA.each do |data, encoded|

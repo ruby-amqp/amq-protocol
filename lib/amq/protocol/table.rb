@@ -44,17 +44,19 @@ module AMQ
           when Integer then
             buffer << TYPE_INTEGER
             buffer << [value].pack(PACK_UINT32)
+          when Float then
+            buffer << TYPE_32BIT_FLOAT
+            buffer << [value].pack(PACK_32BIT_FLOAT)
           when TrueClass, FalseClass then
             value = value ? 1 : 0
             buffer << TYPE_INTEGER
             buffer << [value].pack(PACK_UINT32)
           when Hash then
-            buffer << TYPE_HASH # it will work as long as the encoding is ASCII-8BIT
+            buffer << TYPE_HASH # TODO: encoding support
             buffer << self.encode(value)
           when Time then
-            # TODO: encode timezone?
             buffer << TYPE_TIME
-            buffer << [value.to_i].pack(PACK_INT64).reverse # Don't ask. It works.
+            buffer << [value.to_i].pack(PACK_INT64).reverse # FIXME: there has to be a more efficient way
           else
             # We don't want to require these libraries.
             if defined?(BigDecimal) && value.is_a?(BigDecimal)
@@ -123,8 +125,12 @@ module AMQ
           when TYPE_SIGNED_8BIT then raise NotImplementedError.new
           when TYPE_SIGNED_16BIT then raise NotImplementedError.new
           when TYPE_SIGNED_64BIT then raise NotImplementedError.new
-          when TYPE_32BIT_FLOAT then raise NotImplementedError.new
-          when TYPE_64BIT_FLOAT then raise NotImplementedError.new
+          when TYPE_32BIT_FLOAT then
+            value = data.slice(offset, 4).unpack(PACK_32BIT_FLOAT).first
+            offset += 4
+          when TYPE_64BIT_FLOAT then
+            value = data.slice(offset, 8).unpack(PACK_64BIT_FLOAT).first
+            offset += 8
           when TYPE_VOID
             value = nil
           when TYPE_BYTE_ARRAY
