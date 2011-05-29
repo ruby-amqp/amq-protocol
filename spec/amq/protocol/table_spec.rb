@@ -17,7 +17,7 @@ module AMQ
         {
           {}                       => "\000\000\000\000",
           {"test" => 1}            => "\000\000\000\n\004testI\000\000\000\001",
-          {"float" => 1.0}         => "\000\000\000\v\005floatf\000\000\200?",
+          {"float" => 1.87}        => "\000\000\000\017\005floatd\354Q\270\036\205\353\375?",
           {"test" => "string"}     => "\000\000\000\020\004testS\000\000\000\006string",
           {"test" => {}}           => "\000\000\000\n\004testF\000\000\000\000",
           {"test" => bigdecimal_1} => "\000\000\000\v\004testD\000\000\000\000\001",
@@ -28,7 +28,7 @@ module AMQ
         {
           {}                       => "\x00\x00\x00\x00",
           {"test" => 1}            => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",
-          {"float" => 1.0}         => "\000\000\000\v\005floatf\000\000\200?",
+          {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd\xB8\x1E\x85\xEBQ\xB8\xFE?",
           {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
           {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
           {"test" => bigdecimal_1} => "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01",
@@ -53,7 +53,7 @@ module AMQ
         end
 
         it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :latitude  => 59.35, :longitude => 18.066667 } }" do
-          Table.encode(:coordinates => { :latitude  => 59.35, :longitude => 18.066667 }).should eql("\x00\x00\x00.\vcoordinatesF\x00\x00\x00\x1D\blatitudefffmB\tlongitudef\x89\x88\x90A")
+          Table.encode(:coordinates => { :latitude  => 59.35, :longitude => 18.066667 }).should eql("\000\000\0006\vcoordinatesF\000\000\000%\blatituded\315\314\314\314\314\254M@\tlongituded\361\270\250\026\021\0212@")
         end
 
         DATA.each do |data, encoded|
@@ -67,6 +67,10 @@ module AMQ
         DATA.each do |data, encoded|
           it "should return #{data.inspect} for #{encoded.inspect}" do
             Table.decode(encoded).should eql(data)
+          end
+
+          it "is capable of decoding what it encodes" do
+            Table.decode(Table.encode(data)).should == data
           end
         end
       end

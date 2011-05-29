@@ -45,8 +45,8 @@ module AMQ
             buffer << TYPE_INTEGER
             buffer << [value].pack(PACK_UINT32)
           when Float then
-            buffer << TYPE_32BIT_FLOAT
-            buffer << [value].pack(PACK_32BIT_FLOAT)
+            buffer << TYPE_64BIT_FLOAT
+            buffer << [value].pack(PACK_64BIT_FLOAT)
           when TrueClass, FalseClass then
             value = value ? 1 : 0
             buffer << TYPE_INTEGER
