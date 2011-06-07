@@ -109,7 +109,6 @@ module AMQ
             offset += 5
             value = BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
           when TYPE_TIME
-            # TODO: what is the first unpacked value??? Zone, maybe? It's 0, so it'd make sense.
             timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
             value = Time.at(timestamp)
             offset += 8
