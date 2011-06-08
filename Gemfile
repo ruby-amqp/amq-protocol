@@ -6,14 +6,14 @@ extend Module.new {
   def gem(name, options = Hash.new)
     local_path = File.expand_path("../vendor/#{name}", __FILE__)
     if File.exist?(local_path)
-      super name, options.merge(path: local_path).delete_if { |key, _| [:git, :branch].include?(key) }
+      super name, options.merge(:path => local_path).delete_if { |key, _| [:git, :branch].include?(key) }
     else
       super name, options
     end
   end
 }
 
-source "http://gemcutter.org"
+source :rubygems
 
 group(:development) do
   gem "nake",         :platform => :ruby_19
