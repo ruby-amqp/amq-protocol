@@ -245,6 +245,8 @@ module AMQ
       end
 
       def self.encode_body(body, channel, frame_size)
+        return [BodyFrame.new(body, channel)] if body.empty?
+
         # Spec is broken: Our errata says that it does define
         # something, but it just doesn"t relate do method and
         # properties frames. Which makes it, well, suboptimal.
