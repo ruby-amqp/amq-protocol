@@ -249,15 +249,17 @@ module AMQ
         # something, but it just doesn"t relate do method and
         # properties frames. Which makes it, well, suboptimal.
         # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
-        limit = frame_size - 7 - 1
+        limit        = frame_size - 8
+        limit_plus_1 = limit + 1
 
-        Array.new.tap do |array|
-          while body
-            payload, body = body[0, limit + 1], body[limit + 1, body.length - limit]
-            # array << [0x03, payload]
-            array << BodyFrame.new(payload, channel)
-          end
+        array = Array.new
+        while body
+          payload, body = body[0, limit_plus_1], body[limit_plus_1, body.length - limit]
+          # array << [0x03, payload]
+          array << BodyFrame.new(payload, channel)
         end
+
+        array
       end
 
       # We can return different:
@@ -1262,21 +1264,21 @@ module AMQ
       @method_id = 60
 
       PROPERTIES = [
-        :content_type, # shortstr
-        :content_encoding, # shortstr
-        :headers, # table
-        :delivery_mode, # octet
-        :priority, # octet
-        :correlation_id, # shortstr
-        :reply_to, # shortstr
-        :expiration, # shortstr
-        :message_id, # shortstr
-        :timestamp, # timestamp
-        :type, # shortstr
-        :user_id, # shortstr
-        :app_id, # shortstr
-        :cluster_id, # shortstr
-      ]
+                    :content_type, # shortstr
+                    :content_encoding, # shortstr
+                    :headers, # table
+                    :delivery_mode, # octet
+                    :priority, # octet
+                    :correlation_id, # shortstr
+                    :reply_to, # shortstr
+                    :expiration, # shortstr
+                    :message_id, # shortstr
+                    :timestamp, # timestamp
+                    :type, # shortstr
+                    :user_id, # shortstr
+                    :app_id, # shortstr
+                    :cluster_id, # shortstr
+                   ]
 
       # 1 << 15
       def self.encode_content_type(value)
