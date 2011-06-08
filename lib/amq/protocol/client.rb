@@ -52,7 +52,7 @@ module AMQ
         @_subclasses.select{ |k| defined?(k::VALUE) }
       end # self.subclasses_with_values
 
-      def self.[](code) # TODO: rewrite more effectively
+      def self.[](code)
         if result = subclasses_with_values.detect { |klass| klass::VALUE == code }
           result
         else
