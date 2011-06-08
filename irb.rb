@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bundle exec ruby
 # encoding: binary
 
 # This file is supposed to make inspecting AMQ protocol easier.
@@ -46,11 +46,11 @@ else
     include AMQ::Protocol
 
     begin
-      require "amq/client/io/string"
+      require "amq/client/framing/string/frame"
 
       class AMQ::Protocol::Frame
         def self.decode(string)
-          AMQ::Client::StringAdapter::Frame.decode(string)
+          AMQ::Client::Framing::String::Frame.decode(string)
         end
       end
     rescue LoadError
@@ -70,10 +70,8 @@ else
       end
     end
 
-    require "stringio"
-
     def fd(data)
-      Frame.decode(StringIO.new(data))
+      Frame.decode(data)
     end
   rescue Exception => exception # it just discards all the exceptions!
     abort exception.message + "\n  - " + exception.backtrace.join("\n  - ")
