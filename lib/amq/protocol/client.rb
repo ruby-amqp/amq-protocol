@@ -1668,9 +1668,13 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           frames = [MethodFrame.new(buffer, channel)]
           properties, headers = self.split_headers(user_headers)
-          # TODO: what shall I do with the headers?
+
+          # TODO: Java client uses "minimal basic" properties set when application passes properties
+          #       as `null`. amqp gem (and probably most of other clients) has defaults that make properties
+          #       to always be present, however, having our own "minimal basic" properties set is easy and
+          #       cheap performance-wise. Yet it will iron out a few edge cases. MK.
           if properties.nil? or properties.empty?
-            raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
+            raise RuntimeError.new("Properties can not be empty!")
           end
           properties_payload = Basic.encode_properties(payload.bytesize, properties)
           frames << HeaderFrame.new(properties_payload, channel)
