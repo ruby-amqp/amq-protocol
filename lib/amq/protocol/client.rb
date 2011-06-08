@@ -26,9 +26,8 @@ module AMQ
     PACK_UCHAR_UINT32       = "CN".freeze
     PACK_CHAR_UINT16_UINT32 = "cnN".freeze
 
-    PACK_32BIT_FLOAT        = 'f'.freeze
-    PACK_64BIT_FLOAT        = 'd'.freeze
-
+    PACK_32BIT_FLOAT        = "f".freeze
+    PACK_64BIT_FLOAT        = "d".freeze
 
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
@@ -247,10 +246,7 @@ module AMQ
       def self.encode_body(body, channel, frame_size)
         return [BodyFrame.new(body, channel)] if body.empty?
 
-        # Spec is broken: Our errata says that it does define
-        # something, but it just doesn"t relate do method and
-        # properties frames. Which makes it, well, suboptimal.
-        # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
+        # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
         limit        = frame_size - 8
         limit_plus_1 = limit + 1
 
@@ -1266,21 +1262,21 @@ module AMQ
       @method_id = 60
 
       PROPERTIES = [
-                    :content_type, # shortstr
-                    :content_encoding, # shortstr
-                    :headers, # table
-                    :delivery_mode, # octet
-                    :priority, # octet
-                    :correlation_id, # shortstr
-                    :reply_to, # shortstr
-                    :expiration, # shortstr
-                    :message_id, # shortstr
-                    :timestamp, # timestamp
-                    :type, # shortstr
-                    :user_id, # shortstr
-                    :app_id, # shortstr
-                    :cluster_id, # shortstr
-                   ]
+        :content_type, # shortstr
+        :content_encoding, # shortstr
+        :headers, # table
+        :delivery_mode, # octet
+        :priority, # octet
+        :correlation_id, # shortstr
+        :reply_to, # shortstr
+        :expiration, # shortstr
+        :message_id, # shortstr
+        :timestamp, # timestamp
+        :type, # shortstr
+        :user_id, # shortstr
+        :app_id, # shortstr
+        :cluster_id, # shortstr
+      ]
 
       # 1 << 15
       def self.encode_content_type(value)
@@ -1672,13 +1668,9 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           frames = [MethodFrame.new(buffer, channel)]
           properties, headers = self.split_headers(user_headers)
-
-          # TODO: Java client uses "minimal basic" properties set when application passes properties
-          #       as `null`. amqp gem (and probably most of other clients) has defaults that make properties
-          #       to always be present, however, having our own "minimal basic" properties set is easy and
-          #       cheap performance-wise. Yet it will iron out a few edge cases. MK.
+          # TODO: what shall I do with the headers?
           if properties.nil? or properties.empty?
-            raise RuntimeError.new("Properties can not be empty!")
+            raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
           end
           properties_payload = Basic.encode_properties(payload.bytesize, properties)
           frames << HeaderFrame.new(properties_payload, channel)

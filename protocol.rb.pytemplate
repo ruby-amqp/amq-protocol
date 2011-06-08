@@ -27,13 +27,16 @@ module AMQ
     PACK_UCHAR_UINT32       = 'CN'.freeze
     PACK_CHAR_UINT16_UINT32 = 'cnN'.freeze
 
-    # @version 0.0.1
+    PACK_32BIT_FLOAT        = 'f'.freeze
+    PACK_64BIT_FLOAT        = 'd'.freeze
+
+
+
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
       Protocol::Class.classes
     end
 
-    # @version 0.0.1
     # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
       Protocol::Method.methods
@@ -51,7 +54,7 @@ module AMQ
         @_subclasses.select{ |k| defined?(k::VALUE) }
       end # self.subclasses_with_values
 
-      def self.[](code) # TODO: rewrite more effectively
+      def self.[](code)
         if result = subclasses_with_values.detect { |klass| klass::VALUE == code }
           result
         else
@@ -181,19 +184,20 @@ module AMQ
       end
 
       def self.encode_body(body, channel, frame_size)
-        # Spec is broken: Our errata says that it does define
-        # something, but it just doesn't relate do method and
-        # properties frames. Which makes it, well, suboptimal.
-        # https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
-        limit = frame_size - 7 - 1
+        return [BodyFrame.new(body, channel)] if body.empty?
 
-        Array.new.tap do |array|
-          while body
-            payload, body = body[0, limit + 1], body[limit + 1, body.length - limit]
-            # array << [0x03, payload]
-            array << BodyFrame.new(payload, channel)
-          end
+        # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
+        limit        = frame_size - 8
+        limit_plus_1 = limit + 1
+
+        array = Array.new
+        while body
+          payload, body = body[0, limit_plus_1], body[limit_plus_1, body.length - limit]
+          # array << [0x03, payload]
+          array << BodyFrame.new(payload, channel)
         end
+
+        array
       end
 
       # We can return different:
