@@ -320,7 +320,7 @@ module AMQ
         @index = ${method.binary()}
         @packed_indexes = [${klass.index}, ${method.index}].pack(PACK_UINT16_X2).freeze
 
-        % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server")):
+        % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server") or spec.type == "all"):
         # @return
         def self.decode(data)
           offset = 0
@@ -352,7 +352,7 @@ module AMQ
           % endif
         end
 
-        % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")):
+        % if (spec.type == "client" and method.accepted_by("server")) or (spec.type == "server" and method.accepted_by("client")) or spec.type == "all":
         # @return
         # ${method.params()}
         % if klass.name == "connection":
