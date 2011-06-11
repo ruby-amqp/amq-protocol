@@ -21,7 +21,7 @@ group(:development) do
   gem "amq-client"
 
   # excludes Windows, Rubinius and JRuby
-  gem "perftools.rb", :platform => :mri
+  gem "perftools.rb", :platform => :ruby_18
 end
 
 group(:test) do
