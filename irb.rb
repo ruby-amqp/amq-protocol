@@ -41,8 +41,16 @@ else
     puts "~ Loading original #{irbrc} ..."
     load irbrc
 
-    file = ENV["FILE"] || "client"
-    require_relative "lib/amq/protocol/#{file}.rb"
+    # TODO: Don't generate constants in all.rb multiple
+    # times, then we can remove this craziness with $VERBOSE.
+    old_verbose, $VERBOSE = $VERBOSE, nil
+    begin
+      require_relative "lib/amq/protocol/all.rb"
+    rescue LoadError
+      abort "File lib/amq/protocol/all.rb doesn't exist! You have to generate it using ./tasks.rb generate --targets=all, executed from the root of AMQ Protocol repository."
+    end
+    $VERBOSE = old_verbose
+
     include AMQ::Protocol
 
     begin
@@ -73,6 +81,17 @@ else
     def fd(data)
       Frame.decode(data)
     end
+
+    puts <<-EOF
+
+This is an AMQP #{AMQ::Protocol::PROTOCOL_VERSION} console. You can:
+
+  - Decode data via: fd(frame_data).
+  - Encode data using AMQP classes directly:
+      frame = Connection::Open.encode("/")
+      frame.encode
+
+    EOF
   rescue Exception => exception # it just discards all the exceptions!
     abort exception.message + "\n  - " + exception.backtrace.join("\n  - ")
   end
