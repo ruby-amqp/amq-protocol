@@ -20,6 +20,12 @@ gem 'amq-protocol', :git => 'https://github.com/ruby-amqp/amq-protocol.git'
 
 h2. Development
 
+h3. Inspection
+
+If you need to see what AMQP methods are encoded, just regenerate the protocol file using @./tasks.rb generate --development@ and then set @$DEBUG@ to @true@ for which parts of code you want to see the debug statements.
+
+!http://static.101ideas.cz/amqp-debug.png!
+
 h3. Nightly Builds
 
 You can always find nightly builds at "gems.101ideas.cz":http://gems.101ideas.cz.
