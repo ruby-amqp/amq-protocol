@@ -16,15 +16,15 @@ extend Module.new {
 source :rubygems
 
 group(:development) do
-  gem "nake",         :platform => :ruby_19
-  gem "contributors", :platform => :ruby_19
+  gem "nake",         :platform => :mri_19
+  gem "contributors", :platform => :mri_19
   gem "amq-client"
 
   # excludes Windows, Rubinius and JRuby
-  gem "perftools.rb", :platform => :ruby_18
+  gem "perftools.rb", :platform => :mri_18
 end
 
 group(:test) do
   gem "rspec", ">=2.0.0"
-  gem "simplecov", :platform => :ruby_19
+  gem "simplecov", :platform => :mri_19
 end
