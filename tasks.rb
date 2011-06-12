@@ -4,14 +4,19 @@
 load "contributors.nake"
 
 # ./tasks.rb generate
+# ./tasks.rb generate --targets=all,
 # ./tasks.rb generate --targets=client,server
+# ./tasks.rb generate --development
 Task.new(:generate) do |task|
   task.description = "Generate lib/amq/protocol/client.rb"
 
-  def task.check_validity_of_target(target)
-    valid_choices = ["client", "server", "all"]
-    unless valid_choices.include?(target)
-      raise "Target can be one #{valid_choices.inspect}, not #{target.inspect}"
+  def self.valid_choices
+    ["client", "server", "all"]
+  end
+
+  def self.check_validity_of_target(target)
+    unless self.valid_choices.include?(target)
+      abort "Target can be one #{valid_choices.inspect}, not #{target.inspect}"
     end
   end
 
@@ -26,9 +31,9 @@ Task.new(:generate) do |task|
     end
 
     opts[:targets].each do |type|
-      task.check_validity_of_target(type)
+      self.check_validity_of_target(type)
       path = "lib/amq/protocol/#{type}.rb"
-      sh "./codegen.py #{type} #{spec} #{path}"
+      sh "DEVELOPMENT=#{opts[:development]} ./codegen.py #{type} #{spec} #{path}"
       if File.file?(path)
         sh "./post-processing.rb #{path}"
         sh "ruby -c #{path}"
