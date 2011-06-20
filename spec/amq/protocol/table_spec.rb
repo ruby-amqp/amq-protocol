@@ -52,8 +52,12 @@ module AMQ
           Table.encode(:test => true).should eql("\x00\x00\x00\n\x04testI\x00\x00\x00\x01")
         end
 
-        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :latitude  => 59.35, :longitude => 18.066667 } }" do
-          Table.encode(:coordinates => { :latitude  => 59.35, :longitude => 18.066667 }).should eql("\000\000\0006\vcoordinatesF\000\000\000%\blatituded\315\314\314\314\314\254M@\tlongituded\361\270\250\026\021\0212@")
+        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :latitude  => 59.35 } }" do
+          Table.encode(:coordinates => { :latitude  => 59.35 }).should eql("\000\000\000#\vcoordinatesF\000\000\000\022\blatituded\315\314\314\314\314\254M@")
+        end
+
+        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :longitude => 18.066667 } }" do
+          Table.encode(:coordinates => { :longitude => 18.066667 }).should eql("\000\000\000$\vcoordinatesF\000\000\000\023\tlongituded\361\270\250\026\021\0212@")
         end
 
         DATA.each do |data, encoded|
