@@ -25,8 +25,6 @@ group(:development) do
 end
 
 group(:test) do
-  gem "rspec", "~> 2.6.0"
-  gem "rake",  "~> 0.9.2"
-
+  gem "rspec", ">=2.0.0"
   gem "simplecov", :platform => :mri_19
 end
