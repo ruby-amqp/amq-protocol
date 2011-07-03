@@ -17,7 +17,6 @@ source :rubygems
 
 group(:development) do
   gem "nake",         :platform => :mri_19
-  gem "contributors", :platform => :mri_19
   gem "amq-client"
 
   # excludes Windows, Rubinius and JRuby
