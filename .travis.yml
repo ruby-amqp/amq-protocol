@@ -11,5 +11,5 @@ rvm:
 notifications:
   recipients:
     - jakub@rabbitmq.com
-    - michael@novemberain.com
+    - michaelklishin@me.com
     - markizko@gmail.com
