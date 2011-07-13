@@ -103,7 +103,7 @@ module AMQ
             "timestampval" => Time.parse("2011-07-14 01:17:46 +0400"),
             "floatval"     => 3.14,
             "longval"      => 912598613,
-            "hashval"      => { "protocol" => "AMQP091" }
+            "hashval"      => { "protocol" => "AMQP091", "true" => true, "false" => false, "nil" => nil }
           }
           Table.decode(Table.encode(input)).should == input
         end

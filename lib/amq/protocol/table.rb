@@ -60,6 +60,8 @@ module AMQ
           when Time then
             buffer << TYPE_TIME
             buffer << [value.to_i].pack(PACK_INT64).reverse # FIXME: there has to be a more efficient way
+          when nil then
+            buffer << TYPE_VOID
           else
             # We don't want to require these libraries.
             if defined?(BigDecimal) && value.is_a?(BigDecimal)
