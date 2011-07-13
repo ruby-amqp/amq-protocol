@@ -29,6 +29,10 @@ module AMQ
       TYPE_BYTE_ARRAY = 'x'.freeze
       TEN = '10'.freeze
 
+      BOOLEAN_TRUE  = "\x01".freeze
+      BOOLEAN_FALSE = "\x00".freeze
+
+
       def self.encode(table)
         buffer = String.new
         table ||= {}
@@ -47,10 +51,9 @@ module AMQ
           when Float then
             buffer << TYPE_64BIT_FLOAT
             buffer << [value].pack(PACK_64BIT_FLOAT)
-          when TrueClass, FalseClass then
-            value = value ? 1 : 0
-            buffer << TYPE_INTEGER
-            buffer << [value].pack(PACK_UINT32)
+          when true, false then
+            buffer << TYPE_BOOLEAN
+            buffer << (value ? BOOLEAN_TRUE : BOOLEAN_FALSE)
           when Hash then
             buffer << TYPE_HASH # TODO: encoding support
             buffer << self.encode(value)
@@ -95,6 +98,7 @@ module AMQ
           offset += key_length
           type = data.slice(offset, 1)
           offset += 1
+
           case type
           when TYPE_STRING
             length = data.slice(offset, 4).unpack(PACK_UINT32).first
@@ -119,8 +123,9 @@ module AMQ
           when TYPE_BOOLEAN
             value  = data.slice(offset, 2)
             integer = value.unpack(PACK_CHAR).first # 0 or 1
-            value = integer == 1
+            value = (integer == 1)
             offset += 1
+            value
           when TYPE_SIGNED_8BIT then raise NotImplementedError.new
           when TYPE_SIGNED_16BIT then raise NotImplementedError.new
           when TYPE_SIGNED_64BIT then raise NotImplementedError.new

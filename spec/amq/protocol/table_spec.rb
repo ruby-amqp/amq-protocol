@@ -48,8 +48,12 @@ module AMQ
           Table.encode(nil).should eql(encoded_value)
         end
 
-        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :test => true }" do
-          Table.encode(:test => true).should eql("\x00\x00\x00\n\x04testI\x00\x00\x00\x01")
+        it "should return \x00\x00\x00\a\x04testt\x01 for { :test => true }" do
+          Table.encode(:test => true).should eql("\x00\x00\x00\a\x04testt\x01")
+        end
+
+        it "should return \x00\x00\x00\a\x04testt\x00 for { :test => false }" do
+          Table.encode(:test => false).should eql("\x00\x00\x00\a\x04testt\x00")
         end
 
         it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :latitude  => 59.35 } }" do
@@ -76,8 +80,34 @@ module AMQ
           it "is capable of decoding what it encodes" do
             Table.decode(Table.encode(data)).should == data
           end
+        end # DATA.each
+
+
+        it "is capable of decoding booleans" do
+          input1   = { "boolval" => true }
+          Table.decode(Table.encode(input1)).should == input1
+
+
+          input2   = { "boolval" => false }
+          Table.decode(Table.encode(input2)).should == input2
         end
-      end
+
+
+
+        it "is capable of decoding tables" do
+          input   = {
+            "boolval"      => true,
+            "intval"       => 1,
+            "strval"       => "Test",
+            "timestampval" => Time.parse("2011-07-14 01:17:46 +0400"),
+            "floatval"     => 3.14,
+            "longval"      => 912598613,
+            "hashval"      => { "protocol" => "AMQP091" }
+          }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+      end # describe
     end
   end
 end
