@@ -84,7 +84,7 @@ module AMQ
         end # DATA.each
 
 
-        it "is capable of decoding booleans" do
+        it "is capable of decoding boolean table values" do
           input1   = { "boolval" => true }
           Table.decode(Table.encode(input1)).should == input1
 
@@ -92,6 +92,63 @@ module AMQ
           input2   = { "boolval" => false }
           Table.decode(Table.encode(input2)).should == input2
         end
+
+
+
+        it "is capable of decoding string table values" do
+          input   = { "stringvalue" => "string" }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding integer table values" do
+          input   = { "intvalue" => 10 }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding long table values" do
+          input   = { "longvalue" => 912598613 }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding float table values" do
+          input   = { "floatvalue" => 100.0 }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding time table values" do
+          input   = { "intvalue" => Time.parse("2011-07-14 01:17:46 +0400") }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding empty hash table values" do
+          input   = { "hashvalue" => Hash.new }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding simple nested hash table values" do
+          input   = { "hashvalue" => { "a" => "b" } }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding nil table values" do
+          input   = { "nil" => nil }
+          Table.decode(Table.encode(input)).should == input
+        end
+
 
 
 
