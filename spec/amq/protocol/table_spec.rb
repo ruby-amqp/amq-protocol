@@ -117,7 +117,11 @@ module AMQ
                 "name"  => "AMQP",
                 "major" => 0,
                 "minor" => "9",
-                "rev"   => 1.0
+                "rev"   => 1.0,
+                "spec"  => {
+                  "url"  => "http://bit.ly/hw2ELX",
+                  "utf8" => "à bientôt"
+                }
               },
               "true"     => true,
               "false"    => false,
