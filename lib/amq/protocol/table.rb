@@ -63,49 +63,60 @@ module AMQ
           type = data.slice(offset, 1)
           offset += 1
 
-          case type
-          when TYPE_STRING
-            length = data.slice(offset, 4).unpack(PACK_UINT32).first
-            offset += 4
-            value = data.slice(offset, length)
-            offset += length
-          when TYPE_INTEGER
-            value = data.slice(offset, 4).unpack(PACK_UINT32).first
-            offset += 4
-          when TYPE_DECIMAL
-            decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
-            offset += 5
-            value = BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
-          when TYPE_TIME
-            timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
-            value = Time.at(timestamp)
-            offset += 8
-          when TYPE_HASH
-            length = data.slice(offset, 4).unpack(PACK_UINT32).first
-            value = self.decode(data.slice(offset, length + 4))
-            offset += 4 + length
-          when TYPE_BOOLEAN
-            value  = data.slice(offset, 2)
-            integer = value.unpack(PACK_CHAR).first # 0 or 1
-            value = (integer == 1)
-            offset += 1
-            value
-          when TYPE_SIGNED_8BIT then raise NotImplementedError.new
-          when TYPE_SIGNED_16BIT then raise NotImplementedError.new
-          when TYPE_SIGNED_64BIT then raise NotImplementedError.new
-          when TYPE_32BIT_FLOAT then
-            value = data.slice(offset, 4).unpack(PACK_32BIT_FLOAT).first
-            offset += 4
-          when TYPE_64BIT_FLOAT then
-            value = data.slice(offset, 8).unpack(PACK_64BIT_FLOAT).first
-            offset += 8
-          when TYPE_VOID
-            value = nil
-          when TYPE_ARRAY
-            
-          else
-            raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{table_length}\nProcessed data: #{table.inspect}"
-          end
+          value = case type
+                  when TYPE_STRING
+                    length = data.slice(offset, 4).unpack(PACK_UINT32).first
+                    offset += 4
+                    v = data.slice(offset, length)
+                    offset += length
+
+                    v
+                  when TYPE_INTEGER
+                    v = data.slice(offset, 4).unpack(PACK_UINT32).first
+                    offset += 4
+
+                    v
+                  when TYPE_DECIMAL
+                    decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
+                    offset += 5
+                    BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
+                  when TYPE_TIME
+                    timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
+                    v = Time.at(timestamp)
+                    offset += 8
+
+                    v
+                  when TYPE_HASH
+                    length = data.slice(offset, 4).unpack(PACK_UINT32).first
+                    v = self.decode(data.slice(offset, length + 4))
+                    offset += 4 + length
+
+                    v
+                  when TYPE_BOOLEAN
+                    b  = data.slice(offset, 2)
+                    integer = b.unpack(PACK_CHAR).first # 0 or 1
+                    offset += 1
+                    (integer == 1)
+                  when TYPE_SIGNED_8BIT then raise NotImplementedError.new
+                  when TYPE_SIGNED_16BIT then raise NotImplementedError.new
+                  when TYPE_SIGNED_64BIT then raise NotImplementedError.new
+                  when TYPE_32BIT_FLOAT then
+                    v = data.slice(offset, 4).unpack(PACK_32BIT_FLOAT).first
+                    offset += 4
+
+                    v
+                  when TYPE_64BIT_FLOAT then
+                    v = data.slice(offset, 8).unpack(PACK_64BIT_FLOAT).first
+                    offset += 8
+
+                    v
+                  when TYPE_VOID
+                    nil
+                  when TYPE_ARRAY
+                    []
+                  else
+                    raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{table_length}\nProcessed data: #{table.inspect}"
+                  end
           table[key] = value
         end
 
@@ -116,8 +127,6 @@ module AMQ
       def self.length(data)
         data.unpack(PACK_UINT32).first
       end
-
-
     end # Table
   end # Protocol
 end # AMQ
