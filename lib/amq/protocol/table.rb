@@ -49,10 +49,13 @@ module AMQ
       end
 
       def self.decode(data)
-        table = Hash.new
-        size = data.unpack(PACK_UINT32).first
-        offset = 4
-        while offset < size
+        table        = Hash.new
+        table_length = data.unpack(PACK_UINT32).first
+
+        return table if table_length.zero?
+
+        offset       = 4
+        while offset < table_length
           key_length = data.slice(offset, 1).unpack(PACK_CHAR).first
           offset += 1
           key = data.slice(offset, key_length)
@@ -101,7 +104,7 @@ module AMQ
           when TYPE_ARRAY
             
           else
-            raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{size}\nProcessed data: #{table.inspect}"
+            raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{table_length}\nProcessed data: #{table.inspect}"
           end
           table[key] = value
         end
