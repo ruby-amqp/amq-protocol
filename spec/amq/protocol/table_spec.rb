@@ -108,6 +108,34 @@ module AMQ
           Table.decode(Table.encode(input)).should == input
         end
 
+
+
+        it "is capable of decoding deeply nested tables" do
+          input   = {
+            "hashval"    => {
+              "protocol" => {
+                "name"  => "AMQP",
+                "major" => 0,
+                "minor" => "9",
+                "rev"   => 1.0
+              },
+              "true"     => true,
+              "false"    => false,
+              "nil"      => nil
+            }
+          }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        xit "is capable of decoding array values in tables" do
+          input   = {
+            "arrayval"     => [198, 3, 77, 8.0, ["inner", "array", { :oh => :well, "it" => "should work", 3 => 6 }], "two", { :a => "value", :is => nil }]
+          }
+          Table.decode(Table.encode(input)).should == input
+        end
+
       end # describe
     end
   end
