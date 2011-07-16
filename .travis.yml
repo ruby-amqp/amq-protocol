@@ -5,9 +5,9 @@ rvm:
   - 1.8.7
   - 1.9.2
   - jruby
-  - rbx
+  - rbx-2.0
   - ree
-  - 1.8.7-p174
+  - ruby-head
 notifications:
   recipients:
     - jakub@rabbitmq.com
