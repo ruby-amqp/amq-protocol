@@ -84,7 +84,7 @@ module AMQ
         end # DATA.each
 
 
-        it "is capable of decoding booleans" do
+        it "is capable of decoding boolean table values" do
           input1   = { "boolval" => true }
           Table.decode(Table.encode(input1)).should == input1
 
@@ -92,6 +92,76 @@ module AMQ
           input2   = { "boolval" => false }
           Table.decode(Table.encode(input2)).should == input2
         end
+
+
+
+        it "is capable of decoding string table values" do
+          input   = { "stringvalue" => "string" }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding integer table values" do
+          input   = { "intvalue" => 10 }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding long table values" do
+          input   = { "longvalue" => 912598613 }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding float table values" do
+          input   = { "floatvalue" => 100.0 }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding time table values" do
+          input   = { "intvalue" => Time.parse("2011-07-14 01:17:46 +0400") }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding empty hash table values" do
+          input   = { "hashvalue" => Hash.new }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        xit "is capable of decoding empty array table values" do
+          input   = { "arrayvalue" => Array.new }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+        xit "is capable of decoding single string value array table values" do
+          input   = { "arrayvalue" => ["amq-protocol"] }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding simple nested hash table values" do
+          input   = { "hashvalue" => { "a" => "b" } }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding nil table values" do
+          input   = { "nil" => nil }
+          Table.decode(Table.encode(input)).should == input
+        end
+
 
 
 
@@ -106,6 +176,56 @@ module AMQ
             "hashval"      => { "protocol" => "AMQP091", "true" => true, "false" => false, "nil" => nil }
           }
           Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding deeply nested tables" do
+          input   = {
+            "hashval"    => {
+              "protocol" => {
+                "name"  => "AMQP",
+                "major" => 0,
+                "minor" => "9",
+                "rev"   => 1.0,
+                "spec"  => {
+                  "url"  => "http://bit.ly/hw2ELX",
+                  "utf8" => "à bientôt"
+                }
+              },
+              "true"     => true,
+              "false"    => false,
+              "nil"      => nil
+            }
+          }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+
+
+        it "is capable of decoding array values in tables" do
+          input1   = {
+            "arrayval1" => [198, 3, 77, 8.0, ["inner", "array", { "oh" => "well", "it" => "should work", "3" => 6 }], "two", { "a" => "value", "is" => nil }],
+            "arrayval2" => [198, 3, 77, "two", { "a" => "value", "is" => nil }, 8.0, ["inner", "array", { "oh" => "well", "it" => "should work", "3" => 6 }]]
+          }
+          Table.decode(Table.encode(input1)).should == input1
+
+
+          input2 = {
+                       "coordinates" => {
+                         "latitude"  => 59.35,
+                         "longitude" => 18.066667
+                       },
+                       "time"         => @now,
+                       "participants" => 11,
+                       "venue"        => "Stockholm",
+                       "true_field"   => true,
+                       "false_field"  => false,
+                       "nil_field"    => nil,
+                       "ary_field"    => ["one", 2.0, 3]
+                     }
+
+          Table.decode(Table.encode(input2)).should == input2
         end
 
       end # describe
