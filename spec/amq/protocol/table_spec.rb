@@ -137,7 +137,7 @@ module AMQ
 
 
 
-        it "is capable of decoding empty array table values" do
+        xit "is capable of decoding empty array table values" do
           input   = { "arrayvalue" => Array.new }
           Table.decode(Table.encode(input)).should == input
         end
