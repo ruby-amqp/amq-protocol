@@ -2,6 +2,7 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
 require 'time'
+require "amq/protocol/value_encoder"
 
 module AMQ
   module Protocol
@@ -113,6 +114,21 @@ module AMQ
 
         described_class.field_value_size(input1).should == 20
         described_class.encode(input1).bytesize.should == 20
+
+
+        input2 = ["one", "two", "three"]
+        described_class.field_value_size(input2).should == 31
+        described_class.encode(input2).bytesize.should == 31
+
+
+        input3 = ["one", 2, "three"]
+        described_class.field_value_size(input3).should == 28
+        described_class.encode(input3).bytesize.should == 28
+
+
+        input4 = ["one", 2, "three", ["four", 5, [6.0]]]
+        described_class.field_value_size(input4).should == 61
+        described_class.encode(input4).bytesize.should == 61
       end
 
 
