@@ -204,10 +204,28 @@ module AMQ
 
 
         it "is capable of decoding array values in tables" do
-          input   = {
-            "arrayval" => ["two", { "a" => "value", "is" => nil }, 198, 3, 77, 8.0, ["inner", "array", { "oh" => "well", "it" => "should work", "3" => 6 }]]
+          input1   = {
+            "arrayval1" => [198, 3, 77, 8.0, ["inner", "array", { "oh" => "well", "it" => "should work", "3" => 6 }], "two", { "a" => "value", "is" => nil }],
+            "arrayval2" => [198, 3, 77, "two", { "a" => "value", "is" => nil }, 8.0, ["inner", "array", { "oh" => "well", "it" => "should work", "3" => 6 }]]
           }
-          Table.decode(Table.encode(input)).should == input
+          Table.decode(Table.encode(input1)).should == input1
+
+
+          input2 = {
+                       "coordinates" => {
+                         "latitude"  => 59.35,
+                         "longitude" => 18.066667
+                       },
+                       "time"         => @now,
+                       "participants" => 11,
+                       "venue"        => "Stockholm",
+                       "true_field"   => true,
+                       "false_field"  => false,
+                       "nil_field"    => nil,
+                       "ary_field"    => ["one", 2.0, 3]
+                     }
+
+          Table.decode(Table.encode(input2)).should == input2
         end
 
       end # describe

@@ -70,7 +70,7 @@ module AMQ
         end
 
 
-        [ary, offset + array_length]
+        [ary, initial_offset + array_length + 4]
       end # self.decode_array(data, initial_offset)
 
 
