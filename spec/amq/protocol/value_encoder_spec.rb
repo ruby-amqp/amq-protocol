@@ -2,11 +2,11 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
 require 'time'
-require "amq/protocol/value_encoder"
+require "amq/protocol/table_value_encoder"
 
 module AMQ
   module Protocol
-    describe ValueEncoder do
+    describe TableValueEncoder do
 
 
       it "calculates size of string field values" do
@@ -132,6 +132,6 @@ module AMQ
       end
 
 
-    end # ValueEncoder
+    end # TableValueEncoder
   end # Protocol
 end # AMQ

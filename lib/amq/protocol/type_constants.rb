@@ -2,7 +2,7 @@
 
 module AMQ
   module Protocol
-    module Encoding
+    module TypeConstants
       TYPE_STRING       = 'S'.freeze
       TYPE_INTEGER      = 'I'.freeze
       TYPE_HASH         = 'F'.freeze
@@ -21,6 +21,6 @@ module AMQ
 
       BOOLEAN_TRUE  = "\x01".freeze
       BOOLEAN_FALSE = "\x00".freeze
-    end # Encoding
+    end # TypeConstants
   end # Protocol
 end # AMQ

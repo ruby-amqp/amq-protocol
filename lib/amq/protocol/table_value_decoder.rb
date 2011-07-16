@@ -1,19 +1,19 @@
 # encoding: binary
 
 require "amq/protocol/client"
-require "amq/protocol/encoding"
+require "amq/protocol/type_constants"
 require "amq/protocol/table"
 
 module AMQ
   module Protocol
 
-    class ValueDecoder
+    class TableValueDecoder
 
       #
       # Behaviors
       #
 
-      include Encoding
+      include TypeConstants
 
 
       #
@@ -145,6 +145,6 @@ module AMQ
 
         [v, offset]
       end # self.decode_hash(data, offset)
-    end # ValueDecoder
+    end # TableValueDecoder
   end # Protocol
 end # AMQ

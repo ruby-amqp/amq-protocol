@@ -1,19 +1,19 @@
 # encoding: binary
 
 require "amq/protocol/client"
-require "amq/protocol/encoding"
+require "amq/protocol/type_constants"
 require "amq/protocol/table"
 
 module AMQ
   module Protocol
 
-    class ValueEncoder
+    class TableValueEncoder
 
       #
       # Behaviors
       #
 
-      include Encoding
+      include TypeConstants
 
       #
       # API
@@ -110,7 +110,7 @@ module AMQ
         acc
       end # self.array_size(value)
 
-    end # ValueEncoder
+    end # TableValueEncoder
 
   end # Protocol
 end # AMQ

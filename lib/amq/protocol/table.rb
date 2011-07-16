@@ -1,9 +1,9 @@
 # encoding: binary
 
 require "amq/protocol/client"
-require "amq/protocol/encoding"
-require "amq/protocol/value_encoder"
-require "amq/protocol/value_decoder"
+require "amq/protocol/type_constants"
+require "amq/protocol/table_value_encoder"
+require "amq/protocol/table_value_decoder"
 
 # We will need to introduce concept of mappings, because
 # AMQP 0.9, 0.9.1 and RabbitMQ uses different letters for entities
@@ -16,7 +16,7 @@ module AMQ
       # Behaviors
       #
 
-      include Encoding
+      include TypeConstants
 
 
       #
@@ -42,7 +42,7 @@ module AMQ
             buffer << TYPE_HASH
             buffer << self.encode(value)
           else
-            buffer << AMQ::Protocol::ValueEncoder.encode(value)
+            buffer << TableValueEncoder.encode(value)
           end
         end
 
@@ -61,40 +61,40 @@ module AMQ
         offset       = 4
         while offset <= table_length
           key, offset  = decode_table_key(data, offset)
-          type, offset = ValueDecoder.decode_value_type(data, offset)
+          type, offset = TableValueDecoder.decode_value_type(data, offset)
 
           table[key] = case type
                        when TYPE_STRING
-                         v, offset = ValueDecoder.decode_string(data, offset)
+                         v, offset = TableValueDecoder.decode_string(data, offset)
                          v
                        when TYPE_INTEGER
-                         v, offset = ValueDecoder.decode_integer(data, offset)
+                         v, offset = TableValueDecoder.decode_integer(data, offset)
                          v
                        when TYPE_DECIMAL
-                         v, offset = ValueDecoder.decode_big_decimal(data, offset)
+                         v, offset = TableValueDecoder.decode_big_decimal(data, offset)
                          v
                        when TYPE_TIME
-                         v, offset = ValueDecoder.decode_time(data, offset)
+                         v, offset = TableValueDecoder.decode_time(data, offset)
                          v
                        when TYPE_HASH
-                         v, offset = ValueDecoder.decode_hash(data, offset)
+                         v, offset = TableValueDecoder.decode_hash(data, offset)
                          v
                        when TYPE_BOOLEAN
-                         v, offset = ValueDecoder.decode_boolean(data, offset)
+                         v, offset = TableValueDecoder.decode_boolean(data, offset)
                          v
                        when TYPE_SIGNED_8BIT then raise NotImplementedError.new
                        when TYPE_SIGNED_16BIT then raise NotImplementedError.new
                        when TYPE_SIGNED_64BIT then raise NotImplementedError.new
                        when TYPE_32BIT_FLOAT then
-                         v, offset = ValueDecoder.decode_32bit_float(data, offset)
+                         v, offset = TableValueDecoder.decode_32bit_float(data, offset)
                          v
                        when TYPE_64BIT_FLOAT then
-                         v, offset = ValueDecoder.decode_64bit_float(data, offset)
+                         v, offset = TableValueDecoder.decode_64bit_float(data, offset)
                          v
                        when TYPE_VOID
                          nil
                        when TYPE_ARRAY
-                         v, offset = ValueDecoder.decode_array(data, offset)
+                         v, offset = TableValueDecoder.decode_array(data, offset)
                          v
                        else
                          raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{table_length}\nProcessed data: #{table.inspect}"
@@ -114,7 +114,7 @@ module AMQ
         acc = 0
         value.each do |k, v|
           acc += (1 + k.bytesize)
-          acc += ValueEncoder.field_value_size(v)
+          acc += TableValueEncoder.field_value_size(v)
         end
 
         acc
