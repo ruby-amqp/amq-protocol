@@ -106,6 +106,16 @@ module AMQ
       end
 
 
+      def self.hash_size(value)
+        acc = 0
+        value.each do |k, v|
+          acc += (1 + k.bytesize)
+          acc += ValueEncoder.field_value_size(v)
+        end
+
+        acc
+      end # self.hash_size(value)
+
 
 
       def self.decode_string(data, offset)
@@ -193,7 +203,7 @@ module AMQ
 
 
       def self.decode_array(data, offset)
-        
+
       end
     end # Table
   end # Protocol

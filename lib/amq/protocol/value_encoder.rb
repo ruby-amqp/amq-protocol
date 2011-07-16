@@ -93,6 +93,8 @@ module AMQ
           acc += 1
         when nil then
           # nothing, type tag alone is enough
+        when Hash then
+          acc += (4 + Table.hash_size(value))
         end
 
         acc
