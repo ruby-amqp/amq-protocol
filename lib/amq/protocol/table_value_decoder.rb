@@ -24,8 +24,9 @@ module AMQ
         array_length = data.slice(initial_offset, 4).unpack(PACK_UINT32).first
 
         ary    = Array.new
-        offset      = initial_offset + 4
-        while offset <= array_length
+        offset = initial_offset + 4
+
+        while offset <= (initial_offset + array_length)
           type, offset = decode_value_type(data, offset)
 
           i = case type
@@ -69,7 +70,7 @@ module AMQ
         end
 
 
-        [ary, offset]
+        [ary, offset + array_length]
       end # self.decode_array(data, initial_offset)
 
 
