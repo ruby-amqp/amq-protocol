@@ -81,7 +81,7 @@ module AMQ
               "rev"   => 1.0,
               "spec"  => {
                 "url"  => "http://bit.ly/hw2ELX",
-                "utf8" => "à bientôt"
+                "utf8" => one_point_eight? ? "à bientôt" : "à bientôt".force_encoding(::Encoding::ASCII_8BIT)
               }
             },
             "true"     => true,
