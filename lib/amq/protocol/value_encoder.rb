@@ -48,7 +48,7 @@ module AMQ
           accumulator << TYPE_VOID
         when Array then
           accumulator << TYPE_ARRAY
-          accumulator << value.length
+          accumulator << [self.array_size(value)].pack(PACK_UINT32)
 
           value.each { |v| accumulator << self.encode(v) }
         when Hash then
@@ -95,11 +95,20 @@ module AMQ
           # nothing, type tag alone is enough
         when Hash then
           acc += (4 + Table.hash_size(value))
+        when Array then
+          acc += (4 + self.array_size(value))
         end
 
         acc
       end # self.field_value_size(value)
 
+
+      def self.array_size(value)
+        acc = 0
+        value.each { |v| acc += self.field_value_size(v) }
+
+        acc
+      end # self.array_size(value)
 
     end # ValueEncoder
 

@@ -108,7 +108,12 @@ module AMQ
         described_class.encode(input2).bytesize.should == 149
       end
 
-      it "calculates size of array field values"
+      it "calculates size of basic array field values" do
+        input1 = [1, 2, 3]
+
+        described_class.field_value_size(input1).should == 20
+        described_class.encode(input1).bytesize.should == 20
+      end
 
 
     end # ValueEncoder
