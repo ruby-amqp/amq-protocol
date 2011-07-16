@@ -63,7 +63,7 @@ module AMQ
           type = data.slice(offset, 1)
           offset += 1
 
-          value = case type
+          table[key] = case type
                   when TYPE_STRING
                     length = data.slice(offset, 4).unpack(PACK_UINT32).first
                     offset += 4
@@ -117,7 +117,6 @@ module AMQ
                   else
                     raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{table_length}\nProcessed data: #{table.inspect}"
                   end
-          table[key] = value
         end
 
         table
