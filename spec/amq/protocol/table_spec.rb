@@ -205,7 +205,8 @@ module AMQ
 
         xit "is capable of decoding array values in tables" do
           input   = {
-            "arrayval"     => [198, 3, 77, 8.0, ["inner", "array", { :oh => :well, "it" => "should work", 3 => 6 }], "two", { :a => "value", :is => nil }]
+            # "arrayval" => [198, 3, 77, 8.0]
+            "arrayval" => [198, 3, 77, 8.0, ["inner", "array", { :oh => :well, "it" => "should work", 3 => 6 }], "two", { :a => "value", :is => nil }]
           }
           Table.decode(Table.encode(input)).should == input
         end

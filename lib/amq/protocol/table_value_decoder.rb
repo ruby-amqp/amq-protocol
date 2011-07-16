@@ -59,7 +59,7 @@ module AMQ
                  when TYPE_VOID
                    nil
                  when TYPE_ARRAY
-                   v, offset = ValueDecoder.decode_array(data, offset)
+                   v, offset = TableValueDecoder.decode_array(data, offset)
                    v
                  else
                    raise ArgumentError.new("unsupported type: #{type.inspect}")

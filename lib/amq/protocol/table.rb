@@ -32,7 +32,9 @@ module AMQ
 
       def self.encode(table)
         buffer = String.new
+
         table ||= {}
+
         table.each do |key, value|
           key = key.to_s # it can be a symbol as well
           buffer << key.bytesize.chr + key
@@ -82,7 +84,7 @@ module AMQ
                        when TYPE_BOOLEAN
                          v, offset = TableValueDecoder.decode_boolean(data, offset)
                          v
-                       when TYPE_SIGNED_8BIT then raise NotImplementedError.new
+                       when TYPE_SIGNED_8BIT  then raise NotImplementedError.new
                        when TYPE_SIGNED_16BIT then raise NotImplementedError.new
                        when TYPE_SIGNED_64BIT then raise NotImplementedError.new
                        when TYPE_32BIT_FLOAT then
@@ -113,7 +115,7 @@ module AMQ
       def self.hash_size(value)
         acc = 0
         value.each do |k, v|
-          acc += (1 + k.bytesize)
+          acc += (1 + k.to_s.bytesize)
           acc += TableValueEncoder.field_value_size(v)
         end
 

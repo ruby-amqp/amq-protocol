@@ -52,6 +52,7 @@ module AMQ
 
           value.each { |v| accumulator << self.encode(v) }
         when Hash then
+          accumulator << TYPE_HASH
           accumulator << AMQ::Protocol::Table.encode(value)
         else
           # We don't want to require these libraries.

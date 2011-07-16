@@ -37,11 +37,14 @@ module AMQ
 
 
 
-      xit "is capable of decoding arrays TableValueEncoder encodes" do
+      it "is capable of decoding arrays TableValueEncoder encodes" do
         input1 = [{ "one" => 2 }, 3]
         data1  = TableValueEncoder.encode(input1)
 
-        puts(data1.inspect)
+        # puts(TableValueEncoder.encode({ "one" => 2 }).inspect)
+        # puts(TableValueEncoder.encode(input1).inspect)
+
+
         value, offset = described_class.decode_array(data1, 1)
         value.size.should == 2
         value.first.should == Hash["one" => 2]

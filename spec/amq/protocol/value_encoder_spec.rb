@@ -57,17 +57,17 @@ module AMQ
       it "calculates size of basic table field values" do
         input1   = { "key" => "value" }
         described_class.field_value_size(input1).should == 19
-        described_class.encode(input1).bytesize.should == 18
+        described_class.encode(input1).bytesize.should == 19
 
 
         input2   = { "intval" => 1 }
         described_class.field_value_size(input2).should == 17
-        described_class.encode(input2).bytesize.should == 16
+        described_class.encode(input2).bytesize.should == 17
 
 
         input3   = { "intval" => 1, "key" => "value" }
         described_class.field_value_size(input3).should == 31
-        described_class.encode(input3).bytesize.should == 30
+        described_class.encode(input3).bytesize.should == 31
       end
 
 
@@ -91,7 +91,8 @@ module AMQ
         }
 
         described_class.field_value_size(input1).should == 162
-        described_class.encode(input1).bytesize.should == 161
+        # puts(described_class.encode(input1).inspect)
+        described_class.encode(input1).bytesize.should == 162
 
 
 
@@ -106,7 +107,7 @@ module AMQ
         }
 
         described_class.field_value_size(input2).should == 150
-        described_class.encode(input2).bytesize.should == 149
+        described_class.encode(input2).bytesize.should == 150
       end
 
       it "calculates size of basic array field values" do
