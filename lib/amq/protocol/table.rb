@@ -56,55 +56,36 @@ module AMQ
 
         offset       = 4
         while offset < table_length
-          key_length = data.slice(offset, 1).unpack(PACK_CHAR).first
-          offset += 1
-          key = data.slice(offset, key_length)
-          offset += key_length
-          type = data.slice(offset, 1)
-          offset += 1
+          key, offset  = decode_table_key(data, offset)
+          type, offset = decode_value_type(data, offset)
 
           table[key] = case type
                        when TYPE_STRING
                          v, offset = decode_string(data, offset)
                          v
                        when TYPE_INTEGER
-                         v = data.slice(offset, 4).unpack(PACK_UINT32).first
-                         offset += 4
-
+                         v, offset = decode_integer(data, offset)
                          v
                        when TYPE_DECIMAL
-                         decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
-                         offset += 5
-                         BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
+                         v, offset = decode_big_decimal(data, offset)
+                         v
                        when TYPE_TIME
-                         timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
-                         v = Time.at(timestamp)
-                         offset += 8
-
+                         v, offset = decode_time(data, offset)
                          v
                        when TYPE_HASH
-                         length = data.slice(offset, 4).unpack(PACK_UINT32).first
-                         v = self.decode(data.slice(offset, length + 4))
-                         offset += 4 + length
-
+                         v, offset = decode_hash(data, offset)
                          v
                        when TYPE_BOOLEAN
-                         b  = data.slice(offset, 2)
-                         integer = b.unpack(PACK_CHAR).first # 0 or 1
-                         offset += 1
-                         (integer == 1)
+                         v, offset = decode_boolean(data, offset)
+                         v
                        when TYPE_SIGNED_8BIT then raise NotImplementedError.new
                        when TYPE_SIGNED_16BIT then raise NotImplementedError.new
                        when TYPE_SIGNED_64BIT then raise NotImplementedError.new
                        when TYPE_32BIT_FLOAT then
-                         v = data.slice(offset, 4).unpack(PACK_32BIT_FLOAT).first
-                         offset += 4
-
+                         v, offset = decode_32bit_float(data, offset)
                          v
                        when TYPE_64BIT_FLOAT then
-                         v = data.slice(offset, 8).unpack(PACK_64BIT_FLOAT).first
-                         offset += 8
-
+                         v, offset = decode_64bit_float(data, offset)
                          v
                        when TYPE_VOID
                          nil
@@ -135,6 +116,78 @@ module AMQ
         [v, offset]
       end # self.decode_string(data, offset)
 
+
+      def self.decode_integer(data, offset)
+        v = data.slice(offset, 4).unpack(PACK_UINT32).first
+        offset += 4
+
+        [v, offset]
+      end # self.decode_integer(data, offset)
+
+
+      def self.decode_big_decimal(data, offset)
+        decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
+        offset += 5
+        v = BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
+
+        [v, offset]
+      end # self.decode_big_decimal(data, offset)
+
+
+      def self.decode_time(data, offset)
+        timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
+        v = Time.at(timestamp)
+        offset += 8
+
+        [v, offset]
+      end # self.decode_time(data, offset)
+
+
+      def self.decode_hash(data, offset)
+        length = data.slice(offset, 4).unpack(PACK_UINT32).first
+        v = self.decode(data.slice(offset, length + 4))
+        offset += 4 + length
+
+        [v, offset]
+      end # self.decode_hash(data, offset)
+
+
+      def self.decode_boolean(data, offset)
+        integer = data.slice(offset, 2).unpack(PACK_CHAR).first # 0 or 1
+        offset += 1
+        [(integer == 1), offset]
+      end # self.decode_boolean(data, offset)
+
+
+      def self.decode_32bit_float(data, offset)
+        v = data.slice(offset, 4).unpack(PACK_32BIT_FLOAT).first
+        offset += 4
+
+        [v, offset]
+      end # self.decode_32bit_float(data, offset)
+
+
+      def self.decode_64bit_float(data, offset)
+        v = data.slice(offset, 8).unpack(PACK_64BIT_FLOAT).first
+        offset += 8
+
+        [v, offset]
+      end # self.decode_64bit_float(data, offset)
+
+
+      def self.decode_table_key(data, offset)
+        key_length = data.slice(offset, 1).unpack(PACK_CHAR).first
+        offset += 1
+        key = data.slice(offset, key_length)
+        offset += key_length
+
+        [key, offset]
+      end # self.decode_table_key(data, offset)
+
+
+      def self.decode_value_type(data, offset)
+        [data.slice(offset, 1), offset + 1]
+      end # self.decode_value_type(data, offset)
     end # Table
   end # Protocol
 end # AMQ
