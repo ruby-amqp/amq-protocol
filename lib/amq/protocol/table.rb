@@ -90,7 +90,8 @@ module AMQ
                        when TYPE_VOID
                          nil
                        when TYPE_ARRAY
-                         []
+                         v, offset = decode_array(data, offset)
+                         v
                        else
                          raise ArgumentError, "Not a valid type: #{type.inspect}\nData: #{data.inspect}\nUnprocessed data: #{data[offset..-1].inspect}\nOffset: #{offset}\nTotal size: #{table_length}\nProcessed data: #{table.inspect}"
                        end
@@ -188,6 +189,12 @@ module AMQ
       def self.decode_value_type(data, offset)
         [data.slice(offset, 1), offset + 1]
       end # self.decode_value_type(data, offset)
+
+
+
+      def self.decode_array(data, offset)
+        
+      end
     end # Table
   end # Protocol
 end # AMQ

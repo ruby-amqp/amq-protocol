@@ -73,6 +73,32 @@ module AMQ
         accumulator
       end # self.encode(value)
 
+
+
+
+      def self.field_value_size(value)
+        # the type tag takes 1 byte
+        acc = 1
+
+        case value
+        when String then
+          acc += (value.bytesize + 4)
+        when Integer then
+          acc += 4
+        when Float then
+          acc += 8
+        when Time, DateTime then
+          acc += 8
+        when true, false then
+          acc += 1
+        when nil then
+          # nothing, type tag alone is enough
+        end
+
+        acc
+      end # self.field_value_size(value)
+
+
     end # ValueEncoder
 
   end # Protocol
