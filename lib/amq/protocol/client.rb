@@ -244,7 +244,7 @@ module AMQ
       end
 
       def self.encode_body(body, channel, frame_size)
-        return [BodyFrame.new(body, channel)] if body.empty?
+        return [] if body.empty?
 
         # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
         limit        = frame_size - 8
