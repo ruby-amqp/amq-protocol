@@ -1,8 +1,6 @@
 #!/usr/bin/env bundle exec nake
 # encoding: utf-8
 
-load "contributors.nake"
-
 # ./tasks.rb generate
 # ./tasks.rb generate --targets=all,
 # ./tasks.rb generate --targets=client,server
