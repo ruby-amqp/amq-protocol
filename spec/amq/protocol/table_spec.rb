@@ -137,13 +137,13 @@ module AMQ
 
 
 
-        xit "is capable of decoding empty array table values" do
+        it "is capable of decoding empty array table values" do
           input   = { "arrayvalue" => Array.new }
           Table.decode(Table.encode(input)).should == input
         end
 
 
-        xit "is capable of decoding single string value array table values" do
+        it "is capable of decoding single string value array table values" do
           input   = { "arrayvalue" => ["amq-protocol"] }
           Table.decode(Table.encode(input)).should == input
         end
