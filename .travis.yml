@@ -9,6 +9,7 @@ rvm:
   - rbx-2.0
   - ree
   - ruby-head
+  - jruby
 notifications:
   recipients:
     - jakub@rabbitmq.com
