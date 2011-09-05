@@ -19,21 +19,42 @@ module AMQ
         }
       }
 
-      describe ".pack_64_big_endian" do
-        it "packs integers into big-endian string" do
-          examples.each do |key, value|
-            described_class.pack_64_big_endian(key).should == value
-          end
+      it "packs integers into big-endian string" do
+        examples.each do |key, value|
+          described_class.pack_64_big_endian(key).should == value
         end
       end
 
-      describe ".unpack_64_big_endian" do
-        it "should unpack string representation into integer" do
-          examples.each do |key, value|
-            described_class.unpack_64_big_endian(value)[0].should == key
+      it "should unpack string representation into integer" do
+        examples.each do |key, value|
+          described_class.unpack_64_big_endian(value)[0].should == key
+        end
+      end
+      
+      if RUBY_VERSION < '1.9'
+        describe "with utf encoding" do
+          before do
+            $KCODE = 'u'
+          end
+          
+          after do 
+            $KCODE = 'NONE'
+          end
+          
+          it "packs integers into big-endian string" do
+            examples.each do |key, value|
+              described_class.pack_64_big_endian(key).should == value
+            end
+          end
+
+          it "should unpack string representation into integer" do
+            examples.each do |key, value|
+              described_class.unpack_64_big_endian(value)[0].should == key
+            end
           end
         end
       end
+      
     end
   end
 end
