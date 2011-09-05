@@ -18,11 +18,11 @@ module AMQ
     else
       def self.pack_64_big_endian(long_long)
         result = [long_long].pack(Q)
-        result.chars.to_a.reverse.join
+        result.bytes.to_a.reverse.map(&:chr).join
       end
 
       def self.unpack_64_big_endian(data)
-        data = data.chars.to_a.reverse.join
+        data = data.bytes.to_a.reverse.map(&:chr).join
         data.unpack(Q)
       end
     end
