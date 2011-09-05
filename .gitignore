@@ -6,3 +6,4 @@ tmp
 /vendor/amq-*
 /coverage
 Gemfile.lock
+.rbx/*
