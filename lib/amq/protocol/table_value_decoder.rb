@@ -85,8 +85,8 @@ module AMQ
 
 
       def self.decode_integer(data, offset)
-        v = AMQ::Hacks.unpack_64_big_endian(data.slice(offset, 8)).first
-        offset += 8
+        v = data.slice(offset, 4).unpack(PACK_UINT32).first
+        offset += 4
 
         [v, offset]
       end # self.decode_integer(data, offset)
