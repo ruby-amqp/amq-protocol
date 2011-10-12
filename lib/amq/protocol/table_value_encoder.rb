@@ -34,7 +34,7 @@ module AMQ
           accumulator << v
         when Integer then
           accumulator << TYPE_INTEGER
-          accumulator << [value].pack(PACK_UINT32)
+          accumulator << AMQ::Hacks.pack_64_big_endian(value)
         when Float then
           accumulator << TYPE_64BIT_FLOAT
           accumulator << [value].pack(PACK_64BIT_FLOAT)
@@ -85,7 +85,7 @@ module AMQ
         when String then
           acc += (value.bytesize + 4)
         when Integer then
-          acc += 4
+          acc += 8
         when Float then
           acc += 8
         when Time, DateTime then
