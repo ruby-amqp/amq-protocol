@@ -21,8 +21,8 @@ module AMQ
       end
 
       it "calculates size of integer field values" do
-        described_class.field_value_size(10).should == 5
-        described_class.encode(10).bytesize.should == 5
+        described_class.field_value_size(10).should == 9
+        described_class.encode(10).bytesize.should == 9
       end
 
       it "calculates size of float field values (considering them to be 64-bit)" do
@@ -61,13 +61,13 @@ module AMQ
 
 
         input2   = { "intval" => 1 }
-        described_class.field_value_size(input2).should == 17
-        described_class.encode(input2).bytesize.should == 17
+        described_class.field_value_size(input2).should == 21
+        described_class.encode(input2).bytesize.should == 21
 
 
         input3   = { "intval" => 1, "key" => "value" }
-        described_class.field_value_size(input3).should == 31
-        described_class.encode(input3).bytesize.should == 31
+        described_class.field_value_size(input3).should == 35
+        described_class.encode(input3).bytesize.should == 35
       end
 
 
@@ -90,9 +90,8 @@ module AMQ
           }
         }
 
-        described_class.field_value_size(input1).should == 162
-        # puts(described_class.encode(input1).inspect)
-        described_class.encode(input1).bytesize.should == 162
+        described_class.field_value_size(input1).should == 166
+        described_class.encode(input1).bytesize.should == 166
 
 
 
@@ -106,15 +105,15 @@ module AMQ
           "hashval"      => { "protocol" => "AMQP091", "true" => true, "false" => false, "nil" => nil }
         }
 
-        described_class.field_value_size(input2).should == 150
-        described_class.encode(input2).bytesize.should == 150
+        described_class.field_value_size(input2).should == 158
+        described_class.encode(input2).bytesize.should == 158
       end
 
       it "calculates size of basic array field values" do
         input1 = [1, 2, 3]
 
-        described_class.field_value_size(input1).should == 20
-        described_class.encode(input1).bytesize.should == 20
+        described_class.field_value_size(input1).should == 32
+        described_class.encode(input1).bytesize.should == 32
 
 
         input2 = ["one", "two", "three"]
@@ -123,13 +122,13 @@ module AMQ
 
 
         input3 = ["one", 2, "three"]
-        described_class.field_value_size(input3).should == 28
-        described_class.encode(input3).bytesize.should == 28
+        described_class.field_value_size(input3).should == 32
+        described_class.encode(input3).bytesize.should == 32
 
 
         input4 = ["one", 2, "three", ["four", 5, [6.0]]]
-        described_class.field_value_size(input4).should == 61
-        described_class.encode(input4).bytesize.should == 61
+        described_class.field_value_size(input4).should == 69
+        described_class.encode(input4).bytesize.should == 69
       end
 
 
