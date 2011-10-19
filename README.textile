@@ -26,17 +26,6 @@ If you need to see what AMQP methods are encoded, just regenerate the protocol f
 
 !http://static.101ideas.cz/amqp-debug.png!
 
-h3. Nightly Builds
-
-You can always find nightly builds at "gems.101ideas.cz":http://gems.101ideas.cz.
-
-You can install them thusly:
-
-<pre>
-wget http://gems.101ideas.cz/amq-protocol-nightly.gem
-gem install amq-protocol-nightly.gem
-</pre>
-
 h3. Contributing
 
 If you want to change some code, don't edit @lib/amq/protocol/client.rb@ —
@@ -44,6 +33,12 @@ that file is generated from @protocol.rb.pytemplate@
 which is a template file used by @codegen.py@. You can re-generate by running
 <pre>nake ./tasks.rb generate</pre>
 Please note that nake gem only runs on Ruby 1.9.2.
+
+
+## Maintainer Information
+
+amq-protocol is maintained by [Michael Klishin](https://github.com/michaelklishin).
+
 
 h2. Links
 
