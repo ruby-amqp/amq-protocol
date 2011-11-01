@@ -4,7 +4,7 @@ script: "bundle exec rspec spec"
 rvm:
   - 1.8.7
   - rbx-18mode
-  - rbx-19mode
+  # - rbx-19mode
   - ree
   - jruby
   - 1.9.2
