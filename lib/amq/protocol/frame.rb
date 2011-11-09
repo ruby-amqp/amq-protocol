@@ -48,6 +48,10 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
         raise FrameTypeError.new(TYPES_OPTIONS) unless type
         [type, channel, size]
       end
+
+      def final?
+        true
+      end
     end
 
     class FrameSubclass < Frame
@@ -129,14 +133,14 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
       def decode_payload
         @decoded_payload ||= begin
-          @klass_id, @weight = @payload.unpack(PACK_UINT16_X2)
-          # the total size of the content body, that is, the sum of the body sizes for the
-          # following content body frames. Zero indicates that there are no content body frames.
-          # So this is NOT related to this very header frame!
-          @body_size         = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first
-          @data              = @payload[12..-1]
-          @properties        = Basic.decode_properties(@data)
-        end
+                               @klass_id, @weight = @payload.unpack(PACK_UINT16_X2)
+                               # the total size of the content body, that is, the sum of the body sizes for the
+                               # following content body frames. Zero indicates that there are no content body frames.
+                               # So this is NOT related to this very header frame!
+                               @body_size         = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first
+                               @data              = @payload[12..-1]
+                               @properties        = Basic.decode_properties(@data)
+                             end
       end
     end
 
@@ -145,6 +149,12 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
       def decode_payload
         @payload
+      end
+
+      def final?
+        # we cannot know whether it is final or not so framing code in amq-client
+        # checks this over the entire frameset. MK.
+        false
       end
     end
 
