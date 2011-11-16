@@ -210,13 +210,12 @@ module AMQ
           }
           Table.decode(Table.encode(input1)).should == input1
 
-
+          now = Time.now
           input2 = {
                        "coordinates" => {
                          "latitude"  => 59.35,
                          "longitude" => 18.066667
                        },
-                       "time"         => @now,
                        "participants" => 11,
                        "venue"        => "Stockholm",
                        "true_field"   => true,
@@ -226,6 +225,9 @@ module AMQ
                      }
 
           Table.decode(Table.encode(input2)).should == input2
+
+          input3 = { "timely" => { "now" => now } }
+          Table.decode(Table.encode(input3))["timely"]["now"].to_i.should == now.to_i
         end
 
       end # describe
