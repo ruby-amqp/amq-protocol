@@ -1613,6 +1613,21 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          consumer_tag = data[offset, length]
+          offset += length
+          self.new(consumer_tag)
+        end
+        
+        attr_reader :consumer_tag
+        def initialize(consumer_tag)
+          @consumer_tag = consumer_tag
+        end
       end
 
       class CancelOk < Protocol::Method

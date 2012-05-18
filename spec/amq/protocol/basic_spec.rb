@@ -138,6 +138,14 @@ module AMQ
             method_frame.channel.should == 1
           end
         end
+        
+        describe '.decode' do
+          subject do
+            CancelOk.decode("\x03foo\x01")            
+          end
+
+          its(:consumer_tag) { should == 'foo' }
+        end
       end
 
       describe CancelOk do
