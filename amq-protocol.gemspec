@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   If you want to write your own AMQP client, this gem can help you with that.
   DESC
   s.email = ["bWljaGFlbEBub3ZlbWJlcmFpbi5jb20=\n", "c3Rhc3RueUAxMDFpZGVhcy5jeg==\n"].map { |i| Base64.decode64(i) }
+  s.licenses    = ["MIT"]
 
   # files
   s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
