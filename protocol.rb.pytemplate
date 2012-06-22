@@ -188,11 +188,10 @@ module AMQ
 
         # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
         limit        = frame_size - 8
-        limit_plus_1 = limit + 1
 
         array = Array.new
         while body
-          payload, body = body[0, limit_plus_1], body[limit_plus_1, body.length - limit]
+          payload, body = body[0, limit], body[limit, body.length - limit]
           # array << [0x03, payload]
           array << BodyFrame.new(payload, channel)
         end
@@ -386,9 +385,6 @@ module AMQ
           frames + self.encode_body(payload, channel, frame_size)
           % endif
           % else:
-          % if os.getenv("DEVELOPMENT"):
-          STDERR.puts("~ [\e[31m#{channel}\e[m] \e[32m${klass.name}.${method.name}\e[m(${", ".join([method + "=#{" + method + ".inspect}" for method in method.not_ignored_args()])})") if $DEBUG
-          % endif
           MethodFrame.new(buffer, channel)
           % endif
         end

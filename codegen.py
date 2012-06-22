@@ -152,4 +152,4 @@ def generateMain(type):
     return main
 
 if __name__ == "__main__":
-    do_main_dict({"client": generateMain("client"), "server": generateMain("server"), "all": generateMain("all")})
+    do_main_dict({"client": generateMain("client")})

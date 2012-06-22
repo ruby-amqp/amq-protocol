@@ -16,6 +16,8 @@ $: << File.expand_path('../../lib', __FILE__)
 
 require "amq/protocol"
 
+puts "Running on #{RUBY_VERSION}"
+
 module RubyVersionsSUpport
   def one_point_eight?
     RUBY_VERSION =~ /^1.8/
