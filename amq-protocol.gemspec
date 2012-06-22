@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
   s.require_paths = ["lib"]
 
-  s.extra_rdoc_files = ["README.textile"] + Dir.glob("doc/*")
+  s.extra_rdoc_files = ["README.md"] + Dir.glob("doc/*")
 
 
   # RubyForge
