@@ -17,17 +17,19 @@ module AMQ
     # caching
     EMPTY_STRING = "".freeze
 
-    PACK_CHAR               = "C".freeze
-    PACK_UINT16             = "n".freeze
-    PACK_UINT16_X2          = "n2".freeze
-    PACK_UINT32             = "N".freeze
-    PACK_UINT32_X2          = "N2".freeze
-    PACK_INT64              = "q".freeze
-    PACK_UCHAR_UINT32       = "CN".freeze
-    PACK_CHAR_UINT16_UINT32 = "cnN".freeze
+    PACK_CHAR               = 'C'.freeze
+    PACK_UINT16             = 'n'.freeze
+    PACK_UINT16_X2          = 'n2'.freeze
+    PACK_UINT32             = 'N'.freeze
+    PACK_UINT32_X2          = 'N2'.freeze
+    PACK_INT64              = 'q'.freeze
+    PACK_UCHAR_UINT32       = 'CN'.freeze
+    PACK_CHAR_UINT16_UINT32 = 'cnN'.freeze
 
-    PACK_32BIT_FLOAT        = "f".freeze
-    PACK_64BIT_FLOAT        = "d".freeze
+    PACK_32BIT_FLOAT        = 'f'.freeze
+    PACK_64BIT_FLOAT        = 'd'.freeze
+
+
 
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
@@ -168,8 +170,9 @@ module AMQ
       VALUE = 541
     end
 
-    # We don"t instantiate the following classes,
-    # as we don"t actually need any per-instance state.
+
+    # We don't instantiate the following classes,
+    # as we don't actually need any per-instance state.
     # Also, this is pretty low-level functionality,
     # hence it should have a reasonable performance.
     # As everyone knows, garbage collector in MRI performs
@@ -177,10 +180,10 @@ module AMQ
     # not creating any objects, but only use class as
     # a struct. Creating classes is quite expensive though,
     # but here the inheritance comes handy and mainly
-    # as we can"t simply make a reference to a function,
-    # we can"t use a hash or an object. I"ve been also
+    # as we can't simply make a reference to a function,
+    # we can't use a hash or an object. I've been also
     # considering to have just a bunch of methods, but
-    # here"s the problem, that after we"d require this file,
+    # here's the problem, that after we'd require this file,
     # all these methods would become global which would
     # be a bad, bad thing to do.
     class Class
@@ -248,11 +251,10 @@ module AMQ
 
         # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
         limit        = frame_size - 8
-        limit_plus_1 = limit + 1
 
         array = Array.new
         while body
-          payload, body = body[0, limit_plus_1], body[limit_plus_1, body.length - limit]
+          payload, body = body[0, limit], body[limit, body.length - limit]
           # array << [0x03, payload]
           array << BodyFrame.new(payload, channel)
         end
@@ -277,6 +279,8 @@ module AMQ
     class Connection < Protocol::Class
       @name = "connection"
       @method_id = 10
+
+
 
       class Start < Protocol::Method
         @name = "connection.start"
@@ -317,6 +321,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class StartOk < Protocol::Method
@@ -325,15 +331,16 @@ module AMQ
         @index = 0x000A000B # 10, 11, 655371
         @packed_indexes = [10, 11].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["client_properties = nil", "mechanism = "PLAIN"", "response = nil", "locale = "en_US""]
+        # [u'client_properties = nil', u"mechanism = u'PLAIN'", u'response = nil', u"locale = u'en_US'"]
         def self.encode(client_properties, mechanism, response, locale)
           channel = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << AMQ::Protocol::Table.encode(client_properties)
           buffer << mechanism.bytesize.chr
@@ -344,6 +351,7 @@ module AMQ
           buffer << locale
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class Secure < Protocol::Method
@@ -370,6 +378,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class SecureOk < Protocol::Method
@@ -378,20 +388,22 @@ module AMQ
         @index = 0x000A0015 # 10, 21, 655381
         @packed_indexes = [10, 21].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["response = nil"]
+        # [u'response = nil']
         def self.encode(response)
           channel = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [response.bytesize].pack(PACK_UINT32)
           buffer << response
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class Tune < Protocol::Method
@@ -422,6 +434,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class TuneOk < Protocol::Method
@@ -430,21 +444,23 @@ module AMQ
         @index = 0x000A001F # 10, 31, 655391
         @packed_indexes = [10, 31].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["channel_max = false", "frame_max = false", "heartbeat = false"]
+        # [u'channel_max = false', u'frame_max = false', u'heartbeat = false']
         def self.encode(channel_max, frame_max, heartbeat)
           channel = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [channel_max].pack(PACK_UINT16)
           buffer << [frame_max].pack(PACK_UINT32)
           buffer << [heartbeat].pack(PACK_UINT16)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class Open < Protocol::Method
@@ -453,17 +469,18 @@ module AMQ
         @index = 0x000A0028 # 10, 40, 655400
         @packed_indexes = [10, 40].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["virtual_host = "/"", "capabilities = EMPTY_STRING", "insist = false"]
+        # [u"virtual_host = u'/'", u'capabilities = EMPTY_STRING', u'insist = false']
         def self.encode(virtual_host)
           capabilities = EMPTY_STRING
           insist = false
           channel = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << virtual_host.bytesize.chr
           buffer << virtual_host
@@ -474,6 +491,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class OpenOk < Protocol::Method
@@ -500,6 +518,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Close < Protocol::Method
@@ -537,10 +557,10 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
+        # [u'reply_code = nil', u'reply_text = EMPTY_STRING', u'class_id = nil', u'method_id = nil']
         def self.encode(reply_code, reply_text, class_id, method_id)
           channel = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [reply_code].pack(PACK_UINT16)
           buffer << reply_text.bytesize.chr
@@ -549,6 +569,7 @@ module AMQ
           buffer << [method_id].pack(PACK_UINT16)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class CloseOk < Protocol::Method
@@ -574,16 +595,20 @@ module AMQ
         # []
         def self.encode()
           channel = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           MethodFrame.new(buffer, channel)
         end
+
       end
+
     end
 
     class Channel < Protocol::Class
       @name = "channel"
       @method_id = 20
+
+
 
       class Open < Protocol::Method
         @name = "channel.open"
@@ -591,19 +616,21 @@ module AMQ
         @index = 0x0014000A # 20, 10, 1310730
         @packed_indexes = [20, 10].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["out_of_band = EMPTY_STRING"]
+        # [u'out_of_band = EMPTY_STRING']
         def self.encode(channel, out_of_band)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << out_of_band.bytesize.chr
           buffer << out_of_band
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class OpenOk < Protocol::Method
@@ -630,6 +657,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Flow < Protocol::Method
@@ -657,15 +686,16 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # [u'active = nil']
         def self.encode(channel, active)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class FlowOk < Protocol::Method
@@ -693,15 +723,16 @@ module AMQ
         end
 
         # @return
-        # ["active = nil"]
+        # [u'active = nil']
         def self.encode(channel, active)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class Close < Protocol::Method
@@ -739,9 +770,9 @@ module AMQ
         end
 
         # @return
-        # ["reply_code = nil", "reply_text = EMPTY_STRING", "class_id = nil", "method_id = nil"]
+        # [u'reply_code = nil', u'reply_text = EMPTY_STRING', u'class_id = nil', u'method_id = nil']
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [reply_code].pack(PACK_UINT16)
           buffer << reply_text.bytesize.chr
@@ -750,6 +781,7 @@ module AMQ
           buffer << [method_id].pack(PACK_UINT16)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class CloseOk < Protocol::Method
@@ -774,16 +806,20 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           MethodFrame.new(buffer, channel)
         end
+
       end
+
     end
 
     class Exchange < Protocol::Class
       @name = "exchange"
       @method_id = 40
+
+
 
       class Declare < Protocol::Method
         @name = "exchange.declare"
@@ -791,15 +827,16 @@ module AMQ
         @index = 0x0028000A # 40, 10, 2621450
         @packed_indexes = [40, 10].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "exchange = nil", "type = "direct"", "passive = false", "durable = false", "auto_delete = false", "internal = false", "nowait = false", "arguments = {}"]
+        # [u'ticket = 0', u'exchange = nil', u"type = u'direct'", u'passive = false', u'durable = false', u'auto_delete = false', u'internal = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << exchange.bytesize.chr
@@ -816,6 +853,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class DeclareOk < Protocol::Method
@@ -836,6 +874,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Delete < Protocol::Method
@@ -844,15 +884,16 @@ module AMQ
         @index = 0x00280014 # 40, 20, 2621460
         @packed_indexes = [40, 20].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "exchange = nil", "if_unused = false", "nowait = false"]
+        # [u'ticket = 0', u'exchange = nil', u'if_unused = false', u'nowait = false']
         def self.encode(channel, exchange, if_unused, nowait)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << exchange.bytesize.chr
@@ -863,6 +904,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class DeleteOk < Protocol::Method
@@ -883,6 +925,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Bind < Protocol::Method
@@ -891,15 +935,16 @@ module AMQ
         @index = 0x0028001E # 40, 30, 2621470
         @packed_indexes = [40, 30].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u'ticket = 0', u'destination = nil', u'source = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << destination.bytesize.chr
@@ -914,6 +959,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class BindOk < Protocol::Method
@@ -934,6 +980,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Unbind < Protocol::Method
@@ -942,15 +990,16 @@ module AMQ
         @index = 0x00280028 # 40, 40, 2621480
         @packed_indexes = [40, 40].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "destination = nil", "source = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u'ticket = 0', u'destination = nil', u'source = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << destination.bytesize.chr
@@ -965,6 +1014,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class UnbindOk < Protocol::Method
@@ -985,12 +1035,17 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
+
     end
 
     class Queue < Protocol::Class
       @name = "queue"
       @method_id = 50
+
+
 
       class Declare < Protocol::Method
         @name = "queue.declare"
@@ -998,15 +1053,16 @@ module AMQ
         @index = 0x0032000A # 50, 10, 3276810
         @packed_indexes = [50, 10].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "passive = false", "durable = false", "exclusive = false", "auto_delete = false", "nowait = false", "arguments = {}"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'passive = false', u'durable = false', u'exclusive = false', u'auto_delete = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1021,6 +1077,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class DeclareOk < Protocol::Method
@@ -1053,6 +1110,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Bind < Protocol::Method
@@ -1061,15 +1120,16 @@ module AMQ
         @index = 0x00320014 # 50, 20, 3276820
         @packed_indexes = [50, 20].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "exchange = nil", "routing_key = EMPTY_STRING", "nowait = false", "arguments = {}"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'exchange = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, exchange, routing_key, nowait, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1084,6 +1144,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class BindOk < Protocol::Method
@@ -1104,6 +1165,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Purge < Protocol::Method
@@ -1112,15 +1175,16 @@ module AMQ
         @index = 0x0032001E # 50, 30, 3276830
         @packed_indexes = [50, 30].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "nowait = false"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'nowait = false']
         def self.encode(channel, queue, nowait)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1130,6 +1194,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class PurgeOk < Protocol::Method
@@ -1154,6 +1219,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Delete < Protocol::Method
@@ -1162,15 +1229,16 @@ module AMQ
         @index = 0x00320028 # 50, 40, 3276840
         @packed_indexes = [50, 40].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "if_unused = false", "if_empty = false", "nowait = false"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'if_unused = false', u'if_empty = false', u'nowait = false']
         def self.encode(channel, queue, if_unused, if_empty, nowait)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1182,6 +1250,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class DeleteOk < Protocol::Method
@@ -1206,6 +1275,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Unbind < Protocol::Method
@@ -1214,15 +1285,16 @@ module AMQ
         @index = 0x00320032 # 50, 50, 3276850
         @packed_indexes = [50, 50].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "exchange = nil", "routing_key = EMPTY_STRING", "arguments = {}"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'exchange = nil', u'routing_key = EMPTY_STRING', u'arguments = {}']
         def self.encode(channel, queue, exchange, routing_key, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1234,6 +1306,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class UnbindOk < Protocol::Method
@@ -1254,7 +1327,10 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
+
     end
 
     class Basic < Protocol::Class
@@ -1280,7 +1356,7 @@ module AMQ
 
       # 1 << 15
       def self.encode_content_type(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [0, 0x8000, buffer]
@@ -1288,7 +1364,7 @@ module AMQ
 
       # 1 << 14
       def self.encode_content_encoding(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [1, 0x4000, buffer]
@@ -1296,28 +1372,28 @@ module AMQ
 
       # 1 << 13
       def self.encode_headers(value)
-        buffer = ""
+        buffer = ''
         buffer << AMQ::Protocol::Table.encode(value)
         [2, 0x2000, buffer]
       end
 
       # 1 << 12
       def self.encode_delivery_mode(value)
-        buffer = ""
+        buffer = ''
         buffer << [value].pack(PACK_CHAR)
         [3, 0x1000, buffer]
       end
 
       # 1 << 11
       def self.encode_priority(value)
-        buffer = ""
+        buffer = ''
         buffer << [value].pack(PACK_CHAR)
         [4, 0x0800, buffer]
       end
 
       # 1 << 10
       def self.encode_correlation_id(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [5, 0x0400, buffer]
@@ -1325,7 +1401,7 @@ module AMQ
 
       # 1 << 9
       def self.encode_reply_to(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [6, 0x0200, buffer]
@@ -1333,7 +1409,7 @@ module AMQ
 
       # 1 << 8
       def self.encode_expiration(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [7, 0x0100, buffer]
@@ -1341,7 +1417,7 @@ module AMQ
 
       # 1 << 7
       def self.encode_message_id(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [8, 0x0080, buffer]
@@ -1349,14 +1425,14 @@ module AMQ
 
       # 1 << 6
       def self.encode_timestamp(value)
-        buffer = ""
+        buffer = ''
         buffer << AMQ::Hacks.pack_64_big_endian(value)
         [9, 0x0040, buffer]
       end
 
       # 1 << 5
       def self.encode_type(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [10, 0x0020, buffer]
@@ -1364,7 +1440,7 @@ module AMQ
 
       # 1 << 4
       def self.encode_user_id(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [11, 0x0010, buffer]
@@ -1372,7 +1448,7 @@ module AMQ
 
       # 1 << 3
       def self.encode_app_id(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [12, 0x0008, buffer]
@@ -1380,11 +1456,13 @@ module AMQ
 
       # 1 << 2
       def self.encode_cluster_id(value)
-        buffer = ""
+        buffer = ''
         buffer << value.bytesize.chr
         buffer << value
         [13, 0x0004, buffer]
       end
+
+
 
       def self.encode_properties(body_size, properties)
         pieces, flags = [], 0
@@ -1395,7 +1473,7 @@ module AMQ
           pieces[i] = result
         end
 
-        # result = [60, 0, body_size, flags].pack("n2Qn")
+        # result = [60, 0, body_size, flags].pack('n2Qn')
         result = [60, 0].pack(PACK_UINT16_X2)
         result += AMQ::Hacks.pack_64_big_endian(body_size)
         result += [flags].pack(PACK_UINT16)
@@ -1437,7 +1515,7 @@ module AMQ
         0x0004 => :shortstr,
       }
 
-      # Hash doesn"t give any guarantees on keys order, we will do it in a
+      # Hash doesn't give any guarantees on keys order, we will do it in a
       # straightforward way
       DECODE_PROPERTIES_KEYS = [
         0x8000,
@@ -1495,14 +1573,15 @@ module AMQ
         @index = 0x003C000A # 60, 10, 3932170
         @packed_indexes = [60, 10].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["prefetch_size = false", "prefetch_count = false", "global = false"]
+        # [u'prefetch_size = false', u'prefetch_count = false', u'global = false']
         def self.encode(channel, prefetch_size, prefetch_count, global)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [prefetch_size].pack(PACK_UINT32)
           buffer << [prefetch_count].pack(PACK_UINT16)
@@ -1511,6 +1590,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class QosOk < Protocol::Method
@@ -1531,6 +1611,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Consume < Protocol::Method
@@ -1539,15 +1621,16 @@ module AMQ
         @index = 0x003C0014 # 60, 20, 3932180
         @packed_indexes = [60, 20].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "consumer_tag = EMPTY_STRING", "no_local = false", "no_ack = false", "exclusive = false", "nowait = false", "arguments = {}"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'consumer_tag = EMPTY_STRING', u'no_local = false', u'no_ack = false', u'exclusive = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, consumer_tag, no_local, no_ack, exclusive, nowait, arguments)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1563,6 +1646,7 @@ module AMQ
           buffer << AMQ::Protocol::Table.encode(arguments)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class ConsumeOk < Protocol::Method
@@ -1589,6 +1673,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Cancel < Protocol::Method
@@ -1597,14 +1683,15 @@ module AMQ
         @index = 0x003C001E # 60, 30, 3932190
         @packed_indexes = [60, 30].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["consumer_tag = nil", "nowait = false"]
+        # [u'consumer_tag = nil', u'nowait = false']
         def self.encode(channel, consumer_tag, nowait)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << consumer_tag.bytesize.chr
           buffer << consumer_tag
@@ -1614,20 +1701,6 @@ module AMQ
           MethodFrame.new(buffer, channel)
         end
 
-        # @return
-        def self.decode(data)
-          offset = 0
-          length = data[offset, 1].unpack(PACK_CHAR).first
-          offset += 1
-          consumer_tag = data[offset, length]
-          offset += length
-          self.new(consumer_tag)
-        end
-        
-        attr_reader :consumer_tag
-        def initialize(consumer_tag)
-          @consumer_tag = consumer_tag
-        end
       end
 
       class CancelOk < Protocol::Method
@@ -1654,6 +1727,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Publish < Protocol::Method
@@ -1662,15 +1737,16 @@ module AMQ
         @index = 0x003C0028 # 60, 40, 3932200
         @packed_indexes = [60, 40].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           true
         end
 
         # @return
-        # ["ticket = 0", "exchange = EMPTY_STRING", "routing_key = EMPTY_STRING", "mandatory = false", "immediate = false", "user_headers = nil", "payload = """, "frame_size = nil"]
+        # [u'ticket = 0', u'exchange = EMPTY_STRING', u'routing_key = EMPTY_STRING', u'mandatory = false', u'immediate = false', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
         def self.encode(channel, payload, user_headers, exchange, routing_key, mandatory, immediate, frame_size)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << exchange.bytesize.chr
@@ -1691,6 +1767,7 @@ module AMQ
           frames << HeaderFrame.new(properties_payload, channel)
           frames + self.encode_body(payload, channel, frame_size)
         end
+
       end
 
       class Return < Protocol::Method
@@ -1730,6 +1807,8 @@ module AMQ
         def self.has_content?
           true
         end
+
+
       end
 
       class Deliver < Protocol::Method
@@ -1773,6 +1852,8 @@ module AMQ
         def self.has_content?
           true
         end
+
+
       end
 
       class Get < Protocol::Method
@@ -1781,15 +1862,16 @@ module AMQ
         @index = 0x003C0046 # 60, 70, 3932230
         @packed_indexes = [60, 70].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["ticket = 0", "queue = EMPTY_STRING", "no_ack = false"]
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'no_ack = false']
         def self.encode(channel, queue, no_ack)
           ticket = 0
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.bytesize.chr
@@ -1799,6 +1881,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class GetOk < Protocol::Method
@@ -1840,6 +1923,8 @@ module AMQ
         def self.has_content?
           true
         end
+
+
       end
 
       class GetEmpty < Protocol::Method
@@ -1866,6 +1951,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Ack < Protocol::Method
@@ -1896,9 +1983,9 @@ module AMQ
         end
 
         # @return
-        # ["delivery_tag = false", "multiple = false"]
+        # [u'delivery_tag = false', u'multiple = false']
         def self.encode(channel, delivery_tag, multiple)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
@@ -1906,6 +1993,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class Reject < Protocol::Method
@@ -1914,14 +2002,15 @@ module AMQ
         @index = 0x003C005A # 60, 90, 3932250
         @packed_indexes = [60, 90].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["delivery_tag = nil", "requeue = true"]
+        # [u'delivery_tag = nil', u'requeue = true']
         def self.encode(channel, delivery_tag, requeue)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
@@ -1929,6 +2018,7 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class RecoverAsync < Protocol::Method
@@ -1937,20 +2027,22 @@ module AMQ
         @index = 0x003C0064 # 60, 100, 3932260
         @packed_indexes = [60, 100].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["requeue = false"]
+        # [u'requeue = false']
         def self.encode(channel, requeue)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class Recover < Protocol::Method
@@ -1959,20 +2051,22 @@ module AMQ
         @index = 0x003C006E # 60, 110, 3932270
         @packed_indexes = [60, 110].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
 
         # @return
-        # ["requeue = false"]
+        # [u'requeue = false']
         def self.encode(channel, requeue)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class RecoverOk < Protocol::Method
@@ -1993,6 +2087,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Nack < Protocol::Method
@@ -2025,9 +2121,9 @@ module AMQ
         end
 
         # @return
-        # ["delivery_tag = false", "multiple = false", "requeue = true"]
+        # [u'delivery_tag = false', u'multiple = false', u'requeue = true']
         def self.encode(channel, delivery_tag, multiple, requeue)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           buffer << AMQ::Hacks.pack_64_big_endian(delivery_tag)
           bit_buffer = 0
@@ -2036,18 +2132,23 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
+
     end
 
     class Tx < Protocol::Class
       @name = "tx"
       @method_id = 90
 
+
+
       class Select < Protocol::Method
         @name = "tx.select"
         @method_id = 10
         @index = 0x005A000A # 90, 10, 5898250
         @packed_indexes = [90, 10].pack(PACK_UINT16_X2).freeze
+
 
         def self.has_content?
           false
@@ -2056,10 +2157,11 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class SelectOk < Protocol::Method
@@ -2080,6 +2182,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Commit < Protocol::Method
@@ -2088,6 +2192,7 @@ module AMQ
         @index = 0x005A0014 # 90, 20, 5898260
         @packed_indexes = [90, 20].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
@@ -2095,10 +2200,11 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class CommitOk < Protocol::Method
@@ -2119,6 +2225,8 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
 
       class Rollback < Protocol::Method
@@ -2127,6 +2235,7 @@ module AMQ
         @index = 0x005A001E # 90, 30, 5898270
         @packed_indexes = [90, 30].pack(PACK_UINT16_X2).freeze
 
+
         def self.has_content?
           false
         end
@@ -2134,10 +2243,11 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class RollbackOk < Protocol::Method
@@ -2158,12 +2268,17 @@ module AMQ
         def self.has_content?
           false
         end
+
+
       end
+
     end
 
     class Confirm < Protocol::Class
       @name = "confirm"
       @method_id = 85
+
+
 
       class Select < Protocol::Method
         @name = "confirm.select"
@@ -2190,15 +2305,16 @@ module AMQ
         end
 
         # @return
-        # ["nowait = false"]
+        # [u'nowait = false']
         def self.encode(channel, nowait)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           buffer << [bit_buffer].pack(PACK_CHAR)
           MethodFrame.new(buffer, channel)
         end
+
       end
 
       class SelectOk < Protocol::Method
@@ -2223,12 +2339,15 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ""
+          buffer = ''
           buffer << @packed_indexes
           MethodFrame.new(buffer, channel)
         end
+
       end
+
     end
+
 
     METHODS = begin
       Method.methods.inject(Hash.new) do |hash, klass|
@@ -2237,3 +2356,4 @@ module AMQ
     end
   end
 end
+
