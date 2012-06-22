@@ -385,9 +385,6 @@ module AMQ
           frames + self.encode_body(payload, channel, frame_size)
           % endif
           % else:
-          % if os.getenv("DEVELOPMENT"):
-          STDERR.puts("~ [\e[31m#{channel}\e[m] \e[32m${klass.name}.${method.name}\e[m(${", ".join([method + "=#{" + method + ".inspect}" for method in method.not_ignored_args()])})") if $DEBUG
-          % endif
           MethodFrame.new(buffer, channel)
           % endif
         end
