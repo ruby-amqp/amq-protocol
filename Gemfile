@@ -3,7 +3,6 @@
 source :rubygems
 
 group :development do
-  gem "nake",         :platform => :mri_19
   # excludes Windows, Rubinius and JRuby
   gem "perftools.rb", :platform => :mri_18
 end
