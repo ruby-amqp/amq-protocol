@@ -25,7 +25,7 @@ module AMQ
           end
         end
 
-        context 'when the body is to big to fit in a single frame' do
+        context 'when the body is too big to fit in a single frame' do
           it 'encodes a body into a list of BodyFrames that each fit within the frame size' do
             lipsum = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
             frame_size = 100
