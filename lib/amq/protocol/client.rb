@@ -1684,6 +1684,24 @@ module AMQ
         @index = 0x003C001E # 60, 30, 3932190
         @packed_indexes = [60, 30].pack(PACK_UINT16_X2).freeze
 
+        # @return
+        def self.decode(data)
+          offset = 0
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          consumer_tag = data[offset, length]
+          offset += length
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          nowait = (bit_buffer & (1 << 0)) != 0
+          self.new(consumer_tag, nowait)
+        end
+
+        attr_reader :consumer_tag, :nowait
+        def initialize(consumer_tag, nowait)
+          @consumer_tag = consumer_tag
+          @nowait = nowait
+        end
 
         def self.has_content?
           false
