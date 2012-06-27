@@ -244,8 +244,8 @@ module AMQ
       def self.encode_properties(body_size, properties)
         pieces, flags = [], 0
 
-        properties.each do |key, value|
-          i, f, result = self.send(:"encode_#{key}", value)
+        properties.reject {|key, value| value.nil?}.each do |key, value|
+          i, f, result = self.__send__(:"encode_#{key}", value)
           flags |= f
           pieces[i] = result
         end
