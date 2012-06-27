@@ -13,7 +13,6 @@ module AMQ
     PROTOCOL_VERSION = "0.9.1".freeze
     PREAMBLE         = "AMQP\x00\x00\x09\x01".freeze
     DEFAULT_PORT     = 5672
-    TLS_PORT         = 5671
 
     # caching
     EMPTY_STRING = "".freeze
@@ -1468,8 +1467,8 @@ module AMQ
       def self.encode_properties(body_size, properties)
         pieces, flags = [], 0
 
-        properties.each do |key, value|
-          i, f, result = self.send(:"encode_#{key}", value)
+        properties.reject {|key, value| value.nil?}.each do |key, value|
+          i, f, result = self.__send__(:"encode_#{key}", value)
           flags |= f
           pieces[i] = result
         end
