@@ -94,6 +94,15 @@ module AMQ
         end
 
 
+        it "is capable of decoding nil table values" do
+          input   = { "nilval" => nil }
+          Table.decode(Table.encode(input)).should == input
+        end
+
+        it "is capable of decoding nil table in nested hash/map values" do
+          input   = { "hash" => {"nil" => nil} }
+          Table.decode(Table.encode(input)).should == input
+        end
 
         it "is capable of decoding string table values" do
           input   = { "stringvalue" => "string" }
