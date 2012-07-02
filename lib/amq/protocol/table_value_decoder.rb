@@ -20,6 +20,10 @@ module AMQ
       # API
       #
 
+      BIG_ENDIAN = ([1].pack("s") == "\x00\x01")
+      Q = "Q".freeze
+
+
       def self.decode_array(data, initial_offset)
         array_length = data.slice(initial_offset, 4).unpack(PACK_UINT32).first
 
@@ -30,41 +34,47 @@ module AMQ
           type, offset = decode_value_type(data, offset)
 
           i = case type
-                 when TYPE_STRING
-                   v, offset = decode_string(data, offset)
-                   v
-                 when TYPE_INTEGER
-                   v, offset = decode_integer(data, offset)
-                   v
-                 when TYPE_DECIMAL
-                   v, offset = decode_big_decimal(data, offset)
-                   v
-                 when TYPE_TIME
-                   v, offset = decode_time(data, offset)
-                   v
-                 when TYPE_HASH
-                   v, offset = decode_hash(data, offset)
-                   v
-                 when TYPE_BOOLEAN
-                   v, offset = decode_boolean(data, offset)
-                   v
-                 when TYPE_SIGNED_8BIT then raise NotImplementedError.new
-                 when TYPE_SIGNED_16BIT then raise NotImplementedError.new
-                 when TYPE_SIGNED_64BIT then raise NotImplementedError.new
-                 when TYPE_32BIT_FLOAT then
-                   v, offset = decode_32bit_float(data, offset)
-                   v
-                 when TYPE_64BIT_FLOAT then
-                   v, offset = decode_64bit_float(data, offset)
-                   v
-                 when TYPE_VOID
-                   nil
-                 when TYPE_ARRAY
-                   v, offset = TableValueDecoder.decode_array(data, offset)
-                   v
-                 else
-                   raise ArgumentError.new("unsupported type: #{type.inspect}")
-                 end
+              when TYPE_STRING
+                v, offset = decode_string(data, offset)
+                v
+              when TYPE_INTEGER
+                v, offset = decode_integer(data, offset)
+                v
+              when TYPE_DECIMAL
+                v, offset = decode_big_decimal(data, offset)
+                v
+              when TYPE_TIME
+                v, offset = decode_time(data, offset)
+                v
+              when TYPE_HASH
+                v, offset = decode_hash(data, offset)
+                v
+              when TYPE_BOOLEAN
+                v, offset = decode_boolean(data, offset)
+                v
+              when TYPE_SIGNED_8BIT then
+                # TODO
+                raise NotImplementedError.new
+              when TYPE_SIGNED_16BIT then
+                # TODO
+                raise NotImplementedError.new
+              when TYPE_SIGNED_64BIT then
+                v, offset = decode_long(data, offset)
+                v
+              when TYPE_32BIT_FLOAT then
+                v, offset = decode_32bit_float(data, offset)
+                v
+              when TYPE_64BIT_FLOAT then
+                v, offset = decode_64bit_float(data, offset)
+                v
+              when TYPE_VOID
+                nil
+              when TYPE_ARRAY
+                v, offset = TableValueDecoder.decode_array(data, offset)
+                v
+              else
+                raise ArgumentError.new("unsupported type in a table value: #{type.inspect}, do not know how to decode!")
+              end
 
           ary << i
         end
@@ -90,6 +100,24 @@ module AMQ
 
         [v, offset]
       end # self.decode_integer(data, offset)
+
+
+      if BIG_ENDIAN
+        def self.decode_long(data, offset)
+          v    = data.slice(offset, 8).unpack(Q)
+
+          offset += 8
+          [v, offset]
+        end
+      else
+        def self.decode_long(data, offset)
+          slice = data.slice(offset, 8).bytes.to_a.reverse.map(&:chr).join
+          v     = slice.unpack(Q).first
+
+          offset += 8
+          [v, offset]
+        end
+      end
 
 
       def self.decode_big_decimal(data, offset)
