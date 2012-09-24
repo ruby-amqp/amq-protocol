@@ -4,11 +4,11 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     buffer = []
     type = spec.resolveDomain(unresolved_domain)
     if type == 'shortstr':
-        buffer.append("buffer << %s.bytesize.chr" % (cValue,))
-        buffer.append("buffer << %s" % (cValue,))
+        buffer.append("buffer << %s.to_s.bytesize.chr" % (cValue,))
+        buffer.append("buffer << %s.to_s" % (cValue,))
     elif type == 'longstr':
-        buffer.append("buffer << [%s.bytesize].pack(PACK_UINT32)" % (cValue,))
-        buffer.append("buffer << %s" % (cValue,))
+        buffer.append("buffer << [%s.to_s.bytesize].pack(PACK_UINT32)" % (cValue,))
+        buffer.append("buffer << %s.to_s" % (cValue,))
     elif type == 'octet':
         buffer.append("buffer << [%s].pack(PACK_CHAR)" % (cValue,))
     elif type == 'short':
@@ -87,17 +87,9 @@ def genSingleSimpleDecode(spec, field):
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
     if type == 'shortstr':
-        # buffer.append("length = data.unpack(PACK_CHAR)[0]")
-        # buffer.append("result = data[offset..-1]")
-        # buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
-        # buffer.append("result")
-        buffer.append("data")
+        buffer.append("data.to_s")
     elif type == 'longstr':
-        # buffer.append("length = data.unpack(PACK_CHAR)[0]")
-        # buffer.append("result = data[offset..-1]")
-        # buffer.append("raise 'Bad size: #{length} expected, got #{result.bytesize}' if result.bytesize != length")
-        # buffer.append("result")
-        buffer.append("data")
+        buffer.append("data.to_s")
     elif type == 'octet':
         buffer.append("data.unpack(PACK_CHAR).first")
     elif type == 'short':
