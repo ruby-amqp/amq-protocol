@@ -25,10 +25,24 @@ module AMQ
         end
       end
 
-      # describe DeclareOk do
-      #   describe '.decode' do
-      #   end
-      # end
+      describe Declare, "encoded with a symbol name" do
+        describe '.encode' do
+          it 'encodes the parameters into a MethodFrame' do
+            channel = 1
+            exchange = :exchange2
+            type = 'fanout'
+            passive = false
+            durable = false
+            auto_delete = false
+            internal = false
+            nowait = false
+            arguments = nil
+            method_frame = Declare.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
+            method_frame.payload.should == "\x00(\x00\n\x00\x00\texchange2\x06fanout\x00\x00\x00\x00\x00"
+            method_frame.channel.should == 1
+          end
+        end
+      end
 
       describe Delete do
         describe '.encode' do
