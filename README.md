@@ -16,8 +16,12 @@ See [this page about AMQP gems family](https://github.com/ruby-amqp/amq-client/b
 
 ## Development
 
-Make sure you have Python and the mako templating package installed. amq-protocol uses RabbitMQ protocol
-code generation library that is in Python, so there is some Python involved in the build. Don't fret.
+Make sure you have Python, pip and the mako templating package installed:
+
+    pip install mako
+
+amq-protocol uses RabbitMQ protocol code generation library that is in Python, so there is some
+Python involved in the build.
 
 To regenerate `lib/amq/protocol/client.rb` from the source (`protocol.rb.pytemplate`), run
 
