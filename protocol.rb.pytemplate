@@ -14,6 +14,8 @@ module AMQ
     PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}".freeze
     PREAMBLE         = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}".freeze
     DEFAULT_PORT     = ${spec.port}
+    TLS_PORT         = 5671
+    SSL_PORT         = 5671
 
     # caching
     EMPTY_STRING = "".freeze
