@@ -6,7 +6,7 @@
 
 import os, sys, re
 
-sys.path.append(os.path.join("vendor", "rabbitmq-codegen"))
+sys.path.append(os.path.join("codegen", "rabbitmq-codegen"))
 
 from amqp_codegen import *
 try:
@@ -61,7 +61,7 @@ AmqpEntity.__init__ = new_init
 
 # method.accepted_by("server")
 # method.accepted_by("client", "server")
-accepted_by_update = json.loads(file("amqp_0.9.1_changes.json").read())
+accepted_by_update = json.loads(file("codegen/amqp_0.9.1_changes.json").read())
 
 def accepted_by(self, *receivers):
     def get_accepted_by(self):
