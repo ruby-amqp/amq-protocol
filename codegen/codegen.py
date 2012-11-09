@@ -147,7 +147,7 @@ def generateMain(type):
     def main(json_spec_path):
         spec = AmqpSpecObject(json_spec_path)
         spec.type = type
-        print render("protocol.rb.pytemplate", spec = spec)
+        print render("codegen/protocol.rb.pytemplate", spec = spec)
 
     return main
 
