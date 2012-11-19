@@ -42,7 +42,8 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end
 
       def self.decode_header(header)
-        raise EmptyResponseError if header == nil
+        raise EmptyResponseError if header == nil || header.empty?
+
         type_id, channel, size = header.unpack(PACK_CHAR_UINT16_UINT32)
         type = TYPES_REVERSE[type_id]
         raise FrameTypeError.new(TYPES_OPTIONS) unless type
