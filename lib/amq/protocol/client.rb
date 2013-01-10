@@ -604,6 +604,74 @@ module AMQ
 
       end
 
+      class Blocked < Protocol::Method
+        @name = "connection.blocked"
+        @method_id = 60
+        @index = 0x000A003C # 10, 60, 655420
+        @packed_indexes = [10, 60].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          reason = data[offset, length]
+          offset += length
+          self.new(reason)
+        end
+
+        attr_reader :reason
+        def initialize(reason)
+          @reason = reason
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # [u'reason = EMPTY_STRING']
+        def self.encode(reason)
+          channel = 0
+          buffer = ''
+          buffer << @packed_indexes
+          buffer << reason.to_s.bytesize.chr
+          buffer << reason.to_s
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
+      class Unblocked < Protocol::Method
+        @name = "connection.unblocked"
+        @method_id = 61
+        @index = 0x000A003D # 10, 61, 655421
+        @packed_indexes = [10, 61].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          self.new()
+        end
+
+        def initialize()
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # []
+        def self.encode()
+          channel = 0
+          buffer = ''
+          buffer << @packed_indexes
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
     end
 
     class Channel < Protocol::Class
