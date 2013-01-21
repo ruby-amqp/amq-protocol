@@ -10,9 +10,9 @@ module AMQ
       FINAL_OCTET   = "\xCE".freeze # 206
 
       def self.encoded_payload(payload)
-        if payload.respond_to?(:force_encoding)
-          # TODO: should this copy rather than mutate?
-          payload.force_encoding('BINARY')
+        if payload.respond_to?(:force_encoding) && payload.encoding.name != 'BINARY'
+          # Only copy if we have to.
+          payload = payload.dup.force_encoding('BINARY')
         end
         payload
       end
