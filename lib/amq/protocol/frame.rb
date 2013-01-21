@@ -2,7 +2,6 @@
 
 module AMQ
   module Protocol
-    SIMPLE_BYTE_PACK = 'c*'
     class Frame
       TYPES = {:method => 1, :headers => 2, :body => 3, :heartbeat => 8}.freeze
       TYPES_REVERSE = TYPES.invert.freeze
@@ -10,11 +9,27 @@ module AMQ
       CHANNEL_RANGE = (0..65535).freeze
       FINAL_OCTET   = "\xCE".freeze # 206
 
+      def self.encoded_payload(payload)
+        if payload.respond_to?(:force_encoding) && payload.encoding.name != 'BINARY'
+          # Only copy if we have to.
+          payload = payload.dup.force_encoding('BINARY')
+        end
+        payload
+      end
+
       # The channel number is 0 for all frames which are global to the connection and 1-65535 for frames that refer to specific channels.
-      def self.encode(type, payload, channel)
+      def self.encode_to_array(type, payload, channel)
         raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
         raise RuntimeError.new("Payload can't be nil") if payload.nil?
-        [find_type(type), channel, payload.bytesize].pack(PACK_CHAR_UINT16_UINT32) + payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
+        components = []
+        components << [find_type(type), channel, payload.bytesize].pack(PACK_CHAR_UINT16_UINT32)
+        components << encoded_payload(payload)
+        components << FINAL_OCTET
+        components
+      end
+
+      def self.encode(type, payload, channel)
+        encode_to_array(type, payload, channel).join
       end
 
       class << self
@@ -80,8 +95,16 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
         @payload.bytesize
       end
 
+      def encode_to_array
+        components = []
+        components << [self.class.id, @channel, self.size].pack(PACK_CHAR_UINT16_UINT32)
+        components << self.class.encoded_payload(@payload)
+        components << FINAL_OCTET
+        components
+      end
+
       def encode
-        [self.class.id, @channel, self.size].pack(PACK_CHAR_UINT16_UINT32) + @payload.bytes.to_a.pack(SIMPLE_BYTE_PACK) + FINAL_OCTET
+        encode_to_array.join
       end
     end
 
