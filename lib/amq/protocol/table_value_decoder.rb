@@ -21,7 +21,7 @@ module AMQ
       #
 
       BIG_ENDIAN = ([1].pack("s") == "\x00\x01")
-      Q = "Q".freeze
+      Q = "q".freeze
 
 
       def self.decode_array(data, initial_offset)

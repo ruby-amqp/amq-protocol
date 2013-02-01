@@ -171,8 +171,15 @@ module AMQ
           Table.decode(Table.encode(input)).should == input
         end
 
+        it 'is capable of decoding 8bit signed integers' do
+          output = TableValueDecoder.decode_short_short("\xC0",0).first
+          output.should == -64
+        end
 
-
+        it 'is capable of decoding 16bit signed integers' do
+          output = TableValueDecoder.decode_short("\b\xC0",0).first
+          output.should == -16376
+        end
 
         it "is capable of decoding tables" do
           input   = {

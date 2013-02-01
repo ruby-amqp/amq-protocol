@@ -31,6 +31,9 @@ module AMQ
     PACK_32BIT_FLOAT        = 'f'.freeze
     PACK_64BIT_FLOAT        = 'd'.freeze
 
+    PACK_SIGNED_8BIT        = 'c'.freeze
+    PACK_SIGNED_16BIT       = 's'.freeze
+
 
 
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
