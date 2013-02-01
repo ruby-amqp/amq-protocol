@@ -9,7 +9,7 @@ module AMQ
       TYPE_TIME         = 'T'.freeze
       TYPE_DECIMAL      = 'D'.freeze
       TYPE_BOOLEAN      = 't'.freeze
-      TYPE_SIGNED_8BIT  = 'b'.freeze
+      TYPE_SIGNED_8BIT  = 'c'.freeze
       TYPE_SIGNED_16BIT = 's'.freeze
       TYPE_SIGNED_64BIT = 'l'.freeze
       TYPE_32BIT_FLOAT  = 'f'.freeze

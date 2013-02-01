@@ -53,11 +53,11 @@ module AMQ
                 v, offset = decode_boolean(data, offset)
                 v
               when TYPE_SIGNED_8BIT then
-                # TODO
-                raise NotImplementedError.new
+                v, offset = decode_short_short(data, offset)
+                v
               when TYPE_SIGNED_16BIT then
-                # TODO
-                raise NotImplementedError.new
+                v, offset = decode_short(data, offset)
+                v
               when TYPE_SIGNED_64BIT then
                 v, offset = decode_long(data, offset)
                 v
@@ -174,6 +174,19 @@ module AMQ
 
         [v, offset]
       end # self.decode_hash(data, offset)
+
+
+      def self.decode_short_short(data, offset)
+        v = data.slice(offset, 1).unpack(PACK_SIGNED_8BIT).first
+        offset += 1
+        [v, offset]
+      end
+
+      def self.decode_short(data, offset)
+        v = data.slice(offset, 2).unpack(PACK_SIGNED_16BIT).first
+        offset += 2
+        [v, offset]
+      end
     end # TableValueDecoder
   end # Protocol
 end # AMQ
