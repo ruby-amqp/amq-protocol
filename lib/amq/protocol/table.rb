@@ -85,9 +85,11 @@ module AMQ
                          v, offset = TableValueDecoder.decode_boolean(data, offset)
                          v
                        when TYPE_SIGNED_8BIT  then
-                         raise NotImplementedError.new
+                         v, offset = TableValueDecoder.decode_short_short(data, offset)
+                         v
                        when TYPE_SIGNED_16BIT then
-                         raise NotImplementedError.new
+                         v, offset = TableValueDecoder.decode_short(data, offset)
+                         v
                        when TYPE_SIGNED_64BIT then
                          v, offset = TableValueDecoder.decode_long(data, offset)
                          v
