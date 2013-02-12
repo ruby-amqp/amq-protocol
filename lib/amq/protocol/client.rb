@@ -254,13 +254,20 @@ module AMQ
       def self.encode_body(body, channel, frame_size)
         return [] if body.empty?
 
-        # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
+        # 8 = 1 + 2 + 4 + 1
+        # 1 byte of frame type
+        # 2 bytes of channel number
+        # 4 bytes of frame payload length
+        # 1 byte of payload trailer FRAME_END byte
         limit        = frame_size - 8
+
+        # Otherwise String#slice on 1.9 will operate with code points,
+        # and we need bytes. MK.
+        body.force_encoding("ASCII-8BIT") if RUBY_VERSION.to_f >= 1.9
 
         array = Array.new
         while body
           payload, body = body[0, limit], body[limit, body.length - limit]
-          # array << [0x03, payload]
           array << BodyFrame.new(payload, channel)
         end
 
@@ -1788,7 +1795,9 @@ module AMQ
           end
           properties_payload = Basic.encode_properties(payload.bytesize, properties)
           frames << HeaderFrame.new(properties_payload, channel)
-          frames + self.encode_body(payload, channel, frame_size)
+          frames += self.encode_body(payload, channel, frame_size)
+
+          frames
         end
 
       end
