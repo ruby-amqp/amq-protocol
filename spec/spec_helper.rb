@@ -20,7 +20,7 @@ require "amq/protocol"
 
 puts "Running on #{RUBY_VERSION}"
 
-module RubyVersionsSUpport
+module RubyVersionsSupport
   def one_point_eight?
     RUBY_VERSION =~ /^1.8/
   end
@@ -30,6 +30,6 @@ end # RubyVersionsSUpport
 RSpec.configure do |config|
   config.include AMQ::Protocol
 
-  config.include(RubyVersionsSUpport)
-  config.extend(RubyVersionsSUpport)
+  config.include(RubyVersionsSupport)
+  config.extend(RubyVersionsSupport)
 end
