@@ -109,6 +109,10 @@ module AMQ
           Table.decode(Table.encode(input)).should == input
         end
 
+        it "is capable of decoding string table values with UTF-8 characters" do
+          input   = { "строка" => "значение" }
+          Table.decode(Table.encode(input)).should == input
+        end
 
 
         it "is capable of decoding integer table values" do

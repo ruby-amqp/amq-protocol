@@ -3,9 +3,11 @@
 require 'bundler/setup'
 require 'rspec'
 
+require "effin_utf8"
+
 begin
   require 'simplecov'
-  
+
   SimpleCov.start do
     add_filter '/spec/'
   end
