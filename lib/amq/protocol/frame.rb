@@ -161,7 +161,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
                                # the total size of the content body, that is, the sum of the body sizes for the
                                # following content body frames. Zero indicates that there are no content body frames.
                                # So this is NOT related to this very header frame!
-                               @body_size         = AMQ::Hacks.unpack_64_big_endian(@payload[4..11]).first
+                               @body_size         = AMQ::Hacks.unpack_uint64_big_endian(@payload[4..11]).first
                                @data              = @payload[12..-1]
                                @properties        = Basic.decode_properties(@data)
                              end
