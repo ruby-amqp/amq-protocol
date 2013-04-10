@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-source :rubygems
+source "https://rubygems.org"
 
 group :development do
   # excludes Windows, Rubinius and JRuby
@@ -8,6 +8,6 @@ group :development do
 end
 
 group :test do
-  gem "rspec", ">= 2.6.0"
+  gem "rspec", ">= 2.13.0"
   gem "effin_utf8"
 end
