@@ -29,7 +29,7 @@ module AMQ
         {
           {}                       => "\x00\x00\x00\x00",
           {"test" => 1}            => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",
-          {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd\xB8\x1E\x85\xEBQ\xB8\xFE?",
+          {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd?\xFE\xB8Q\xEB\x85\x1E\xB8",
           {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
           {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
           {"test" => bigdecimal_1} => "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01",
@@ -49,20 +49,20 @@ module AMQ
           Table.encode(nil).should eql(encoded_value)
         end
 
-        it "should return \x00\x00\x00\a\x04testt\x01 for { :test => true }" do
+        it "should serialize { :test => true }" do
           Table.encode(:test => true).should eql("\x00\x00\x00\a\x04testt\x01")
         end
 
-        it "should return \x00\x00\x00\a\x04testt\x00 for { :test => false }" do
+        it "should serialize { :test => false }" do
           Table.encode(:test => false).should eql("\x00\x00\x00\a\x04testt\x00")
         end
 
-        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :latitude  => 59.35 } }" do
-          Table.encode(:coordinates => { :latitude  => 59.35 }).should eql("\000\000\000#\vcoordinatesF\000\000\000\022\blatituded\315\314\314\314\314\254M@")
+        it "should serialize { :coordinates => { :latitude  => 59.35 } }" do
+          Table.encode(:coordinates => { :latitude  => 59.35 }).should eql("\x00\x00\x00#\vcoordinatesF\x00\x00\x00\x12\blatituded@M\xAC\xCC\xCC\xCC\xCC\xCD")
         end
 
-        it "should return \"\x00\x00\x00\n\x04testI\x00\x00\x00\x01\" for { :coordinates => { :longitude => 18.066667 } }" do
-          Table.encode(:coordinates => { :longitude => 18.066667 }).should eql("\000\000\000$\vcoordinatesF\000\000\000\023\tlongituded\361\270\250\026\021\0212@")
+        it "should serialize { :coordinates => { :longitude => 18.066667 } }" do
+          Table.encode(:coordinates => { :longitude => 18.066667 }).should eql("\x00\x00\x00$\vcoordinatesF\x00\x00\x00\x13\tlongituded@2\x11\x11\x16\xA8\xB8\xF1")
         end
 
         DATA.each do |data, encoded|
@@ -182,7 +182,7 @@ module AMQ
 
         it 'is capable of decoding 16bit signed integers' do
           output = TableValueDecoder.decode_short("\b\xC0",0).first
-          output.should == -16376
+          output.should == -64
         end
 
         it "is capable of decoding tables" do

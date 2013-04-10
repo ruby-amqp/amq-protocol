@@ -20,6 +20,7 @@ module AMQ
     # caching
     EMPTY_STRING = "".freeze
 
+    PACK_INT8               = 'c'.freeze
     PACK_CHAR               = 'C'.freeze
     PACK_UINT16             = 'n'.freeze
     PACK_UINT16_X2          = 'n2'.freeze
@@ -30,7 +31,7 @@ module AMQ
     PACK_CHAR_UINT16_UINT32 = 'cnN'.freeze
 
     PACK_32BIT_FLOAT        = 'f'.freeze
-    PACK_64BIT_FLOAT        = 'd'.freeze
+    PACK_64BIT_FLOAT        = 'G'.freeze
 
 
 
@@ -262,7 +263,7 @@ module AMQ
 
         # result = [${klass.index}, 0, body_size, flags].pack('n2Qn')
         result = [${klass.index}, 0].pack(PACK_UINT16_X2)
-        result += AMQ::Hacks.pack_64_big_endian(body_size)
+        result += AMQ::Hacks.pack_uint64_big_endian(body_size)
         result += [flags].pack(PACK_UINT16)
         result + pieces.join(EMPTY_STRING)
       end
@@ -392,7 +393,8 @@ module AMQ
           frames << HeaderFrame.new(properties_payload, channel)
           % endif
           % if "payload" in method.args():
-          frames + self.encode_body(payload, channel, frame_size)
+          frames += self.encode_body(payload, channel, frame_size)
+          frames
           % endif
           % else:
           MethodFrame.new(buffer, channel)
