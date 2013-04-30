@@ -12,7 +12,7 @@ from amqp_codegen import *
 try:
     from mako.template import Template
 except ImportError:
-    print "Mako isn't installed. Run easy_install mako."
+    print "Mako isn't installed. Please install mako via pip or similar."
     sys.exit(1)
 
 # main class
@@ -46,10 +46,6 @@ class AmqpSpecObject(AmqpSpec):
 
         self.classes = filter(lambda klass: not klass.ignored, self.classes)
 
-# I know, I'm a bad, bad boy, but come on guys,
-# monkey-patching is just handy for this case.
-# Oh hell, why Python doesn't have at least
-# anonymous functions? This looks so ugly.
 original_init = AmqpEntity.__init__
 def new_init(self, arg):
     original_init(self, arg)
