@@ -2165,6 +2165,129 @@ module AMQ
 
       end
 
+      class Credit < Protocol::Method
+        @name = "basic.credit"
+        @method_id = 200
+        @index = 0x003C00C8 # 60, 200, 3932360
+        @packed_indexes = [60, 200].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          consumer_tag = data[offset, length]
+          offset += length
+          credit = data[offset, 4].unpack(PACK_UINT32).first
+          offset += 4
+          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          drain = (bit_buffer & (1 << 0)) != 0
+          self.new(consumer_tag, credit, drain)
+        end
+
+        attr_reader :consumer_tag, :credit, :drain
+        def initialize(consumer_tag, credit, drain)
+          @consumer_tag = consumer_tag
+          @credit = credit
+          @drain = drain
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # [u'consumer_tag = EMPTY_STRING', u'credit = nil', u'drain = nil']
+        def self.encode(channel, consumer_tag, credit, drain)
+          buffer = ''
+          buffer << @packed_indexes
+          buffer << consumer_tag.to_s.bytesize.chr
+          buffer << consumer_tag.to_s
+          buffer << [credit].pack(PACK_UINT32)
+          bit_buffer = 0
+          bit_buffer = bit_buffer | (1 << 0) if drain
+          buffer << [bit_buffer].pack(PACK_CHAR)
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
+      class CreditOk < Protocol::Method
+        @name = "basic.credit-ok"
+        @method_id = 201
+        @index = 0x003C00C9 # 60, 201, 3932361
+        @packed_indexes = [60, 201].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          available = data[offset, 4].unpack(PACK_UINT32).first
+          offset += 4
+          self.new(available)
+        end
+
+        attr_reader :available
+        def initialize(available)
+          @available = available
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # [u'available = nil']
+        def self.encode(channel, available)
+          buffer = ''
+          buffer << @packed_indexes
+          buffer << [available].pack(PACK_UINT32)
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
+      class CreditDrained < Protocol::Method
+        @name = "basic.credit-drained"
+        @method_id = 202
+        @index = 0x003C00CA # 60, 202, 3932362
+        @packed_indexes = [60, 202].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = 0
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          consumer_tag = data[offset, length]
+          offset += length
+          credit_drained = data[offset, 4].unpack(PACK_UINT32).first
+          offset += 4
+          self.new(consumer_tag, credit_drained)
+        end
+
+        attr_reader :consumer_tag, :credit_drained
+        def initialize(consumer_tag, credit_drained)
+          @consumer_tag = consumer_tag
+          @credit_drained = credit_drained
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # [u'consumer_tag = EMPTY_STRING', u'credit_drained = nil']
+        def self.encode(channel, consumer_tag, credit_drained)
+          buffer = ''
+          buffer << @packed_indexes
+          buffer << consumer_tag.to_s.bytesize.chr
+          buffer << consumer_tag.to_s
+          buffer << [credit_drained].pack(PACK_UINT32)
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
     end
 
     class Tx < Protocol::Class

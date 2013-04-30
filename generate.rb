@@ -5,6 +5,8 @@ def sh(*args)
   system(*args)
 end
 
+extensions = ["codegen/rabbitmq-codegen/credit_extension.json"]
+
 spec = "codegen/rabbitmq-codegen/amqp-rabbitmq-0.9.1.json"
 unless File.exist?(spec)
   sh "git submodule update --init"
@@ -12,7 +14,7 @@ end
 
 path = "lib/amq/protocol/client.rb"
 puts "Running ./codegen/codegen.py client #{spec} #{path}"
-sh "./codegen/codegen.py client #{spec} #{path}"
+sh "./codegen/codegen.py client #{spec} #{extensions.join(' ')} #{path}"
 if File.file?(path)
   sh "ruby -c #{path}"
 end
