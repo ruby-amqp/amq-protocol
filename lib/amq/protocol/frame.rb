@@ -95,16 +95,22 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
         @payload.bytesize
       end
 
+      # TODO: remove once we are sure none of the clients
+      #       uses this method directly
+      # @api private
       def encode_to_array
         components = []
-        components << [self.class.id, @channel, self.size].pack(PACK_CHAR_UINT16_UINT32)
+        components << [self.class.id, @channel, @payload.bytesize].pack(PACK_CHAR_UINT16_UINT32)
         components << self.class.encoded_payload(@payload)
         components << FINAL_OCTET
         components
       end
 
       def encode
-        encode_to_array.join
+        s = [self.class.id, @channel, @payload.bytesize].pack(PACK_CHAR_UINT16_UINT32)
+        s << self.class.encoded_payload(@payload)
+        s << FINAL_OCTET
+        s
       end
     end
 
