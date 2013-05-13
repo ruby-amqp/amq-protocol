@@ -277,8 +277,7 @@ module AMQ
           % if klass.name == "connection":
           channel = 0
           % endif
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor

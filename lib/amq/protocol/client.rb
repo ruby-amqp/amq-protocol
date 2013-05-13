@@ -253,8 +253,7 @@ module AMQ
         # [u'client_properties = nil', u"mechanism = u'PLAIN'", u'response = nil', u"locale = u'en_US'"]
         def self.encode(client_properties, mechanism, response, locale)
           channel = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << AMQ::Protocol::Table.encode(client_properties)
           buffer << mechanism.to_s.bytesize.chr
           buffer << mechanism.to_s
@@ -310,8 +309,7 @@ module AMQ
         # [u'response = nil']
         def self.encode(response)
           channel = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [response.to_s.bytesize].pack(PACK_UINT32)
           buffer << response.to_s
           MethodFrame.new(buffer, channel)
@@ -366,8 +364,7 @@ module AMQ
         # [u'channel_max = false', u'frame_max = false', u'heartbeat = false']
         def self.encode(channel_max, frame_max, heartbeat)
           channel = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [channel_max].pack(PACK_UINT16)
           buffer << [frame_max].pack(PACK_UINT32)
           buffer << [heartbeat].pack(PACK_UINT16)
@@ -393,8 +390,7 @@ module AMQ
           capabilities = EMPTY_STRING
           insist = false
           channel = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << virtual_host.to_s.bytesize.chr
           buffer << virtual_host.to_s
           buffer << capabilities.to_s.bytesize.chr
@@ -473,8 +469,7 @@ module AMQ
         # [u'reply_code = nil', u'reply_text = EMPTY_STRING', u'class_id = nil', u'method_id = nil']
         def self.encode(reply_code, reply_text, class_id, method_id)
           channel = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [reply_code].pack(PACK_UINT16)
           buffer << reply_text.to_s.bytesize.chr
           buffer << reply_text.to_s
@@ -508,8 +503,7 @@ module AMQ
         # []
         def self.encode()
           channel = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           MethodFrame.new(buffer, channel)
         end
 
@@ -537,8 +531,7 @@ module AMQ
         # @return
         # [u'out_of_band = EMPTY_STRING']
         def self.encode(channel, out_of_band)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << out_of_band.to_s.bytesize.chr
           buffer << out_of_band.to_s
           MethodFrame.new(buffer, channel)
@@ -601,8 +594,7 @@ module AMQ
         # @return
         # [u'active = nil']
         def self.encode(channel, active)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -638,8 +630,7 @@ module AMQ
         # @return
         # [u'active = nil']
         def self.encode(channel, active)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if active
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -685,8 +676,7 @@ module AMQ
         # @return
         # [u'reply_code = nil', u'reply_text = EMPTY_STRING', u'class_id = nil', u'method_id = nil']
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [reply_code].pack(PACK_UINT16)
           buffer << reply_text.to_s.bytesize.chr
           buffer << reply_text.to_s
@@ -719,8 +709,7 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           MethodFrame.new(buffer, channel)
         end
 
@@ -749,8 +738,7 @@ module AMQ
         # [u'ticket = 0', u'exchange = nil', u"type = u'direct'", u'passive = false', u'durable = false', u'auto_delete = false', u'internal = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << exchange.to_s.bytesize.chr
           buffer << exchange.to_s
@@ -806,8 +794,7 @@ module AMQ
         # [u'ticket = 0', u'exchange = nil', u'if_unused = false', u'nowait = false']
         def self.encode(channel, exchange, if_unused, nowait)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << exchange.to_s.bytesize.chr
           buffer << exchange.to_s
@@ -857,8 +844,7 @@ module AMQ
         # [u'ticket = 0', u'destination = nil', u'source = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << destination.to_s.bytesize.chr
           buffer << destination.to_s
@@ -912,8 +898,7 @@ module AMQ
         # [u'ticket = 0', u'destination = nil', u'source = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << destination.to_s.bytesize.chr
           buffer << destination.to_s
@@ -975,8 +960,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'passive = false', u'durable = false', u'exclusive = false', u'auto_delete = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1042,8 +1026,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'exchange = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, exchange, routing_key, nowait, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1097,8 +1080,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'nowait = false']
         def self.encode(channel, queue, nowait)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1151,8 +1133,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'if_unused = false', u'if_empty = false', u'nowait = false']
         def self.encode(channel, queue, if_unused, if_empty, nowait)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1207,8 +1188,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'exchange = nil', u'routing_key = EMPTY_STRING', u'arguments = {}']
         def self.encode(channel, queue, exchange, routing_key, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1494,8 +1474,7 @@ module AMQ
         # @return
         # [u'prefetch_size = false', u'prefetch_count = false', u'global = false']
         def self.encode(channel, prefetch_size, prefetch_count, global)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [prefetch_size].pack(PACK_UINT32)
           buffer << [prefetch_count].pack(PACK_UINT16)
           bit_buffer = 0
@@ -1543,8 +1522,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'consumer_tag = EMPTY_STRING', u'no_local = false', u'no_ack = false', u'exclusive = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, consumer_tag, no_local, no_ack, exclusive, nowait, arguments)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1622,8 +1600,7 @@ module AMQ
         # @return
         # [u'consumer_tag = nil', u'nowait = false']
         def self.encode(channel, consumer_tag, nowait)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << consumer_tag.to_s.bytesize.chr
           buffer << consumer_tag.to_s
           bit_buffer = 0
@@ -1677,8 +1654,7 @@ module AMQ
         # [u'ticket = 0', u'exchange = EMPTY_STRING', u'routing_key = EMPTY_STRING', u'mandatory = false', u'immediate = false', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
         def self.encode(channel, payload, user_headers, exchange, routing_key, mandatory, immediate, frame_size)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << exchange.to_s.bytesize.chr
           buffer << exchange.to_s
@@ -1802,8 +1778,7 @@ module AMQ
         # [u'ticket = 0', u'queue = EMPTY_STRING', u'no_ack = false']
         def self.encode(channel, queue, no_ack)
           ticket = 0
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [ticket].pack(PACK_UINT16)
           buffer << queue.to_s.bytesize.chr
           buffer << queue.to_s
@@ -1916,8 +1891,7 @@ module AMQ
         # @return
         # [u'delivery_tag = false', u'multiple = false']
         def self.encode(channel, delivery_tag, multiple)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << AMQ::Hacks.pack_uint64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
@@ -1941,8 +1915,7 @@ module AMQ
         # @return
         # [u'delivery_tag = nil', u'requeue = true']
         def self.encode(channel, delivery_tag, requeue)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << AMQ::Hacks.pack_uint64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
@@ -1966,8 +1939,7 @@ module AMQ
         # @return
         # [u'requeue = false']
         def self.encode(channel, requeue)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -1990,8 +1962,7 @@ module AMQ
         # @return
         # [u'requeue = false']
         def self.encode(channel, requeue)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -2054,8 +2025,7 @@ module AMQ
         # @return
         # [u'delivery_tag = false', u'multiple = false', u'requeue = true']
         def self.encode(channel, delivery_tag, multiple, requeue)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << AMQ::Hacks.pack_uint64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
@@ -2101,8 +2071,7 @@ module AMQ
         # @return
         # [u'consumer_tag = EMPTY_STRING', u'credit = nil', u'drain = nil']
         def self.encode(channel, consumer_tag, credit, drain)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << consumer_tag.to_s.bytesize.chr
           buffer << consumer_tag.to_s
           buffer << [credit].pack(PACK_UINT32)
@@ -2140,8 +2109,7 @@ module AMQ
         # @return
         # [u'available = nil']
         def self.encode(channel, available)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << [available].pack(PACK_UINT32)
           MethodFrame.new(buffer, channel)
         end
@@ -2179,8 +2147,7 @@ module AMQ
         # @return
         # [u'consumer_tag = EMPTY_STRING', u'credit_drained = nil']
         def self.encode(channel, consumer_tag, credit_drained)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           buffer << consumer_tag.to_s.bytesize.chr
           buffer << consumer_tag.to_s
           buffer << [credit_drained].pack(PACK_UINT32)
@@ -2211,8 +2178,7 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           MethodFrame.new(buffer, channel)
         end
 
@@ -2254,8 +2220,7 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           MethodFrame.new(buffer, channel)
         end
 
@@ -2297,8 +2262,7 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           MethodFrame.new(buffer, channel)
         end
 
@@ -2361,8 +2325,7 @@ module AMQ
         # @return
         # [u'nowait = false']
         def self.encode(channel, nowait)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if nowait
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -2393,8 +2356,7 @@ module AMQ
         # @return
         # []
         def self.encode(channel)
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           MethodFrame.new(buffer, channel)
         end
 
