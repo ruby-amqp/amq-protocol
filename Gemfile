@@ -5,6 +5,8 @@ source "https://rubygems.org"
 group :development do
   # excludes Windows, Rubinius and JRuby
   gem "perftools.rb", :platform => :mri_18
+
+  gem "rake"
 end
 
 group :test do
