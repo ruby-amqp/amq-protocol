@@ -5,6 +5,8 @@ require "amq/protocol/type_constants"
 require "amq/protocol/table"
 require "date"
 
+require "amq/protocol/float_32bit"
+
 module AMQ
   module Protocol
 
@@ -36,6 +38,9 @@ module AMQ
         when Integer then
           accumulator << TYPE_INTEGER
           accumulator << [value].pack(PACK_UINT32)
+        when AMQ::Protocol::Float32Bit then
+          accumulator << TYPE_32BIT_FLOAT
+          accumulator << [value.value].pack(PACK_32BIT_FLOAT)
         when Float then
           accumulator << TYPE_64BIT_FLOAT
           accumulator << [value].pack(PACK_64BIT_FLOAT)

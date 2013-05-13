@@ -60,7 +60,13 @@ module AMQ
         value.should == input2
       end
 
+      it "is capable of decoding 32 bit float values" do
+        input = Float32Bit.new(10.0)
+        data  = TableValueEncoder.encode(input)
 
+        value, offset = described_class.decode_32bit_float(data, 1)
+        value.should == 10.0
+      end
     end
   end
 end

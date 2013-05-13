@@ -5,9 +5,6 @@ require "amq/protocol/type_constants"
 require "amq/protocol/table_value_encoder"
 require "amq/protocol/table_value_decoder"
 
-# We will need to introduce concept of mappings, because
-# AMQP 0.9, 0.9.1 and RabbitMQ uses different letters for entities
-# http://dev.rabbitmq.com/wiki/Amqp091Errata#section_3
 module AMQ
   module Protocol
     class Table
