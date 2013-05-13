@@ -2,10 +2,10 @@
 
 require 'amq/endianness'
 
-# Ruby doesn't support pack to/unpack from
-# 64bit string in network byte order.
 module AMQ
-  module Hacks
+  # Implements pack to/unpack from 64bit string in network byte order
+  # compatible with Ruby 1.8+.
+  module Pack
     UINT64 = "Q".freeze
     INT16  = "c".freeze
 
@@ -47,7 +47,7 @@ module AMQ
       end
     end
   end
-end
 
-# AMQ::Hacks.pack_uint64_big_endian(17)
-# AMQ::Hacks.unpack_uint64_big_endian("\x00\x00\x00\x00\x00\x00\x00\x11")
+  # Backwards compatibility
+  Hacks = Pack
+end
