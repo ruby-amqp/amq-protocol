@@ -1319,7 +1319,7 @@ module AMQ
       # 1 << 6
       def self.encode_timestamp(value)
         buffer = ''
-        buffer << AMQ::Hacks.pack_uint64_big_endian(value)
+        buffer << AMQ::Pack.pack_uint64_big_endian(value)
         [9, 0x0040, buffer]
       end
 
@@ -1731,7 +1731,7 @@ module AMQ
           offset += 1
           consumer_tag = data[offset, length]
           offset += length
-          delivery_tag = AMQ::Hacks.unpack_uint64_big_endian(data[offset, 8]).first
+          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
@@ -1799,7 +1799,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = AMQ::Hacks.unpack_uint64_big_endian(data[offset, 8]).first
+          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
@@ -1870,7 +1870,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = AMQ::Hacks.unpack_uint64_big_endian(data[offset, 8]).first
+          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
@@ -1892,7 +1892,7 @@ module AMQ
         # [u'delivery_tag = false', u'multiple = false']
         def self.encode(channel, delivery_tag, multiple)
           buffer = @packed_indexes.dup
-          buffer << AMQ::Hacks.pack_uint64_big_endian(delivery_tag)
+          buffer << AMQ::Pack.pack_uint64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -1916,7 +1916,7 @@ module AMQ
         # [u'delivery_tag = nil', u'requeue = true']
         def self.encode(channel, delivery_tag, requeue)
           buffer = @packed_indexes.dup
-          buffer << AMQ::Hacks.pack_uint64_big_endian(delivery_tag)
+          buffer << AMQ::Pack.pack_uint64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if requeue
           buffer << [bit_buffer].pack(PACK_CHAR)
@@ -2002,7 +2002,7 @@ module AMQ
         # @return
         def self.decode(data)
           offset = 0
-          delivery_tag = AMQ::Hacks.unpack_uint64_big_endian(data[offset, 8]).first
+          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
@@ -2026,7 +2026,7 @@ module AMQ
         # [u'delivery_tag = false', u'multiple = false', u'requeue = true']
         def self.encode(channel, delivery_tag, multiple, requeue)
           buffer = @packed_indexes.dup
-          buffer << AMQ::Hacks.pack_uint64_big_endian(delivery_tag)
+          buffer << AMQ::Pack.pack_uint64_big_endian(delivery_tag)
           bit_buffer = 0
           bit_buffer = bit_buffer | (1 << 0) if multiple
           bit_buffer = bit_buffer | (1 << 1) if requeue
