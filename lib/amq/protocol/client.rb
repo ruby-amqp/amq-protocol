@@ -170,6 +170,7 @@ module AMQ
         # 4 bytes of frame payload length
         # 1 byte of payload trailer FRAME_END byte
         limit        = frame_size - 8
+        return [BodyFrame.new(body, channel)] if body.bytesize < limit
 
         # Otherwise String#slice on 1.9 will operate with code points,
         # and we need bytes. MK.
