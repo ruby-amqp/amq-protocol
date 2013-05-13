@@ -5,9 +5,12 @@
 # IN THE ./codegen DIRECTORY OF THE AMQ-PROTOCOL REPOSITORY.
 
 require "amq/pack"
-require "amq/protocol/constants"
+
 require "amq/protocol/table"
 require "amq/protocol/frame"
+
+require "amq/protocol/constants"
+require "amq/protocol/exceptions"
 
 module AMQ
   module Protocol
@@ -23,63 +26,6 @@ module AMQ
     # @return [Array] Collection of subclasses of AMQ::Protocol::Method.
     def self.methods
       Protocol::Method.methods
-    end
-
-    class Error < StandardError
-      DEFAULT_MESSAGE = "AMQP error".freeze
-
-      def self.inherited(subclass)
-        @_subclasses ||= []
-        @_subclasses << subclass
-      end # self.inherited(subclazz)
-
-      def self.subclasses_with_values
-        @_subclasses.select{ |k| defined?(k::VALUE) }
-      end # self.subclasses_with_values
-
-      def self.[](code)
-        if result = subclasses_with_values.detect { |klass| klass::VALUE == code }
-          result
-        else
-          raise "No such exception class for code #{code}" unless result
-        end # if
-      end # self.[]
-
-      def initialize(message = self.class::DEFAULT_MESSAGE)
-        super(message)
-      end
-    end
-
-    class FrameTypeError < Protocol::Error
-      def initialize(types)
-        super("Must be one of #{types.inspect}")
-      end
-    end
-
-    class EmptyResponseError < Protocol::Error
-      DEFAULT_MESSAGE = "Empty response received from the server."
-
-      def initialize(message = self.class::DEFAULT_MESSAGE)
-        super(message)
-      end
-    end
-
-    class BadResponseError < Protocol::Error
-      def initialize(argument, expected, actual)
-        super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
-      end
-    end
-
-    class SoftError < Protocol::Error
-      def self.inherited(subclass)
-        Error.inherited(subclass)
-      end # self.inherited(subclass)
-    end
-
-    class HardError < Protocol::Error
-      def self.inherited(subclass)
-        Error.inherited(subclass)
-      end # self.inherited(subclass)
     end
 
     class ContentTooLarge < SoftError
@@ -155,21 +101,6 @@ module AMQ
     end
 
 
-    # We don't instantiate the following classes,
-    # as we don't actually need any per-instance state.
-    # Also, this is pretty low-level functionality,
-    # hence it should have a reasonable performance.
-    # As everyone knows, garbage collector in MRI performs
-    # really badly, which is another good reason for
-    # not creating any objects, but only use class as
-    # a struct. Creating classes is quite expensive though,
-    # but here the inheritance comes handy and mainly
-    # as we can't simply make a reference to a function,
-    # we can't use a hash or an object. I've been also
-    # considering to have just a bunch of methods, but
-    # here's the problem, that after we'd require this file,
-    # all these methods would become global which would
-    # be a bad, bad thing to do.
     class Class
       @classes = Array.new
 
@@ -247,24 +178,14 @@ module AMQ
         array = Array.new
         while body
           payload, body = body[0, limit], body[limit, body.length - limit]
-          # array << [0x03, payload]
           array << BodyFrame.new(payload, channel)
         end
 
         array
       end
 
-      # We can return different:
-      # - instantiate given subclass of Method
-      # - create an OpenStruct object
-      # - create a hash
-      # - yield params into the block rather than just return
-      # @api plugin
       def self.instantiate(*args, &block)
         self.new(*args, &block)
-        # or OpenStruct.new(args.first)
-        # or args.first
-        # or block.call(*args)
       end
     end
 
@@ -1769,9 +1690,8 @@ module AMQ
           buffer << [bit_buffer].pack(PACK_CHAR)
           frames = [MethodFrame.new(buffer, channel)]
           properties, headers = self.split_headers(user_headers)
-          # TODO: what shall I do with the headers?
           if properties.nil? or properties.empty?
-            raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
+            raise RuntimeError.new("Properties can not be empty!")
           end
           properties_payload = Basic.encode_properties(payload.bytesize, properties)
           frames << HeaderFrame.new(properties_payload, channel)
