@@ -1,5 +1,6 @@
 /*.gem
 /.rvmrc
+/.ruby-version
 tmp
 *.pyc
 /vendor/bundle
@@ -10,3 +11,5 @@ Gemfile.lock
 .Apple*
 .bundle/*
 bin/*
+*.bundle
+Makefile

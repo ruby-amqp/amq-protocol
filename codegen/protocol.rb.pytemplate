@@ -5,34 +5,19 @@
 # IT DIRECTLY ! FOR CHANGES, PLEASE UPDATE FILES
 # IN THE ./codegen DIRECTORY OF THE AMQ-PROTOCOL REPOSITORY.<% import codegen_helpers as helpers %><% import re, os, codegen %>
 
+require "amq/pack"
+
 require "amq/protocol/table"
 require "amq/protocol/frame"
-require "amq/hacks"
+
+require "amq/protocol/constants"
+require "amq/protocol/exceptions"
 
 module AMQ
   module Protocol
     PROTOCOL_VERSION = "${spec.major}.${spec.minor}.${spec.revision}".freeze
     PREAMBLE         = "${'AMQP\\x00\\x%02x\\x%02x\\x%02x' % (spec.major, spec.minor, spec.revision)}".freeze
     DEFAULT_PORT     = ${spec.port}
-    TLS_PORT         = 5671
-    SSL_PORT         = 5671
-
-    # caching
-    EMPTY_STRING = "".freeze
-
-    PACK_CHAR               = 'C'.freeze
-    PACK_UINT16             = 'n'.freeze
-    PACK_UINT16_X2          = 'n2'.freeze
-    PACK_UINT32             = 'N'.freeze
-    PACK_UINT32_X2          = 'N2'.freeze
-    PACK_INT64              = 'q'.freeze
-    PACK_UCHAR_UINT32       = 'CN'.freeze
-    PACK_CHAR_UINT16_UINT32 = 'cnN'.freeze
-
-    PACK_32BIT_FLOAT        = 'f'.freeze
-    PACK_64BIT_FLOAT        = 'd'.freeze
-
-
 
     # @return [Array] Collection of subclasses of AMQ::Protocol::Class.
     def self.classes
@@ -44,63 +29,6 @@ module AMQ
       Protocol::Method.methods
     end
 
-    class Error < StandardError
-      DEFAULT_MESSAGE = "AMQP error".freeze
-
-      def self.inherited(subclass)
-        @_subclasses ||= []
-        @_subclasses << subclass
-      end # self.inherited(subclazz)
-
-      def self.subclasses_with_values
-        @_subclasses.select{ |k| defined?(k::VALUE) }
-      end # self.subclasses_with_values
-
-      def self.[](code)
-        if result = subclasses_with_values.detect { |klass| klass::VALUE == code }
-          result
-        else
-          raise "No such exception class for code #{code}" unless result
-        end # if
-      end # self.[]
-
-      def initialize(message = self.class::DEFAULT_MESSAGE)
-        super(message)
-      end
-    end
-
-    class FrameTypeError < Protocol::Error
-      def initialize(types)
-        super("Must be one of #{types.inspect}")
-      end
-    end
-
-    class EmptyResponseError < Protocol::Error
-      DEFAULT_MESSAGE = "Empty response received from the server."
-
-      def initialize(message = self.class::DEFAULT_MESSAGE)
-        super(message)
-      end
-    end
-
-    class BadResponseError < Protocol::Error
-      def initialize(argument, expected, actual)
-        super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
-      end
-    end
-
-    class SoftError < Protocol::Error
-      def self.inherited(subclass)
-        Error.inherited(subclass)
-      end # self.inherited(subclass)
-    end
-
-    class HardError < Protocol::Error
-      def self.inherited(subclass)
-        Error.inherited(subclass)
-      end # self.inherited(subclass)
-    end
-
     % for tuple in spec.constants:
     % if tuple[2] == "soft-error" or tuple[2] == "hard-error":
     class ${codegen.to_ruby_class_name(tuple[0])} < ${codegen.to_ruby_class_name(tuple[2])}
@@ -110,21 +38,6 @@ module AMQ
     % endif
     % endfor
 
-    # We don't instantiate the following classes,
-    # as we don't actually need any per-instance state.
-    # Also, this is pretty low-level functionality,
-    # hence it should have a reasonable performance.
-    # As everyone knows, garbage collector in MRI performs
-    # really badly, which is another good reason for
-    # not creating any objects, but only use class as
-    # a struct. Creating classes is quite expensive though,
-    # but here the inheritance comes handy and mainly
-    # as we can't simply make a reference to a function,
-    # we can't use a hash or an object. I've been also
-    # considering to have just a bunch of methods, but
-    # here's the problem, that after we'd require this file,
-    # all these methods would become global which would
-    # be a bad, bad thing to do.
     class Class
       @classes = Array.new
 
@@ -188,30 +101,29 @@ module AMQ
       def self.encode_body(body, channel, frame_size)
         return [] if body.empty?
 
-        # See https://dev.rabbitmq.com/wiki/Amqp091Errata#section_11
+        # 8 = 1 + 2 + 4 + 1
+        # 1 byte of frame type
+        # 2 bytes of channel number
+        # 4 bytes of frame payload length
+        # 1 byte of payload trailer FRAME_END byte
         limit        = frame_size - 8
+        return [BodyFrame.new(body, channel)] if body.bytesize < limit
+
+        # Otherwise String#slice on 1.9 will operate with code points,
+        # and we need bytes. MK.
+        body.force_encoding("ASCII-8BIT") if RUBY_VERSION.to_f >= 1.9
 
         array = Array.new
         while body
           payload, body = body[0, limit], body[limit, body.length - limit]
-          # array << [0x03, payload]
           array << BodyFrame.new(payload, channel)
         end
 
         array
       end
 
-      # We can return different:
-      # - instantiate given subclass of Method
-      # - create an OpenStruct object
-      # - create a hash
-      # - yield params into the block rather than just return
-      # @api plugin
       def self.instantiate(*args, &block)
         self.new(*args, &block)
-        # or OpenStruct.new(args.first)
-        # or args.first
-        # or block.call(*args)
       end
     end
 
@@ -241,7 +153,6 @@ module AMQ
 
       % endif
 
-      ## TODO: not only basic, resp. in fact it's only this class, but not necessarily in the future, rather check if properties are empty #}
       % if klass.name == "basic" :
       def self.encode_properties(body_size, properties)
         pieces, flags = [], 0
@@ -254,7 +165,7 @@ module AMQ
 
         # result = [${klass.index}, 0, body_size, flags].pack('n2Qn')
         result = [${klass.index}, 0].pack(PACK_UINT16_X2)
-        result += AMQ::Hacks.pack_64_big_endian(body_size)
+        result += AMQ::Pack.pack_uint64_big_endian(body_size)
         result += [flags].pack(PACK_UINT16)
         result + pieces.join(EMPTY_STRING)
       end
@@ -367,8 +278,7 @@ module AMQ
           % if klass.name == "connection":
           channel = 0
           % endif
-          buffer = ''
-          buffer << @packed_indexes
+          buffer = @packed_indexes.dup
           % for line in helpers.genEncodeMethodDefinition(spec, method):
           ${line}
           % endfor
@@ -376,15 +286,15 @@ module AMQ
           frames = [MethodFrame.new(buffer, channel)]
           % if "user_headers" in method.args():
           properties, headers = self.split_headers(user_headers)
-          # TODO: what shall I do with the headers?
           if properties.nil? or properties.empty?
-            raise RuntimeError.new("Properties can not be empty!") # TODO: or can they?
+            raise RuntimeError.new("Properties can not be empty!")
           end
           properties_payload = Basic.encode_properties(payload.bytesize, properties)
           frames << HeaderFrame.new(properties_payload, channel)
           % endif
           % if "payload" in method.args():
-          frames + self.encode_body(payload, channel, frame_size)
+          frames += self.encode_body(payload, channel, frame_size)
+          frames
           % endif
           % else:
           MethodFrame.new(buffer, channel)

@@ -5,9 +5,6 @@ require "amq/protocol/type_constants"
 require "amq/protocol/table_value_encoder"
 require "amq/protocol/table_value_decoder"
 
-# We will need to introduce concept of mappings, because
-# AMQP 0.9, 0.9.1 and RabbitMQ uses different letters for entities
-# http://dev.rabbitmq.com/wiki/Amqp091Errata#section_3
 module AMQ
   module Protocol
     class Table
@@ -85,9 +82,11 @@ module AMQ
                          v, offset = TableValueDecoder.decode_boolean(data, offset)
                          v
                        when TYPE_SIGNED_8BIT  then
-                         raise NotImplementedError.new
+                         v, offset = TableValueDecoder.decode_short_short(data, offset)
+                         v
                        when TYPE_SIGNED_16BIT then
-                         raise NotImplementedError.new
+                         v, offset = TableValueDecoder.decode_short(data, offset)
+                         v
                        when TYPE_SIGNED_64BIT then
                          v, offset = TableValueDecoder.decode_long(data, offset)
                          v

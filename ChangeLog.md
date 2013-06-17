@@ -1,3 +1,12 @@
+## Changes between 1.0.0 and 1.1.0
+
+### Performance Enhancements
+
+Encoding of large payloads is now done more efficiently.
+
+Contributed by Greg Brockman.
+
+
 ## Changes between 1.0.0.pre6 and 1.0.0.pre7
 
 ### AMQ::Settings

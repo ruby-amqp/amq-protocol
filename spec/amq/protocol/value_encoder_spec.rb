@@ -3,6 +3,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 
 require 'time'
 require "amq/protocol/table_value_encoder"
+require "amq/protocol/float_32bit"
 
 module AMQ
   module Protocol
@@ -31,6 +32,11 @@ module AMQ
 
         described_class.field_value_size(120000.0).should == 9
         described_class.encode(120000.0).bytesize.should == 9
+      end
+
+      it "calculates size of float field values (boxed as 32-bit)" do
+        described_class.encode(AMQ::Protocol::Float32Bit.new(10.0)).bytesize.should == 5
+        described_class.encode(AMQ::Protocol::Float32Bit.new(120000.0)).bytesize.should == 5
       end
 
       it "calculates size of boolean field values" do

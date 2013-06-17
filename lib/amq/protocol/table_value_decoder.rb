@@ -1,8 +1,10 @@
 # encoding: binary
 
+require "amq/endianness"
 require "amq/protocol/client"
 require "amq/protocol/type_constants"
 require "amq/protocol/table"
+require "amq/protocol/float_32bit"
 
 module AMQ
   module Protocol
@@ -19,10 +21,6 @@ module AMQ
       #
       # API
       #
-
-      BIG_ENDIAN = ([1].pack("s") == "\x00\x01")
-      Q = "Q".freeze
-
 
       def self.decode_array(data, initial_offset)
         array_length = data.slice(initial_offset, 4).unpack(PACK_UINT32).first
@@ -53,11 +51,11 @@ module AMQ
                 v, offset = decode_boolean(data, offset)
                 v
               when TYPE_SIGNED_8BIT then
-                # TODO
-                raise NotImplementedError.new
+                v, offset = decode_short_short(data, offset)
+                v
               when TYPE_SIGNED_16BIT then
-                # TODO
-                raise NotImplementedError.new
+                v, offset = decode_short(data, offset)
+                v
               when TYPE_SIGNED_64BIT then
                 v, offset = decode_long(data, offset)
                 v
@@ -102,9 +100,9 @@ module AMQ
       end # self.decode_integer(data, offset)
 
 
-      if BIG_ENDIAN
+      if AMQ::Endianness.big_endian?
         def self.decode_long(data, offset)
-          v    = data.slice(offset, 8).unpack(Q)
+          v    = data.slice(offset, 8).unpack(PACK_INT64)
 
           offset += 8
           [v, offset]
@@ -112,7 +110,7 @@ module AMQ
       else
         def self.decode_long(data, offset)
           slice = data.slice(offset, 8).bytes.to_a.reverse.map(&:chr).join
-          v     = slice.unpack(Q).first
+          v     = slice.unpack(PACK_INT64).first
 
           offset += 8
           [v, offset]
@@ -174,6 +172,19 @@ module AMQ
 
         [v, offset]
       end # self.decode_hash(data, offset)
+
+
+      def self.decode_short_short(data, offset)
+        v = data.slice(offset, 1).unpack(PACK_INT8).first
+        offset += 1
+        [v, offset]
+      end
+
+      def self.decode_short(data, offset)
+        v = AMQ::Hacks.unpack_int16_big_endian(data.slice(offset, 2)).first
+        offset += 2
+        [v, offset]
+      end
     end # TableValueDecoder
   end # Protocol
 end # AMQ

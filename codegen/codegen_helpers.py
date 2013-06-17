@@ -16,9 +16,9 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'long':
         buffer.append("buffer << [%s].pack(PACK_UINT32)" % (cValue,))
     elif type == 'longlong':
-        buffer.append("buffer << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
+        buffer.append("buffer << AMQ::Pack.pack_uint64_big_endian(%s)" % (cValue,))
     elif type == 'timestamp':
-        buffer.append("buffer << AMQ::Hacks.pack_64_big_endian(%s)" % (cValue,))
+        buffer.append("buffer << AMQ::Pack.pack_uint64_big_endian(%s)" % (cValue,))
     elif type == 'bit':
         raise "Can't encode bit in genSingleEncode"
     elif type == 'table':
@@ -58,7 +58,7 @@ def genSingleDecode(spec, field):
         buffer.append("%s = data[offset, 4].unpack(PACK_UINT32).first" % (cLvalue,))
         buffer.append("offset += 4")
     elif type == 'longlong':
-        buffer.append("%s = AMQ::Hacks.unpack_64_big_endian(data[offset, 8]).first" % (cLvalue,))
+        buffer.append("%s = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'timestamp':
         buffer.append("%s = data[offset, 8].unpack(PACK_UINT32_X2).first" % (cLvalue,))
@@ -91,13 +91,13 @@ def genSingleSimpleDecode(spec, field):
     elif type == 'longstr':
         buffer.append("data.to_s")
     elif type == 'octet':
-        buffer.append("data.unpack(PACK_CHAR).first")
+        buffer.append("data.unpack(PACK_INT8).first")
     elif type == 'short':
         buffer.append("data.unpack(PACK_UINT16).first")
     elif type == 'long':
         buffer.append("data.unpack(PACK_UINT32).first")
     elif type == 'longlong':
-        buffer.append("AMQ::Hacks.unpack_64_big_endian(data).first")
+        buffer.append("AMQ::Pack.unpack_uint64_big_endian(data).first")
     elif type == 'timestamp':
         buffer.append("Time.at(data.unpack(PACK_UINT32_X2).last)")
     elif type == 'bit':
