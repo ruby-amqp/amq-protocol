@@ -2102,6 +2102,7 @@ module AMQ
         end
 
       end
+
     end
 
     class Tx < Protocol::Class
@@ -2318,3 +2319,4 @@ module AMQ
     end
   end
 end
+
