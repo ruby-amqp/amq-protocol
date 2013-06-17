@@ -5,7 +5,7 @@ def sh(*args)
   system(*args)
 end
 
-extensions = ["codegen/rabbitmq-codegen/credit_extension.json"]
+extensions = []
 
 spec = "codegen/rabbitmq-codegen/amqp-rabbitmq-0.9.1.json"
 unless File.exist?(spec)
