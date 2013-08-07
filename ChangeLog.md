@@ -1,3 +1,11 @@
+## Changes between 1.6.0 and 1.7.0
+
+### connection.blocked Support
+
+`connection.blocked` AMQP 0.9.1 extension is now supported
+(should be available as of RabbitMQ 3.2).
+
+
 ## Changes between 1.0.0 and 1.1.0
 
 ### Performance Enhancements
