@@ -1,3 +1,12 @@
+## Changes between 1.7.0 and 1.8.0
+
+### Body Framing Fix
+
+Messages exactly 128 Kb in size are now framed correctly.
+
+Contributed by Nicolas Viennot.
+
+
 ## Changes between 1.6.0 and 1.7.0
 
 ### connection.blocked Support
