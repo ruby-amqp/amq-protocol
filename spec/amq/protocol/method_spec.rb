@@ -34,6 +34,14 @@ module AMQ
             body_frames.map(&:payload).should == lipsum.split('').each_slice(expected_payload_size).map(&:join)
           end
         end
+
+        context 'when the body fits perfectly in a single frame' do
+          it 'encodes a body into a single BodyFrame' do
+            body_frames = Method.encode_body('*' * 131064, 1, 131072)
+            body_frames.first.payload.should == '*' * 131064
+            body_frames.should have(1).item
+          end
+        end
       end
     end
   end

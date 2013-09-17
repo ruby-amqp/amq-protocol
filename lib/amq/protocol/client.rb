@@ -177,7 +177,7 @@ module AMQ
         body.force_encoding("ASCII-8BIT") if RUBY_VERSION.to_f >= 1.9
 
         array = Array.new
-        while body
+        while body && !body.empty?
           payload, body = body[0, limit], body[limit, body.length - limit]
           array << BodyFrame.new(payload, channel)
         end
