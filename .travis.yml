@@ -13,7 +13,7 @@ rvm:
   - rbx-18mode
 notifications:
   recipients:
-    - michael@novemberain.com
+    - michael@rabbitmq.com
 matrix:
   allow_failures:
     - rvm: ruby-head
