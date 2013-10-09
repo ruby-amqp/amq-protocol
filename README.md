@@ -43,7 +43,7 @@ amq-protocol is maintained by [Michael Klishin](https://github.com/michaelklishi
 [![Build Status](https://secure.travis-ci.org/ruby-amqp/amq-protocol.png)](https://travis-ci.org/ruby-amqp/amq-protocol)
 
 
-## Development
+## Issues
 
 Please report any issues you may find to our [Issue tracker](http://github.com/ruby-amqp/amq-protocol/issues) on GitHub.
 
