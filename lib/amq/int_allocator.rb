@@ -43,10 +43,16 @@ module AMQ
     #
     # @return [Integer] Allocated integer if allocation succeeded. nil otherwise.
     def allocate
-      if n = find_unallocated_position
-        @free_set.set(n)
 
-        n
+      if n = @free_set.next_clear_bit
+
+        if n < @hi - 1 then
+          @free_set.set(n)
+          n + 1
+        else
+          -1
+        end
+
       else
         -1
       end
@@ -57,13 +63,13 @@ module AMQ
     #
     # @return [NilClass] nil
     def free(reservation)
-      @free_set.unset(reservation)
+      @free_set.unset(reservation-1)
     end # free(reservation)
     alias release free
 
     # @return [Boolean] true if provided argument was previously allocated, false otherwise
     def allocated?(reservation)
-      @free_set.get(reservation)
+      @free_set.get(reservation-1)
     end # allocated?(reservation)
 
     # Releases the whole allocation range
@@ -75,22 +81,5 @@ module AMQ
 
     protected
 
-    # This implementation is significantly less efficient
-    # that what the RabbitMQ Java client has (based on java.lang.Long#nextSetBit and
-    # java.lang.Long.numberOfTrailingZeros, and thus binary search over bits).
-    # But for channel id generation, this is a good enough implementation.
-    #
-    # @private
-    def find_unallocated_position
-      r = nil
-      @range.each do |i|
-        if !@free_set.get(i)
-          r = i
-          break;
-        end
-      end
-
-      r
-    end # find_unallocated_position
   end # IntAllocator
 end # AMQ
