@@ -1,3 +1,14 @@
+## Changes between 1.8.0 and 1.9.0
+
+### Performance Improvements in AMQ::BitSet
+
+`AMQ::BitSet#next_clear_bit` is now drastically more efficient
+(down from 6 minutes for 10,000 iterations to 4 seconds for 65,536 iterations).
+
+Contributed by Doug Rohrer, Dave Anderson, and Jason Voegele from
+[Neo](http://www.neo.com).
+
+
 ## Changes between 1.7.0 and 1.8.0
 
 ### Body Framing Fix
