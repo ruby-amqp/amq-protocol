@@ -43,12 +43,9 @@ module AMQ
       end
 
       def self.unpack_int16_big_endian(data)
-        [Pack::convert_unsigned_to_signed((data.bytes.to_a.map(&:chr).join).unpack(UINT16_BE)[0])]
+        value = data.bytes.to_a.map(&:chr).join.unpack(UINT16_BE)[0]
+        [(value & ~(1 << 15)) - (value & (1 << 15))]
       end
-    end
-
-    def self.convert_unsigned_to_signed(unsigned16bitValue)
-      (unsigned16bitValue & ~(1 << 15)) - (unsigned16bitValue & (1 << 15))
     end
   end
 

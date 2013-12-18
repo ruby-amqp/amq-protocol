@@ -14,8 +14,7 @@ module AMQ
 
       it "unpacks signed integers from a string to a number" do
         examples_16bit.each do |key, value|
-          r = described_class.unpack_int16_big_endian(value)
-          r[0].should == key
+          described_class.unpack_int16_big_endian(value)[0].should == key
         end
       end
     end
