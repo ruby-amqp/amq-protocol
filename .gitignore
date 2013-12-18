@@ -3,6 +3,8 @@
 /.ruby-version
 tmp
 *.pyc
+*.iml
+.idea
 /vendor/bundle
 /vendor/amq-*
 /coverage
