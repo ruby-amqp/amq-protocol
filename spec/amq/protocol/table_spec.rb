@@ -181,8 +181,8 @@ module AMQ
         end
 
         it 'is capable of decoding 16bit signed integers' do
-          output = TableValueDecoder.decode_short("\b\xC0",0).first
-          output.should == -64
+          output = TableValueDecoder.decode_short("\x06\x8D", 0).first
+          output.should == 1677
         end
 
         it "is capable of decoding tables" do
