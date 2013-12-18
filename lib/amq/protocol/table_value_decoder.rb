@@ -175,7 +175,7 @@ module AMQ
 
 
       def self.decode_short_short(data, offset)
-        v = data.slice(offset, 1).unpack(PACK_INT8).first
+        v = data.slice(offset, 1).unpack(PACK_CHAR).first
         offset += 1
         [v, offset]
       end
