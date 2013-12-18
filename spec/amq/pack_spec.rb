@@ -4,7 +4,24 @@ require File.expand_path('../../spec_helper', __FILE__)
 
 
 module AMQ
-  describe Hacks do
+  describe Pack do
+    context "16-bit big-endian packing / unpacking" do
+      let(:examples_16bit) {
+        {
+            0x068D => "\x06\x8D" # 1677
+        }
+      }
+
+      it "unpacks signed integers from a string to a number" do
+        examples_16bit.each do |key, value|
+          r = described_class.unpack_int16_big_endian(value)
+          r[0].should == key
+        end
+      end
+    end
+
+
+
     context "64-bit big-endian packing / unpacking" do
       let(:examples) {
         {
