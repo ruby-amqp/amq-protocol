@@ -17,16 +17,17 @@ n = 250_000
 puts "Doing a warmup run..."
 15_000.times { AMQ::Protocol::Method.encode_body("ab" * 1024, 1, FRAME_SIZE) }
 
-require 'ruby-prof'
+require 'stackprof'
 
 # preallocate
 ary = Array.new(n) { "ab" * 1024 }
 
 puts "Doing main run..."
-result = RubyProf.profile do
+result = StackProf.run(mode: :wall) do
   n.times { |i| AMQ::Protocol::Method.encode_body(ary[i], 1, FRAME_SIZE) }
 end
 
-printer = RubyProf::FlatPrinter.new(result)
-printer.print(STDOUT, {})
+File.open('./profiling/dumps/body_framing_with_2k_payload.dump', "w+") do |f|
+  f.write Marshal.dump(result)
+end
 

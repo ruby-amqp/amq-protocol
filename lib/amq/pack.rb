@@ -7,7 +7,8 @@ module AMQ
   # compatible with Ruby 1.8+.
   module Pack
     UINT64 = "Q".freeze
-    INT16  = "c".freeze
+    UINT16_BE  = "n".freeze
+    INT16 = "c".freeze
 
     if Endianness.big_endian?
       def self.pack_uint64_big_endian(long_long)
@@ -42,8 +43,8 @@ module AMQ
       end
 
       def self.unpack_int16_big_endian(data)
-        data = data.bytes.to_a.reverse.map(&:chr).join
-        data.unpack(INT16)
+        value = data.bytes.to_a.map(&:chr).join.unpack(UINT16_BE)[0]
+        [(value & ~(1 << 15)) - (value & (1 << 15))]
       end
     end
   end
