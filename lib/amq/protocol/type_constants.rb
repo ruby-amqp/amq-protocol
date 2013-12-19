@@ -9,7 +9,7 @@ module AMQ
       TYPE_DECIMAL      = 'D'.freeze
       TYPE_HASH         = 'F'.freeze
       TYPE_ARRAY        = 'A'.freeze
-      TYPE_BYTE         = 'b'.freeze
+      TYPE_SIGNED_8BIT  = 'b'.freeze
       TYPE_64BIT_FLOAT  = 'd'.freeze
       TYPE_32BIT_FLOAT  = 'f'.freeze
       TYPE_SIGNED_64BIT = 'l'.freeze
