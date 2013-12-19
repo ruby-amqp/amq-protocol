@@ -50,8 +50,8 @@ module AMQ
               when TYPE_BOOLEAN
                 v, offset = decode_boolean(data, offset)
                 v
-              when TYPE_SIGNED_8BIT then
-                v, offset = decode_short_short(data, offset)
+              when TYPE_BYTE then
+                v, offset = decode_byte(data, offset)
                 v
               when TYPE_SIGNED_16BIT then
                 v, offset = decode_short(data, offset)
@@ -173,11 +173,13 @@ module AMQ
         [v, offset]
       end # self.decode_hash(data, offset)
 
-
-      def self.decode_short_short(data, offset)
-        v = data.slice(offset, 1).unpack(PACK_INT8).first
-        offset += 1
-        [v, offset]
+      # Decodes/Converts a byte value from the data at the provided offset.
+      #
+      # @param [Array] data - A big-endian ordered array of bytes.
+      # @param [Fixnum] offset - The offset which bytes the byte is consumed.
+      # @return [Array] - The Fixnum value and new offset pair.
+      def self.decode_byte(data, offset)
+        [data.slice(offset, 1).unpack(PACK_CHAR).first, offset += 1]
       end
 
       def self.decode_short(data, offset)
