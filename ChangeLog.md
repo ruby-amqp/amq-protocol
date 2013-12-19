@@ -1,12 +1,5 @@
 ## Changes between 1.9.0 and 1.9.1
 
-### Byte Decoding
-
-Single byte values are now decoded correctly.
-
-Contributed by Benjamin Conlan.
-
-
 ### Signed 16 Bit Integer Decoding
 
 Signed 16 bit integers are now decoded correctly.
