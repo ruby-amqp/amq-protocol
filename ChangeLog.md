@@ -1,5 +1,11 @@
 ## Changes between 1.9.x and 1.10.0
 
+### Signed 8 Bit Integer Decoding
+
+Signed 8 bit integers are now decoded correctly.
+
+Contributed by Benjamin Conlan.
+
 ### Signed 16 Bit Integer Decoding
 
 Signed 16 bit integers are now decoded correctly.
