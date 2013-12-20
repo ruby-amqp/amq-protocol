@@ -81,8 +81,8 @@ module AMQ
                        when TYPE_BOOLEAN
                          v, offset = TableValueDecoder.decode_boolean(data, offset)
                          v
-                       when TYPE_SIGNED_8BIT  then
-                         v, offset = TableValueDecoder.decode_short_short(data, offset)
+                      when TYPE_BYTE  then
+                         v, offset = TableValueDecoder.decode_byte(data, offset)
                          v
                        when TYPE_SIGNED_16BIT then
                          v, offset = TableValueDecoder.decode_short(data, offset)
