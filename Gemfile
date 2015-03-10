@@ -10,6 +10,7 @@ group :development do
 end
 
 group :test do
-  gem "rspec", "~> 2.13.0"
+  gem "rspec"
+  gem "rspec-its"
   gem "effin_utf8"
 end

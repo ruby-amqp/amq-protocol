@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'rspec'
+require 'rspec/its'
 
 require "effin_utf8"
 

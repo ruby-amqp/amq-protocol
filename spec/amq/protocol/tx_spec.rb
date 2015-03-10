@@ -11,8 +11,8 @@ module AMQ
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
             method_frame = Select.encode(channel)
-            method_frame.payload.should == "\000Z\000\n"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\000Z\000\n")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -27,8 +27,8 @@ module AMQ
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
             method_frame = Commit.encode(channel)
-            method_frame.payload.should == "\000Z\000\024"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\000Z\000\024")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -43,8 +43,8 @@ module AMQ
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
             method_frame = Rollback.encode(channel)
-            method_frame.payload.should == "\000Z\000\036"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\000Z\000\036")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end

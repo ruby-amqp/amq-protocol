@@ -18,8 +18,8 @@ module AMQ
             nowait = false
             arguments = nil
             method_frame = Declare.encode(channel, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
-            method_frame.payload.should == "\x002\x00\n\x00\x00\vhello.world\x0E\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x002\x00\n\x00\x00\vhello.world\x0E\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -30,9 +30,9 @@ module AMQ
             DeclareOk.decode(" amq.gen-KduGSqQrpeUo1otnU0TWSA==\x00\x00\x00\x00\x00\x00\x00\x00")
           end
           
-          its(:queue) { should == 'amq.gen-KduGSqQrpeUo1otnU0TWSA==' }
-          its(:message_count) { should == 0 }
-          its(:consumer_count) { should == 0 }
+          its(:queue) { should eq('amq.gen-KduGSqQrpeUo1otnU0TWSA==') }
+          its(:message_count) { should eq(0) }
+          its(:consumer_count) { should eq(0) }
         end
       end
 
@@ -46,8 +46,8 @@ module AMQ
             nowait = false
             arguments = nil
             method_frame = Bind.encode(channel, queue, exchange, routing_key, nowait, arguments)
-            method_frame.payload.should == "\x002\x00\x14\x00\x00\vhello.world\afoo.bar\x03xyz\x00\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x002\x00\x14\x00\x00\vhello.world\afoo.bar\x03xyz\x00\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -64,8 +64,8 @@ module AMQ
             queue = 'hello.world'
             nowait = false
             method_frame = Purge.encode(channel, queue, nowait)
-            method_frame.payload.should == "\x002\x00\x1E\x00\x00\vhello.world\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x002\x00\x1E\x00\x00\vhello.world\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -76,7 +76,7 @@ module AMQ
             PurgeOk.decode("\x00\x00\x00\x02")
           end
           
-          its(:message_count) { should == 2 }
+          its(:message_count) { should eq(2) }
         end
       end
 
@@ -89,8 +89,8 @@ module AMQ
             if_empty = false
             nowait = false
             method_frame = Delete.encode(channel, queue, if_unused, if_empty, nowait)
-            method_frame.payload.should == "\x002\x00(\x00\x00\vhello.world\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x002\x00(\x00\x00\vhello.world\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -101,7 +101,7 @@ module AMQ
             DeleteOk.decode("\x00\x00\x00\x02")
           end
           
-          its(:message_count) { should == 2 }
+          its(:message_count) { should eq(2) }
         end
       end
 
@@ -114,8 +114,8 @@ module AMQ
             routing_key = 'xyz'
             arguments = nil
             method_frame = Unbind.encode(channel, queue, exchange, routing_key, arguments)
-            method_frame.payload.should == "\x002\x002\x00\x00\vhello.world\afoo.bar\x03xyz\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x002\x002\x00\x00\vhello.world\afoo.bar\x03xyz\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end

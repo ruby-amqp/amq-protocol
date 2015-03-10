@@ -23,7 +23,7 @@ describe AMQ::BitSet do
     it "has no bits set at the start" do
       bs = AMQ::BitSet.new(128)
       0.upto(127) do |i|
-        bs[i].should == false
+        expect(bs[i]).to be_falsey
       end
     end # it
   end # describe
@@ -33,15 +33,15 @@ describe AMQ::BitSet do
       described_class.new(nbits)
     end
     it "returns 0 when the word is between 0 and 63" do
-      subject.word_index(0).should == 0
-      subject.word_index(63).should == 0
+      expect(subject.word_index(0)).to eq(0)
+      expect(subject.word_index(63)).to eq(0)
     end # it
     it "returns 1 when the word is between 64 and 127" do
-      subject.word_index(64).should == 1
-      subject.word_index(127).should == 1
+      expect(subject.word_index(64)).to be(1)
+      expect(subject.word_index(127)).to be(1)
     end # it
     it "returns 2 when the word is between 128 and another number" do
-      subject.word_index(128).should == 2
+      expect(subject.word_index(128)).to be(2)
     end # it
   end # describe
 
@@ -54,7 +54,7 @@ describe AMQ::BitSet do
       end
 
       it "returns true" do
-        subject.get(3).should be_true
+        expect(subject.get(3)).to be_truthy
       end # it
     end # describe
 
@@ -64,7 +64,7 @@ describe AMQ::BitSet do
       end
 
       it "returns false" do
-        subject.get(5).should be_false
+        expect(subject.get(5)).to be_falsey
       end # it
     end # describe
 
@@ -74,10 +74,10 @@ describe AMQ::BitSet do
       end
 
       it "should raise IndexError for negative index" do
-        lambda { subject.get(-1) }.should raise_error(IndexError)
+        expect { subject.get(-1) }.to raise_error(IndexError)
       end # it
       it "should raise IndexError for index >= number of bits" do
-        lambda { subject.get(nbits) }.should raise_error(IndexError)
+        expect { subject.get(nbits) }.to raise_error(IndexError)
       end # it
     end # describe
   end # describe
@@ -91,9 +91,9 @@ describe AMQ::BitSet do
 
       it "has no effect" do
         subject.set(3)
-        subject.get(3).should be_true
+        expect(subject.get(3)).to be_truthy
         subject.set(3)
-        subject[3].should be_true
+        expect(subject[3]).to be_truthy
       end # it
     end # describe
 
@@ -104,13 +104,13 @@ describe AMQ::BitSet do
 
       it "sets that bit" do
         subject.set(3)
-        subject.get(3).should be_true
+        expect(subject.get(3)).to be_truthy
 
         subject.set(33)
-        subject.get(33).should be_true
+        expect(subject.get(33)).to be_truthy
 
         subject.set(3387)
-        subject.get(3387).should be_true
+        expect(subject.get(3387)).to be_truthy
       end # it
     end # describe
 
@@ -120,10 +120,10 @@ describe AMQ::BitSet do
       end
 
       it "should raise IndexError for negative index" do
-        lambda { subject.set(-1) }.should raise_error(IndexError)
+        expect { subject.set(-1) }.to raise_error(IndexError)
       end # it
       it "should raise IndexError for index >= number of bits" do
-        lambda { subject.set(nbits) }.should raise_error(IndexError)
+        expect { subject.set(nbits) }.to raise_error(IndexError)
       end # it
     end # describe
   end # describe
@@ -137,9 +137,9 @@ describe AMQ::BitSet do
 
       it "unsets that bit" do
         subject.set(3)
-        subject.get(3).should be_true
+        expect(subject.get(3)).to be_truthy
         subject.unset(3)
-        subject.get(3).should be_false
+        expect(subject.get(3)).to be_falsey
       end # it
     end # describe
 
@@ -150,9 +150,9 @@ describe AMQ::BitSet do
       end
 
       it "has no effect" do
-        subject.get(3).should be_false
+        expect(subject.get(3)).to be_falsey
         subject.unset(3)
-        subject.get(3).should be_false
+        expect(subject.get(3)).to be_falsey
       end # it
     end # describe
 
@@ -162,10 +162,10 @@ describe AMQ::BitSet do
       end
 
       it "should raise IndexError for negative index" do
-        lambda { subject.unset(-1) }.should raise_error(IndexError)
+        expect { subject.unset(-1) }.to raise_error(IndexError)
       end # it
       it "should raise IndexError for index >= number of bits" do
-        lambda { subject.unset(nbits) }.should raise_error(IndexError)
+        expect { subject.unset(nbits) }.to raise_error(IndexError)
       end # it
     end # describe
   end # describe
@@ -179,25 +179,25 @@ describe AMQ::BitSet do
 
     it "clears all bits" do
       subject.set(3)
-      subject.get(3).should be_true
+      expect(subject.get(3)).to be_truthy
 
       subject.set(7668)
-      subject.get(7668).should be_true
+      expect(subject.get(7668)).to be_truthy
 
       subject.clear
 
-      subject.get(3).should be_false
-      subject.get(7668).should be_false
+      expect(subject.get(3)).to be_falsey
+      expect(subject.get(7668)).to be_falsey
     end # it
   end # describe
 
   describe "#number_of_trailing_ones" do
     it "calculates them" do
-      described_class.number_of_trailing_ones(0).should == 0
-      described_class.number_of_trailing_ones(1).should == 1
-      described_class.number_of_trailing_ones(2).should == 0
-      described_class.number_of_trailing_ones(3).should == 2
-      described_class.number_of_trailing_ones(4).should == 0
+      expect(described_class.number_of_trailing_ones(0)).to eq(0)
+      expect(described_class.number_of_trailing_ones(1)).to eq(1)
+      expect(described_class.number_of_trailing_ones(2)).to eq(0)
+      expect(described_class.number_of_trailing_ones(3)).to eq(2)
+      expect(described_class.number_of_trailing_ones(4)).to eq(0)
     end # it
   end # describe
 
@@ -206,27 +206,27 @@ describe AMQ::BitSet do
       described_class.new(255)
     end
     it "returns sequential values when none have been returned" do
-      subject.next_clear_bit.should == 0
+      expect(subject.next_clear_bit).to eq(0)
       subject.set(0)
-      subject.next_clear_bit.should == 1
+      expect(subject.next_clear_bit).to eq(1)
       subject.set(1)
-      subject.next_clear_bit.should == 2
+      expect(subject.next_clear_bit).to eq(2)
       subject.unset(1)
-      subject.next_clear_bit.should == 1
+      expect(subject.next_clear_bit).to eq(1)
     end # it
 
     it "returns the same number as long as nothing is set" do
-      subject.next_clear_bit.should == 0
-      subject.next_clear_bit.should == 0
+      expect(subject.next_clear_bit).to eq(0)
+      expect(subject.next_clear_bit).to eq(0)
     end # it
 
     it "handles more than 128 bits" do
       0.upto(254) do |i|
         subject.set(i)
-        subject.next_clear_bit.should == i + 1
+        expect(subject.next_clear_bit).to eq(i + 1)
       end
       subject.unset(254)
-      subject.get(254).should be_false
+      expect(subject.get(254)).to be_falsey
     end # it
   end # describe
 end

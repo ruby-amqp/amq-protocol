@@ -1,4 +1,4 @@
-# encoding: binary
+# encoding: utf-8
 
 require File.expand_path('../../../spec_helper', __FILE__)
 
@@ -8,7 +8,7 @@ module AMQ
     describe Frame do
       describe ".encode" do
         it "should raise FrameTypeError if type isn't one of: [:method, :header, :body, :heartbeat]" do
-          lambda { Frame.encode(nil, "", 0) }.should raise_error(FrameTypeError)
+          expect { Frame.encode(nil, "", 0) }.to raise_error(FrameTypeError)
         end
 
         it "should raise FrameTypeError if type isn't valid (when type is a symbol)" do
@@ -20,35 +20,35 @@ module AMQ
         end
 
         it "should raise RuntimeError if channel isn't 0 or an integer in range 1..65535" do
-          lambda { Frame.encode(:method, "", -1) }.should raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
-          lambda { Frame.encode(:method, "", 65536) }.should raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
-          lambda { Frame.encode(:method, "", 65535) }.should_not raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
-          lambda { Frame.encode(:method, "", 0) }.should_not raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
-          lambda { Frame.encode(:method, "", 1) }.should_not raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+          expect { Frame.encode(:method, "", -1) }.to raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+          expect { Frame.encode(:method, "", 65536) }.to raise_error(RuntimeError, /^Channel has to be 0 or an integer in range 1\.\.65535/)
+          expect { Frame.encode(:method, "", 65535) }.not_to raise_error
+          expect { Frame.encode(:method, "", 0) }.not_to raise_error
+          expect { Frame.encode(:method, "", 1) }.not_to raise_error
         end
 
         it "should raise RuntimeError if payload is nil" do
-          lambda { Frame.encode(:method, nil, 0) }.should raise_error(RuntimeError, "Payload can't be nil")
+          expect { Frame.encode(:method, nil, 0) }.to raise_error(RuntimeError, "Payload can't be nil")
         end
 
         it "should encode type" do
-          Frame.encode(:body, "", 0).unpack("c").first.should eql(3)
+          expect(Frame.encode(:body, "", 0).unpack("c").first).to eql(3)
         end
 
         it "should encode channel" do
-          Frame.encode(:body, "", 12).unpack("cn").last.should eql(12)
+          expect(Frame.encode(:body, "", 12).unpack("cn").last).to eql(12)
         end
 
         it "should encode size" do
-          Frame.encode(:body, "test", 12).unpack("cnN").last.should eql(4)
+          expect(Frame.encode(:body, "test", 12).unpack("cnN").last).to eql(4)
         end
 
         it "should include payload" do
-          Frame.encode(:body, "test", 12)[7..-2].should eql("test")
+          expect(Frame.encode(:body, "test", 12)[7..-2]).to eql("test")
         end
 
         it "should include final octet" do
-          Frame.encode(:body, "test", 12).should =~ /\xCE$/
+          expect(Frame.encode(:body, "test", 12).each_byte.to_a.last).to eq("CE".hex)
         end
 
         it "should encode unicode strings" do
@@ -76,20 +76,20 @@ module AMQ
         subject { HeaderFrame.new("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\n\x98\x00\x18application/octet-stream\x02\x00", nil) }
 
         it "should decode body_size from payload" do
-          subject.body_size.should == 10
+          expect(subject.body_size).to eq(10)
         end
 
         it "should decode klass_id from payload" do
-          subject.klass_id.should == 60
+          expect(subject.klass_id).to eq(60)
         end
 
         it "should decode weight from payload" do
-          subject.weight.should == 0
+          expect(subject.weight).to eq(0)
         end
 
         it "should decode properties from payload" do
-          subject.properties[:delivery_mode].should == 2
-          subject.properties[:priority].should == 0
+          expect(subject.properties[:delivery_mode]).to eq(2)
+          expect(subject.properties[:priority]).to eq(0)
         end
       end
     end
