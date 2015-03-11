@@ -119,9 +119,9 @@ module AMQ
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
-            method_frame = CloseOk.encode(1)
+            method_frame = CloseOk.encode(channel)
             expect(method_frame.payload).to eq("\x00\x14\x00\x29")
-            expect(method_frame.channel).to eq(1)
+            expect(method_frame.channel).to eq(channel)
           end
         end
       end

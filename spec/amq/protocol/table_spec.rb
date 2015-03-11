@@ -11,7 +11,6 @@ module AMQ
       timestamp    = Time.utc(2010, 12, 31, 23, 58, 59)
       bigdecimal_1 = BigDecimal.new("1.0")
       bigdecimal_2 = BigDecimal.new("5E-3")
-      bigdecimal_3 = BigDecimal.new("-0.01")
 
 
       DATA = if one_point_eight?

@@ -64,7 +64,7 @@ module AMQ
         input = Float32Bit.new(10.0)
         data  = TableValueEncoder.encode(input)
 
-        value, offset = described_class.decode_32bit_float(data, 1)
+        value = described_class.decode_32bit_float(data, 1)[0]
         expect(value).to eq(10.0)
       end
 

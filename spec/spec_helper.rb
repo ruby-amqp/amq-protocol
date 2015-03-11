@@ -33,4 +33,6 @@ RSpec.configure do |config|
 
   config.include(RubyVersionsSupport)
   config.extend(RubyVersionsSupport)
+
+  config.warnings = true
 end
