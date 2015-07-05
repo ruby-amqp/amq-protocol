@@ -1,3 +1,12 @@
+## Changes between 1.9.x and 2.0.0
+
+### Ruby 1.8 and 1.9 Support Dropped
+
+The project no longer supports Ruby versions
+older than 2.0.
+
+
+
 ## Changes between 1.9.x and 1.10.0
 
 ### Signed 32 Bit Integer Decoding
