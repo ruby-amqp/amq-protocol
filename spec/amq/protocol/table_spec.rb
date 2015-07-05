@@ -14,29 +14,16 @@ module AMQ
       bigdecimal_3 = BigDecimal.new("-0.01")
 
 
-      DATA = if one_point_eight?
-        {
-          {}                       => "\000\000\000\000",
-          {"test" => 1}            => "\000\000\000\n\004testI\000\000\000\001",
-          {"float" => 1.87}        => "\000\000\000\017\005floatd?\375\353\205\036\270Q\354",
-          {"test" => "string"}     => "\000\000\000\020\004testS\000\000\000\006string",
-          {"test" => {}}           => "\000\000\000\n\004testF\000\000\000\000",
-          {"test" => bigdecimal_1} => "\000\000\000\v\004testD\000\000\000\000\001",
-          {"test" => bigdecimal_2} => "\000\000\000\v\004testD\003\000\000\000\005",
-          {"test" => timestamp}    => "\000\000\000\016\004testT\000\000\000\000M\036nC"
-        }
-      else
-        {
-          {}                       => "\x00\x00\x00\x00",
-          {"test" => 1}            => "\x00\x00\x00\n\x04testI\x00\x00\x00\x01",
-          {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd?\xFE\xB8Q\xEB\x85\x1E\xB8",
-          {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
-          {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
-          {"test" => bigdecimal_1} => "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01",
-          {"test" => bigdecimal_2} => "\x00\x00\x00\v\x04testD\x03\x00\x00\x00\x05",
-          {"test" => timestamp}    => "\x00\x00\x00\x0e\x04testT\x00\x00\x00\x00M\x1enC"
-        }
-      end
+      DATA = {
+        {}                       => "\x00\x00\x00\x00",
+        {"test" => 1}            => "\x00\x00\x00\n\x04testI\x01\x00\x00\x00",
+        {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd?\xFE\xB8Q\xEB\x85\x1E\xB8",
+        {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
+        {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
+        {"test" => bigdecimal_1} => "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01",
+        {"test" => bigdecimal_2} => "\x00\x00\x00\v\x04testD\x03\x00\x00\x00\x05",
+        {"test" => timestamp}    => "\x00\x00\x00\x0e\x04testT\x00\x00\x00\x00M\x1enC"
+      }
 
       describe ".encode" do
         it "should return \"\x00\x00\x00\x00\" for nil" do
