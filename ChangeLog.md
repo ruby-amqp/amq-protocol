@@ -1,5 +1,12 @@
 ## Changes between 1.9.x and 1.10.0
 
+### Signed 32 Bit Integer Decoding
+
+Integers are now encoded and decoded as
+signed (32-bit).
+
+Contributed by Michael Klishin.
+
 ### Signed 8 Bit Integer Decoding
 
 Signed 8 bit integers are now decoded correctly.
