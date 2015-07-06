@@ -93,7 +93,7 @@ module AMQ
 
 
       def self.decode_integer(data, offset)
-        v = data.slice(offset, 4).unpack(PACK_INT32).first
+        v = data.slice(offset, 4).unpack(PACK_UINT32).first
         offset += 4
 
         [v, offset]
