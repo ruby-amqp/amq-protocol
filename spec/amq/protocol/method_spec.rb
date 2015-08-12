@@ -10,8 +10,8 @@ module AMQ
         it 'splits user defined headers into properties and headers' do
           input = {:delivery_mode => 2, :content_type => 'application/octet-stream', :foo => 'bar'}
           properties, headers = Method.split_headers(input)
-          properties.should == {:delivery_mode => 2, :content_type => 'application/octet-stream'}
-          headers.should == {:foo => 'bar'}
+          expect(properties).to eq({:delivery_mode => 2, :content_type => 'application/octet-stream'})
+          expect(headers).to eq({:foo => 'bar'})
         end
       end
       
@@ -19,9 +19,9 @@ module AMQ
         context 'when the body fits in a single frame' do
           it 'encodes a body into a BodyFrame' do
             body_frames = Method.encode_body('Hello world', 1, 131072)
-            body_frames.first.payload.should == 'Hello world'
-            body_frames.first.channel.should == 1
-            body_frames.should have(1).item
+            expect(body_frames.first.payload).to eq('Hello world')
+            expect(body_frames.first.channel).to eq(1)
+            expect(body_frames.size).to eq(1)
           end
         end
 
@@ -31,15 +31,15 @@ module AMQ
             frame_size = 100
             expected_payload_size = 92
             body_frames = Method.encode_body(lipsum, 1, frame_size)
-            body_frames.map(&:payload).should == lipsum.split('').each_slice(expected_payload_size).map(&:join)
+            expect(body_frames.map(&:payload)).to eq(lipsum.split('').each_slice(expected_payload_size).map(&:join))
           end
         end
 
         context 'when the body fits perfectly in a single frame' do
           it 'encodes a body into a single BodyFrame' do
             body_frames = Method.encode_body('*' * 131064, 1, 131072)
-            body_frames.first.payload.should == '*' * 131064
-            body_frames.should have(1).item
+            expect(body_frames.first.payload).to eq('*' * 131064)
+            expect(body_frames.size).to eq(1)
           end
         end
       end

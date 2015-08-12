@@ -14,7 +14,7 @@ module AMQ
 
       it "unpacks signed integers from a string to a number" do
         examples_16bit.each do |key, value|
-          described_class.unpack_int16_big_endian(value)[0].should == key
+          expect(described_class.unpack_int16_big_endian(value)[0]).to eq(key)
         end
       end
     end
@@ -37,13 +37,13 @@ module AMQ
 
       it "packs integers into big-endian string" do
         examples.each do |key, value|
-          described_class.pack_uint64_big_endian(key).should == value
+          expect(described_class.pack_uint64_big_endian(key)).to eq(value)
         end
       end
 
       it "should unpack string representation into integer" do
         examples.each do |key, value|
-          described_class.unpack_uint64_big_endian(value)[0].should == key
+          expect(described_class.unpack_uint64_big_endian(value)[0]).to eq(key)
         end
       end
 
@@ -59,13 +59,13 @@ module AMQ
 
           it "packs integers into big-endian string" do
             examples.each do |key, value|
-              described_class.pack_uint64_big_endian(key).should == value
+              expect(described_class.pack_uint64_big_endian(key)).to eq(value)
             end
           end
 
           it "should unpack string representation into integer" do
             examples.each do |key, value|
-              described_class.unpack_uint64_big_endian(value)[0].should == key
+              expect(described_class.unpack_uint64_big_endian(value)[0]).to eq(key)
             end
           end
         end

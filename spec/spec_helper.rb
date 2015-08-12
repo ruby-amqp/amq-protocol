@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'rspec'
+require 'rspec/its'
 
 require "effin_utf8"
 
@@ -32,4 +33,6 @@ RSpec.configure do |config|
 
   config.include(RubyVersionsSupport)
   config.extend(RubyVersionsSupport)
+
+  config.warnings = true
 end

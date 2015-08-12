@@ -19,8 +19,8 @@ module AMQ
             nowait = false
             arguments = nil
             method_frame = Declare.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
-            method_frame.payload.should == "\x00(\x00\n\x00\x00\x1Famqclient.adapters.em.exchange1\x06fanout\x00\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x00(\x00\n\x00\x00\x1Famqclient.adapters.em.exchange1\x06fanout\x00\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -38,8 +38,8 @@ module AMQ
             nowait = false
             arguments = nil
             method_frame = Declare.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
-            method_frame.payload.should == "\x00(\x00\n\x00\x00\texchange2\x06fanout\x00\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x00(\x00\n\x00\x00\texchange2\x06fanout\x00\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -52,8 +52,8 @@ module AMQ
             if_unused = false
             nowait = false
             method_frame = Delete.encode(channel, exchange, if_unused, nowait)
-            method_frame.payload.should == "\x00(\x00\x14\x00\x00\x1Eamqclient.adapters.em.exchange\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x00(\x00\x14\x00\x00\x1Eamqclient.adapters.em.exchange\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -73,8 +73,8 @@ module AMQ
             nowait = false
             arguments = nil
             method_frame = Bind.encode(channel, destination, source, routing_key, nowait, arguments)
-            method_frame.payload.should == "\x00(\x00\x1E\x00\x00\x03foo\x03bar\x03xyz\x00\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x00(\x00\x1E\x00\x00\x03foo\x03bar\x03xyz\x00\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
@@ -94,8 +94,8 @@ module AMQ
             nowait = false
             arguments = nil
             method_frame = Unbind.encode(channel, destination, source, routing_key, nowait, arguments)
-            method_frame.payload.should == "\x00(\x00(\x00\x00\x03foo\x03bar\x03xyz\x00\x00\x00\x00\x00"
-            method_frame.channel.should == 1
+            expect(method_frame.payload).to eq("\x00(\x00(\x00\x00\x03foo\x03bar\x03xyz\x00\x00\x00\x00\x00")
+            expect(method_frame.channel).to eq(1)
           end
         end
       end
