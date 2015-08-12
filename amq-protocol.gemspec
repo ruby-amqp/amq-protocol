@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   DESC
   s.email = ["bWljaGFlbEBub3ZlbWJlcmFpbi5jb20=\n", "c3Rhc3RueUAxMDFpZGVhcy5jeg==\n"].map { |i| Base64.decode64(i) }
   s.licenses    = ["MIT"]
+  s.required_ruby_version = Gem::Requirement.new(">= 2.0")
 
   # files
   s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
