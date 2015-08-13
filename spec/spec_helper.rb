@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'rspec'
+require 'rspec/its'
 
 require "effin_utf8"
 
@@ -20,16 +21,8 @@ require "amq/protocol"
 
 puts "Running on #{RUBY_VERSION}"
 
-module RubyVersionsSupport
-  def one_point_eight?
-    RUBY_VERSION =~ /^1.8/
-  end
-end # RubyVersionsSUpport
-
-
 RSpec.configure do |config|
   config.include AMQ::Protocol
 
-  config.include(RubyVersionsSupport)
-  config.extend(RubyVersionsSupport)
+  config.warnings = true
 end

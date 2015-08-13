@@ -29,13 +29,13 @@ module AMQ
             locale = 'en_GB'
             method_frame = StartOk.encode(client_properties, mechanism, response, locale)
             # the order of the table parts isn't deterministic in Ruby 1.8
-            method_frame.payload[0, 8].should == "\x00\n\x00\v\x00\x00\x00x"
-            method_frame.payload.should include("\bplatformS\x00\x00\x00\nRuby 1.9.2")
-            method_frame.payload.should include("\aproductS\x00\x00\x00\nAMQ Client")
-            method_frame.payload.should include("\vinformationS\x00\x00\x00&http://github.com/ruby-amqp/amq-client")
-            method_frame.payload.should include("\aversionS\x00\x00\x00\x050.2.0")
-            method_frame.payload[-28, 28].should == "\x05PLAIN\x00\x00\x00\f\x00guest\x00guest\x05en_GB"
-            method_frame.payload.length.should == 156
+            expect(method_frame.payload[0, 8]).to eq("\x00\n\x00\v\x00\x00\x00x")
+            expect(method_frame.payload).to include("\bplatformS\x00\x00\x00\nRuby 1.9.2")
+            expect(method_frame.payload).to include("\aproductS\x00\x00\x00\nAMQ Client")
+            expect(method_frame.payload).to include("\vinformationS\x00\x00\x00&http://github.com/ruby-amqp/amq-client")
+            expect(method_frame.payload).to include("\aversionS\x00\x00\x00\x050.2.0")
+            expect(method_frame.payload[-28, 28]).to eq("\x05PLAIN\x00\x00\x00\f\x00guest\x00guest\x05en_GB")
+            expect(method_frame.payload.length).to eq(156)
           end
         end
       end
@@ -46,7 +46,7 @@ module AMQ
             Secure.decode("\x00\x00\x00\x03foo")
           end
           
-          its(:challenge) { should == 'foo' }
+          its(:challenge) { should eq('foo') }
         end
       end
     
@@ -55,7 +55,7 @@ module AMQ
           it 'encodes the parameters as a MethodFrame' do
             response = 'bar'
             method_frame = SecureOk.encode(response)
-            method_frame.payload.should == "\x00\x0a\x00\x15\x00\x00\x00\x03bar"
+            expect(method_frame.payload).to eq("\x00\x0a\x00\x15\x00\x00\x00\x03bar")
           end
         end
       end
@@ -66,9 +66,9 @@ module AMQ
             Tune.decode("\x00\x00\x00\x02\x00\x00\x00\x00")
           end
 
-          its(:channel_max) { should == 0 }
-          its(:frame_max) { should == 131072 }
-          its(:heartbeat) { should == 0}
+          its(:channel_max) { should eq(0) }
+          its(:frame_max) { should eq(131072) }
+          its(:heartbeat) { should eq(0) }
         end
       end
 
@@ -79,7 +79,7 @@ module AMQ
             frame_max = 65536
             heartbeat = 1
             method_frame = TuneOk.encode(channel_max, frame_max, heartbeat)
-            method_frame.payload.should == "\x00\n\x00\x1F\x00\x00\x00\x01\x00\x00\x00\x01"
+            expect(method_frame.payload).to eq("\x00\n\x00\x1F\x00\x00\x00\x01\x00\x00\x00\x01")
           end
         end
       end
@@ -89,7 +89,7 @@ module AMQ
           it 'encodes the parameters into a MethodFrame' do
             vhost = '/test'
             method_frame = Open.encode(vhost)
-            method_frame.payload.should == "\x00\n\x00(\x05/test\x00\x00"
+            expect(method_frame.payload).to eq("\x00\n\x00(\x05/test\x00\x00")
           end
         end
       end
@@ -100,7 +100,7 @@ module AMQ
             OpenOk.decode("\x00")
           end
           
-          its(:known_hosts) { should == '' }
+          its(:known_hosts) { should eq('') }
         end
       end
       
@@ -111,10 +111,10 @@ module AMQ
               Close.decode("\x00\xc8\x07KTHXBAI\x00\x05\x00\x06")
             end
           
-            its(:reply_code) { should == 200 }
-            its(:reply_text) { should == 'KTHXBAI' }
-            its(:class_id) { should == 5 }
-            its(:method_id) { should == 6 }
+            its(:reply_code) { should eq(200) }
+            its(:reply_text) { should eq('KTHXBAI') }
+            its(:class_id) { should eq(5) }
+            its(:method_id) { should eq(6) }
           end
           
           context 'with an error code' do
@@ -131,7 +131,7 @@ module AMQ
             class_id = 0
             method_id = 0
             method_frame = Close.encode(reply_code, reply_text, class_id, method_id)
-            method_frame.payload.should == "\x00\x0a\x002\x02\x1c\x0fNOT_IMPLEMENTED\x00\x00\x00\x00"
+            expect(method_frame.payload).to eq("\x00\x0a\x002\x02\x1c\x0fNOT_IMPLEMENTED\x00\x00\x00\x00")
           end
         end
       end
@@ -140,7 +140,7 @@ module AMQ
         describe '.encode' do
           it 'encodes a MethodFrame' do
             method_frame = CloseOk.encode
-            method_frame.payload.should == "\x00\n\x003"
+            expect(method_frame.payload).to eq("\x00\n\x003")
           end
         end
       end

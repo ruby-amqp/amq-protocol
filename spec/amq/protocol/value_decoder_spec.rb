@@ -12,27 +12,27 @@ module AMQ
         input1 = [1, 2, 3]
 
         value, offset = described_class.decode_array(TableValueEncoder.encode(input1), 1)
-        value.size.should == 3
-        value.first.should == 1
-        value.should == input1
+        expect(value.size).to eq(3)
+        expect(value.first).to eq(1)
+        expect(value).to eq(input1)
 
 
 
         input2 = ["one", 2, "three"]
 
         value, offset = described_class.decode_array(TableValueEncoder.encode(input2), 1)
-        value.size.should == 3
-        value.first.should == "one"
-        value.should == input2
+        expect(value.size).to eq(3)
+        expect(value.first).to eq("one")
+        expect(value).to eq(input2)
 
 
 
         input3 = ["one", 2, "three", 4.0, 5000000.0]
 
         value, offset = described_class.decode_array(TableValueEncoder.encode(input3), 1)
-        value.size.should == 5
-        value.last.should == 5000000.0
-        value.should == input3
+        expect(value.size).to eq(5)
+        expect(value.last).to eq(5000000.0)
+        expect(value).to eq(input3)
       end
 
 
@@ -46,26 +46,26 @@ module AMQ
 
 
         value, offset = described_class.decode_array(data1, 1)
-        value.size.should == 2
-        value.first.should == Hash["one" => 2]
-        value.should == input1
+        expect(value.size).to eq(2)
+        expect(value.first).to eq(Hash["one" => 2])
+        expect(value).to eq(input1)
 
 
 
         input2 = ["one", 2, { "three" => { "four" => 5.0 } }]
 
         value, offset = described_class.decode_array(TableValueEncoder.encode(input2), 1)
-        value.size.should == 3
-        value.last["three"]["four"].should == 5.0
-        value.should == input2
+        expect(value.size).to eq(3)
+        expect(value.last["three"]["four"]).to eq(5.0)
+        expect(value).to eq(input2)
       end
 
       it "is capable of decoding 32 bit float values" do
         input = Float32Bit.new(10.0)
         data  = TableValueEncoder.encode(input)
 
-        value, offset = described_class.decode_32bit_float(data, 1)
-        value.should == 10.0
+        value = described_class.decode_32bit_float(data, 1)[0]
+        expect(value).to eq(10.0)
       end
 
       context "8bit/byte decoding" do
@@ -80,7 +80,7 @@ module AMQ
 
         it "is capable of decoding byte values" do
           examples.each do |key, value|
-            described_class.decode_byte(value, 0).first.should == key
+            expect(described_class.decode_byte(value, 0).first).to eq(key)
           end
         end
       end

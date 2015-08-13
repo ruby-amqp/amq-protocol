@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require "amq/settings"
-
 require "cgi"
 require "uri"
 
