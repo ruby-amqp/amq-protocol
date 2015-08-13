@@ -25,7 +25,5 @@ Gem::Specification.new do |s|
 
   s.extra_rdoc_files = ["README.md"] + Dir.glob("doc/*")
 
-
-  # RubyForge
   s.rubyforge_project = "amq-protocol"
 end
