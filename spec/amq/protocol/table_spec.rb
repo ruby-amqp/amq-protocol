@@ -92,7 +92,9 @@ module AMQ
         end
 
         it "is capable of decoding string table values with UTF-8 characters" do
-          input   = { "строка" => "значение" }
+          input   = {
+            "строка".force_encoding(::Encoding::ASCII_8BIT) => "значение".force_encoding(::Encoding::ASCII_8BIT)
+          }
           expect(Table.decode(Table.encode(input))).to eq(input)
         end
 
@@ -192,7 +194,7 @@ module AMQ
                 "rev"   => 1.0,
                 "spec"  => {
                   "url"  => "http://bit.ly/hw2ELX",
-                  "utf8" => "à bientôt"
+                  "utf8" => "à bientôt".force_encoding(::Encoding::ASCII_8BIT)
                 }
               },
               "true"     => true,
