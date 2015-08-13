@@ -63,7 +63,3 @@ Any questions you may have should be sent to the [Ruby AMQP mailing list](http:/
 ## License
 
 MIT (see LICENSE in the repository root).
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ruby-amqp/amq-protocol/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
