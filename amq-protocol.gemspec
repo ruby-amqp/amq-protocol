@@ -12,9 +12,8 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/ruby-amqp/amq-protocol"
   s.summary = "AMQP 0.9.1 encoder & decoder."
   s.description = <<-DESC
-  amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an
-  AMQP client: amq-protocol only handles serialization and deserialization.
-  If you want to write your own AMQP client, this gem can help you with that.
+  amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not a
+  client: the library only handles serialization and deserialization.
   DESC
   s.email = ["bWljaGFlbEBub3ZlbWJlcmFpbi5jb20=\n", "c3Rhc3RueUAxMDFpZGVhcy5jeg==\n"].map { |i| Base64.decode64(i) }
   s.licenses    = ["MIT"]
