@@ -7,6 +7,13 @@ If you want to write your own AMQP client, this gem will handle all the serializ
 needs for you, including RabbitMQ extensions to AMQP 0.9.1.
 
 
+## Supported Ruby Versions
+
+amq-protocol `1.9.2` was the last version to support Ruby 1.8 and 1.9.
+
+amq-protocol `2.0.0` and later will only support Ruby 2.0+.
+
+
 ## Installation
 
     gem install amq-protocol
