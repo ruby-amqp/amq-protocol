@@ -36,8 +36,8 @@ module AMQ
           accumulator << [v.bytesize].pack(PACK_UINT32)
           accumulator << v
         when Integer then
-          accumulator << TYPE_INTEGER
-          accumulator << [value].pack(PACK_UINT32)
+          accumulator << TYPE_SIGNED_64BIT
+          accumulator << [value].pack(PACK_INT64_BE)
         when AMQ::Protocol::Float32Bit then
           accumulator << TYPE_32BIT_FLOAT
           accumulator << [value.value].pack(PACK_32BIT_FLOAT)
