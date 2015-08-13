@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 require File.expand_path('../../../spec_helper', __FILE__)
 require 'bigdecimal'
@@ -32,24 +32,28 @@ module AMQ
         end
 
         it "should serialize { :test => true }" do
-          expect(Table.encode(:test => true)).to eql("\x00\x00\x00\a\x04testt\x01")
+          expect(Table.encode(:test => true)).
+            to eql("\x00\x00\x00\a\x04testt\x01".force_encoding(Encoding::ASCII_8BIT))
         end
 
         it "should serialize { :test => false }" do
-          expect(Table.encode(:test => false)).to eql("\x00\x00\x00\a\x04testt\x00")
+          expect(Table.encode(:test => false)).
+            to eql("\x00\x00\x00\a\x04testt\x00".force_encoding(Encoding::ASCII_8BIT))
         end
 
         it "should serialize { :coordinates => { :latitude  => 59.35 } }" do
-          expect(Table.encode(:coordinates => { :latitude  => 59.35 })).to eql("\x00\x00\x00#\vcoordinatesF\x00\x00\x00\x12\blatituded@M\xAC\xCC\xCC\xCC\xCC\xCD")
+          expect(Table.encode(:coordinates => { :latitude  => 59.35 })).
+            to eql("\x00\x00\x00#\vcoordinatesF\x00\x00\x00\x12\blatituded@M\xAC\xCC\xCC\xCC\xCC\xCD".force_encoding(Encoding::ASCII_8BIT))
         end
 
         it "should serialize { :coordinates => { :longitude => 18.066667 } }" do
-          expect(Table.encode(:coordinates => { :longitude => 18.066667 })).to eql("\x00\x00\x00$\vcoordinatesF\x00\x00\x00\x13\tlongituded@2\x11\x11\x16\xA8\xB8\xF1")
+          expect(Table.encode(:coordinates => { :longitude => 18.066667 })).
+            to eql("\x00\x00\x00$\vcoordinatesF\x00\x00\x00\x13\tlongituded@2\x11\x11\x16\xA8\xB8\xF1".force_encoding(Encoding::ASCII_8BIT))
         end
 
         DATA.each do |data, encoded|
           it "should return #{encoded.inspect} for #{data.inspect}" do
-            expect(Table.encode(data)).to eql(encoded)
+            expect(Table.encode(data)).to eql(encoded.force_encoding(Encoding::ASCII_8BIT))
           end
         end
       end
