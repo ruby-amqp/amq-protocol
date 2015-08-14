@@ -129,12 +129,12 @@ module AMQ
 
 
         input3 = ["one", 2, "three"]
-        expect(described_class.field_value_size(input3)).to eq(28)
+        expect(described_class.field_value_size(input3)).to eq(32)
         expect(described_class.encode(input3).bytesize).to eq(32)
 
 
         input4 = ["one", 2, "three", ["four", 5, [6.0]]]
-        expect(described_class.field_value_size(input4)).to eq(61)
+        expect(described_class.field_value_size(input4)).to eq(69)
         expect(described_class.encode(input4).bytesize).to eq(69)
       end
 
