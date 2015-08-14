@@ -1,5 +1,11 @@
 ## Changes between 1.9.x and 1.10.0
 
+### Signed 64 Bit Integer Encoding
+
+Integers in headers are encoded as signed 64 Bit (Big Endian).
+
+Contributed by Giuseppe Privitera.
+
 ### Signed 8 Bit Integer Decoding
 
 Signed 8 bit integers are now decoded correctly.
