@@ -15,7 +15,7 @@ module AMQ
 
       DATA = {
           {}                       => "\x00\x00\x00\x00",
-          {"test" => 1}            => "\x00\x00\x00\n\x04testl\x00\x00\x00\x00\x00\x00\x00\x01",
+          {"test" => 1}            => "\x00\x00\x00\x0E\x04testl\x00\x00\x00\x00\x00\x00\x00\x01",
           {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd?\xFE\xB8Q\xEB\x85\x1E\xB8",
           {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
           {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
