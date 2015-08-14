@@ -49,7 +49,7 @@ module AMQ
           accumulator << (value ? BOOLEAN_TRUE : BOOLEAN_FALSE)
         when Time then
           accumulator << TYPE_TIME
-          accumulator << [value.to_i].pack(PACK_INT64).reverse # FIXME: there has to be a more efficient way
+          accumulator << [value.to_i].pack(PACK_INT64_BE)
         when nil then
           accumulator << TYPE_VOID
         when Array then
