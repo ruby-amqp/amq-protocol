@@ -22,7 +22,7 @@ module AMQ
       end
 
       it "calculates size of integer field values" do
-        expect(described_class.field_value_size(10)).to eq(5)
+        expect(described_class.field_value_size(10)).to eq(9)
         expect(described_class.encode(10).bytesize).to eq(9)
       end
 
@@ -67,12 +67,12 @@ module AMQ
 
 
         input2   = { "intval" => 1 }
-        expect(described_class.field_value_size(input2)).to eq(17)
+        expect(described_class.field_value_size(input2)).to eq(21)
         expect(described_class.encode(input2).bytesize).to eq(21)
 
 
         input3   = { "intval" => 1, "key" => "value" }
-        expect(described_class.field_value_size(input3)).to eq(31)
+        expect(described_class.field_value_size(input3)).to eq(35)
         expect(described_class.encode(input3).bytesize).to eq(35)
       end
 
@@ -96,7 +96,7 @@ module AMQ
           }
         }
 
-        expect(described_class.field_value_size(input1)).to eq(162)
+        expect(described_class.field_value_size(input1)).to eq(166)
         # puts(described_class.encode(input1).inspect)
         expect(described_class.encode(input1).bytesize).to eq(166)
 
@@ -112,14 +112,14 @@ module AMQ
           "hashval"      => { "protocol" => "AMQP091", "true" => true, "false" => false, "nil" => nil }
         }
 
-        expect(described_class.field_value_size(input2)).to eq(150)
+        expect(described_class.field_value_size(input2)).to eq(158)
         expect(described_class.encode(input2).bytesize).to eq(158)
       end
 
       it "calculates size of basic array field values" do
         input1 = [1, 2, 3]
 
-        expect(described_class.field_value_size(input1)).to eq(20)
+        expect(described_class.field_value_size(input1)).to eq(32)
         expect(described_class.encode(input1).bytesize).to eq(32)
 
 

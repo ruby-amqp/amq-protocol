@@ -91,7 +91,7 @@ module AMQ
         when String then
           acc += (value.bytesize + 4)
         when Integer then
-          acc += 4
+          acc += 8
         when Float then
           acc += 8
         when Time, DateTime then
