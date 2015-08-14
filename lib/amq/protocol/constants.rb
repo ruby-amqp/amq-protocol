@@ -13,6 +13,7 @@ module AMQ
     PACK_UINT32             = 'N'.freeze
     PACK_UINT32_X2          = 'N2'.freeze
     PACK_INT64              = 'q'.freeze
+    PACK_INT64_BE           = 'q>'.freeze
     PACK_UCHAR_UINT32       = 'CN'.freeze
     PACK_CHAR_UINT16_UINT32 = 'cnN'.freeze
 

@@ -1,14 +1,22 @@
-## Changes between 1.9.x and 1.10.0
+## Changes between 1.9.x and 2.0.0
 
-### Signed 8 Bit Integer Decoding
+2.0.0 has **breaking changes** in header encoding.
 
-Signed 8 bit integers are now decoded correctly.
+### Signed Integer Encoding in Headers
 
-Contributed by Benjamin Conlan.
+Integer values in headers are now encoded as signed 64-bit
+(was unsigned 32-bit previously, unintentionally).
+
+This is a breaking change: consuming messages with integers in headers
+published with older versions of this library will break!
 
 ### Signed 16 Bit Integer Decoding
 
 Signed 16 bit integers are now decoded correctly.
+
+### Signed 8 Bit Integer Decoding
+
+Signed 8 bit integers are now decoded correctly.
 
 Contributed by Benjamin Conlan.
 

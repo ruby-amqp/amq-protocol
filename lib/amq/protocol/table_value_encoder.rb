@@ -36,8 +36,8 @@ module AMQ
           accumulator << [v.bytesize].pack(PACK_UINT32)
           accumulator << v
         when Integer then
-          accumulator << TYPE_INTEGER
-          accumulator << [value].pack(PACK_UINT32)
+          accumulator << TYPE_SIGNED_64BIT
+          accumulator << [value].pack(PACK_INT64_BE)
         when AMQ::Protocol::Float32Bit then
           accumulator << TYPE_32BIT_FLOAT
           accumulator << [value.value].pack(PACK_32BIT_FLOAT)
@@ -49,7 +49,7 @@ module AMQ
           accumulator << (value ? BOOLEAN_TRUE : BOOLEAN_FALSE)
         when Time then
           accumulator << TYPE_TIME
-          accumulator << [value.to_i].pack(PACK_INT64).reverse # FIXME: there has to be a more efficient way
+          accumulator << [value.to_i].pack(PACK_INT64_BE)
         when nil then
           accumulator << TYPE_VOID
         when Array then
@@ -91,7 +91,7 @@ module AMQ
         when String then
           acc += (value.bytesize + 4)
         when Integer then
-          acc += 4
+          acc += 8
         when Float then
           acc += 8
         when Time, DateTime then
