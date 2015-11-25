@@ -41,11 +41,11 @@ module AMQ
             buffer << TYPE_HASH
             buffer << self.encode(value)
           else
-            buffer << TableValueEncoder.encode(value)
+            buffer << TableValueEncoder.encode(value).force_encoding(buffer.encoding)
           end
         end
 
-        [buffer.bytesize].pack(PACK_UINT32) + buffer
+        [buffer.bytesize].pack(PACK_UINT32).force_encoding(buffer.encoding) + buffer
       end
 
 
