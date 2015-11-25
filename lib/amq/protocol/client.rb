@@ -1437,7 +1437,8 @@ module AMQ
         result = [60, 0].pack(PACK_UINT16_X2)
         result += AMQ::Pack.pack_uint64_big_endian(body_size)
         result += [flags].pack(PACK_UINT16)
-        result + pieces.join(EMPTY_STRING)
+        pieces_joined = pieces.join(EMPTY_STRING)
+        result.force_encoding(pieces_joined.encoding) + pieces_joined
       end
 
       # THIS DECODES ONLY FLAGS
