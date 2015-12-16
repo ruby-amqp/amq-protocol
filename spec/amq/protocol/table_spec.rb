@@ -93,6 +93,12 @@ module AMQ
         it "is capable of decoding string table values" do
           input   = { "stringvalue" => "string" }
           expect(Table.decode(Table.encode(input))).to eq(input)
+
+          expect(Table.decode("\x00\x00\x00\x17\vstringvalueS\x00\x00\x00\x06string")).to eq(input)
+        end
+
+        it "is capable of decoding byte array table values (as Ruby strings)" do
+          expect(Table.decode("\x00\x00\x00\x17\vstringvaluex\x00\x00\x00\x06string")).to eq({"stringvalue" => "string"})
         end
 
         it "is capable of decoding string table values with UTF-8 characters" do

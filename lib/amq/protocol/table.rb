@@ -66,6 +66,12 @@ module AMQ
                        when TYPE_STRING
                          v, offset = TableValueDecoder.decode_string(data, offset)
                          v
+                       when TYPE_BYTE_ARRAY
+                         # Ruby doesn't have a direct counterpart to
+                         # ByteBuffer or byte[], so using a string feels
+                         # more appropriate than an array of fixnums
+                         v, offset = TableValueDecoder.decode_string(data, offset)
+                         v
                        when TYPE_INTEGER
                          v, offset = TableValueDecoder.decode_integer(data, offset)
                          v
