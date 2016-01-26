@@ -1,7 +1,10 @@
 language: ruby
+sudo: false
+cache: bundler
 bundler_args: --without development
 script: "bundle exec rspec spec"
 rvm:
+  - 2.3
   - 2.2
   - 2.1
   - 2.0
