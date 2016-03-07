@@ -36,12 +36,12 @@ module AMQ
     end # initialize(hi, lo)
 
     # Attempts to allocate next available integer. If allocation succeeds, allocated value is returned.
-    # Otherwise, nil is returned.
+    # Otherwise, -1 is returned.
     #
     # Current implementation of this method is O(n), where n is number of bits in the range available for
     # allocation.
     #
-    # @return [Integer] Allocated integer if allocation succeeded. nil otherwise.
+    # @return [Integer] Allocated integer if allocation succeeded. -1 otherwise.
     def allocate
 
       if n = @free_set.next_clear_bit
