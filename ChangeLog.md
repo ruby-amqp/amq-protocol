@@ -1,3 +1,15 @@
+## Changes between 2.0.0 and 2.1.0
+
+### Byte Array Decoding
+
+Byte array values in types now can be
+decoded (to the extent Ruby type system
+permits) by this library.
+
+GH issue: [#58](https://github.com/ruby-amqp/amq-protocol/issues/58)
+
+
+
 ## Changes between 1.9.x and 2.0.0
 
 2.0.0 has **breaking changes** in header encoding.
