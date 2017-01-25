@@ -1,9 +1,7 @@
 # encoding: binary
 
 require "amq/endianness"
-require "amq/protocol/client"
 require "amq/protocol/type_constants"
-require "amq/protocol/table"
 require "amq/protocol/float_32bit"
 
 module AMQ
