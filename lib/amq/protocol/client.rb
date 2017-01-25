@@ -1733,7 +1733,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 1) if immediate
           buffer << [bit_buffer].pack(PACK_CHAR)
           frames = [MethodFrame.new(buffer, channel)]
-          properties, headers = self.split_headers(user_headers)
+          properties, _headers = self.split_headers(user_headers)
           if properties.nil? or properties.empty?
             raise RuntimeError.new("Properties can not be empty!")
           end

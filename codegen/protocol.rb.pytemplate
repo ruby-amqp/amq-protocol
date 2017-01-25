@@ -285,7 +285,7 @@ module AMQ
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer, channel)]
           % if "user_headers" in method.args():
-          properties, headers = self.split_headers(user_headers)
+          properties, _headers = self.split_headers(user_headers)
           if properties.nil? or properties.empty?
             raise RuntimeError.new("Properties can not be empty!")
           end
