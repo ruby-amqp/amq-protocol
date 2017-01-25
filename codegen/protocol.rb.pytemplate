@@ -235,7 +235,7 @@ module AMQ
         % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server") or spec.type == "all"):
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           % for line in helpers.genDecodeMethodDefinition(spec, method):
           ${line}
           % endfor
