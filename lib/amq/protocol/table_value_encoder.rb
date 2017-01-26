@@ -1,8 +1,6 @@
 # encoding: binary
 
-require "amq/protocol/client"
 require "amq/protocol/type_constants"
-require "amq/protocol/table"
 require "date"
 
 require "amq/protocol/float_32bit"
@@ -31,10 +29,10 @@ module AMQ
           accumulator << [value.bytesize].pack(PACK_UINT32)
           accumulator << value
         when Symbol then
-          v = value.to_s
+          str = value.to_s
           accumulator << TYPE_STRING
-          accumulator << [v.bytesize].pack(PACK_UINT32)
-          accumulator << v
+          accumulator << [str.bytesize].pack(PACK_UINT32)
+          accumulator << str
         when Integer then
           accumulator << TYPE_SIGNED_64BIT
           accumulator << [value].pack(PACK_INT64_BE)

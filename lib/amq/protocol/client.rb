@@ -204,7 +204,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           version_major = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           version_minor = data[offset, 1].unpack(PACK_CHAR).first
@@ -275,7 +275,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 4].unpack(PACK_UINT32).first
           offset += 4
           challenge = data[offset, length]
@@ -326,7 +326,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           channel_max = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
           frame_max = data[offset, 4].unpack(PACK_UINT32).first
@@ -412,7 +412,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           known_hosts = data[offset, length]
@@ -440,7 +440,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           reply_code = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
           length = data[offset, 1].unpack(PACK_CHAR).first
@@ -489,7 +489,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -518,7 +518,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           reason = data[offset, length]
@@ -555,7 +555,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -614,7 +614,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 4].unpack(PACK_UINT32).first
           offset += 4
           channel_id = data[offset, length]
@@ -642,7 +642,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
@@ -678,7 +678,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           active = (bit_buffer & (1 << 0)) != 0
@@ -714,7 +714,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           reply_code = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
           length = data[offset, 1].unpack(PACK_CHAR).first
@@ -762,7 +762,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -832,7 +832,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -882,7 +882,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -936,7 +936,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -990,7 +990,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -1052,7 +1052,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           queue = data[offset, length]
@@ -1118,7 +1118,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -1167,7 +1167,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           message_count = data[offset, 4].unpack(PACK_UINT32).first
           offset += 4
           self.new(message_count)
@@ -1222,7 +1222,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           message_count = data[offset, 4].unpack(PACK_UINT32).first
           offset += 4
           self.new(message_count)
@@ -1277,7 +1277,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -1561,7 +1561,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -1616,7 +1616,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
@@ -1644,7 +1644,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
@@ -1687,7 +1687,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
@@ -1733,7 +1733,7 @@ module AMQ
           bit_buffer = bit_buffer | (1 << 1) if immediate
           buffer << [bit_buffer].pack(PACK_CHAR)
           frames = [MethodFrame.new(buffer, channel)]
-          properties, headers = self.split_headers(user_headers)
+          properties, _headers = self.split_headers(user_headers)
           if properties.nil? or properties.empty?
             raise RuntimeError.new("Properties can not be empty!")
           end
@@ -1753,7 +1753,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           reply_code = data[offset, 2].unpack(PACK_UINT16).first
           offset += 2
           length = data[offset, 1].unpack(PACK_CHAR).first
@@ -1794,7 +1794,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           consumer_tag = data[offset, length]
@@ -1866,7 +1866,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
@@ -1909,7 +1909,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           length = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           cluster_id = data[offset, length]
@@ -1937,7 +1937,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
@@ -2047,7 +2047,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -2069,7 +2069,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
           offset += 8
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
@@ -2140,7 +2140,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -2182,7 +2182,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -2224,7 +2224,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 
@@ -2254,7 +2254,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
           offset += 1
           nowait = (bit_buffer & (1 << 0)) != 0
@@ -2290,7 +2290,7 @@ module AMQ
 
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           self.new()
         end
 

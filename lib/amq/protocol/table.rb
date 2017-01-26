@@ -1,6 +1,5 @@
 # encoding: binary
 
-require "amq/protocol/client"
 require "amq/protocol/type_constants"
 require "amq/protocol/table_value_encoder"
 require "amq/protocol/table_value_decoder"

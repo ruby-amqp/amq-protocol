@@ -167,7 +167,8 @@ module AMQ
         result = [${klass.index}, 0].pack(PACK_UINT16_X2)
         result += AMQ::Pack.pack_uint64_big_endian(body_size)
         result += [flags].pack(PACK_UINT16)
-        result + pieces.join(EMPTY_STRING)
+        pieces_joined = pieces.join(EMPTY_STRING)
+        result.force_encoding(pieces_joined.encoding) + pieces_joined
       end
 
       # THIS DECODES ONLY FLAGS
@@ -235,7 +236,7 @@ module AMQ
         % if (spec.type == "client" and method.accepted_by("client")) or (spec.type == "server" and method.accepted_by("server") or spec.type == "all"):
         # @return
         def self.decode(data)
-          offset = 0
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
           % for line in helpers.genDecodeMethodDefinition(spec, method):
           ${line}
           % endfor
@@ -285,7 +286,7 @@ module AMQ
           % if "payload" in method.args() or "user_headers" in method.args():
           frames = [MethodFrame.new(buffer, channel)]
           % if "user_headers" in method.args():
-          properties, headers = self.split_headers(user_headers)
+          properties, _headers = self.split_headers(user_headers)
           if properties.nil? or properties.empty?
             raise RuntimeError.new("Properties can not be empty!")
           end
