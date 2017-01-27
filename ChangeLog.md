@@ -1,12 +1,18 @@
 ## Changes between 2.0.0 and 2.1.0
 
+### Ruby Warnings Squashed
+
+Contributed by Akira Matsuda.
+
+GitHub issue: [#62](https://github.com/ruby-amqp/amq-protocol/pull/62)
+
 ### Byte Array Decoding
 
 Byte array values in types now can be
 decoded (to the extent Ruby type system
 permits) by this library.
 
-GH issue: [#58](https://github.com/ruby-amqp/amq-protocol/issues/58)
+GitHub issue: [#58](https://github.com/ruby-amqp/amq-protocol/issues/58)
 
 
 
