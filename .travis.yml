@@ -3,7 +3,7 @@ bundler_args: --without development
 cache: bundler
 script: "bundle exec rspec spec"
 rvm:
-  - "2.4"
+  - "2.4.0"
   - "2.3.3"
   - "2.2"
   - "2.1"
