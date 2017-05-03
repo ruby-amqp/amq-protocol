@@ -132,7 +132,7 @@ module AMQ
 
 
       def self.decode_time(data, offset)
-        timestamp = data.slice(offset, 8).unpack(PACK_UINT32_X2).last
+        timestamp = data.slice(offset, 8).unpack(PACK_UINT64_BE).last
         v = Time.at(timestamp)
         offset += 8
 

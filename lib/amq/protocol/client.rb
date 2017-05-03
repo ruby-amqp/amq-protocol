@@ -1515,7 +1515,7 @@ module AMQ
               result = data[offset, size].unpack(PACK_CHAR).first
             when :timestamp
               size = 8
-              result = Time.at(data[offset, size].unpack(PACK_UINT32_X2).last)
+              result = Time.at(data[offset, size].unpack(PACK_UINT64_BE).last)
             when :table
               size = 4 + data[offset, 4].unpack(PACK_UINT32)[0]
               result = Table.decode(data[offset, size])
