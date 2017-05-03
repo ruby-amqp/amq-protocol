@@ -12,7 +12,7 @@ from amqp_codegen import *
 try:
     from mako.template import Template
 except ImportError:
-    print "Mako isn't installed. Please install mako via pip or similar."
+    print("Mako isn't installed. Please install mako via pip or similar.")
     sys.exit(1)
 
 # main class
@@ -57,7 +57,7 @@ AmqpEntity.__init__ = new_init
 
 # method.accepted_by("server")
 # method.accepted_by("client", "server")
-accepted_by_update = json.loads(file("codegen/amqp_0.9.1_changes.json").read())
+accepted_by_update = json.loads(open("codegen/amqp_0.9.1_changes.json").read())
 
 def accepted_by(self, *receivers):
     def get_accepted_by(self):
@@ -143,7 +143,7 @@ def generateMain(type):
     def main(json_spec_path):
         spec = AmqpSpecObject(json_spec_path)
         spec.type = type
-        print render("codegen/protocol.rb.pytemplate", spec = spec)
+        print(render("codegen/protocol.rb.pytemplate", spec = spec))
 
     return main
 

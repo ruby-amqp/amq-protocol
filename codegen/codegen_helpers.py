@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 def genSingleEncode(spec, cValue, unresolved_domain):
     buffer = []
     type = spec.resolveDomain(unresolved_domain)
@@ -24,7 +26,7 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'table':
         buffer.append("buffer << AMQ::Protocol::Table.encode(%s)" % (cValue,))
     else:
-        raise "Illegal domain in genSingleEncode", type
+        raise "Illegal domain in genSingleEncode: {0}".format(type)
 
     return buffer
 
@@ -34,7 +36,7 @@ def genSingleDecode(spec, field):
 
     if cLvalue == "known_hosts":
         import sys
-        print >> sys.stderr, field, field.ignored
+        print(field, field.ignored, file = sys.stderr)
 
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
@@ -70,7 +72,7 @@ def genSingleDecode(spec, field):
         buffer.append("%s = Table.decode(data[offset, table_length + 4])" % (cLvalue,))
         buffer.append("offset += table_length + 4")
     else:
-        raise StandardError("Illegal domain '" + type + "' in genSingleDecode")
+        raise StandardError("Illegal domain '{0}' in genSingleDecode".format(type))
 
     return buffer
 
