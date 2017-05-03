@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 def genSingleEncode(spec, cValue, unresolved_domain):
     buffer = []
     type = spec.resolveDomain(unresolved_domain)
@@ -24,7 +26,7 @@ def genSingleEncode(spec, cValue, unresolved_domain):
     elif type == 'table':
         buffer.append("buffer << AMQ::Protocol::Table.encode(%s)" % (cValue,))
     else:
-        raise "Illegal domain in genSingleEncode", type
+        raise "Illegal domain in genSingleEncode: {0}".format(type)
 
     return buffer
 
@@ -34,7 +36,7 @@ def genSingleDecode(spec, field):
 
     if cLvalue == "known_hosts":
         import sys
-        print >> sys.stderr, field, field.ignored
+        print(field, field.ignored, file = sys.stderr)
 
     type = spec.resolveDomain(unresolved_domain)
     buffer = []
@@ -61,7 +63,7 @@ def genSingleDecode(spec, field):
         buffer.append("%s = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'timestamp':
-        buffer.append("%s = data[offset, 8].unpack(PACK_UINT32_X2).first" % (cLvalue,))
+        buffer.append("%s = data[offset, 8].unpack(PACK_UINT64_BE).first" % (cLvalue,))
         buffer.append("offset += 8")
     elif type == 'bit':
         raise "Can't decode bit in genSingleDecode"
@@ -70,7 +72,7 @@ def genSingleDecode(spec, field):
         buffer.append("%s = Table.decode(data[offset, table_length + 4])" % (cLvalue,))
         buffer.append("offset += table_length + 4")
     else:
-        raise StandardError("Illegal domain '" + type + "' in genSingleDecode")
+        raise StandardError("Illegal domain '{0}' in genSingleDecode".format(type))
 
     return buffer
 
@@ -99,7 +101,7 @@ def genSingleSimpleDecode(spec, field):
     elif type == 'longlong':
         buffer.append("AMQ::Pack.unpack_uint64_big_endian(data).first")
     elif type == 'timestamp':
-        buffer.append("Time.at(data.unpack(PACK_UINT32_X2).last)")
+        buffer.append("Time.at(data.unpack(PACK_UINT64_BE).last)")
     elif type == 'bit':
         raise "Can't decode bit in genSingleDecode"
     elif type == 'table':
