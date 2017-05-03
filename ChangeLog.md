@@ -1,6 +1,14 @@
 ## Changes between 2.1.0 and 2.2.0 (unreleased)
 
-No changes yet.
+### Timestamps are Encoded as 64-bit Unsigned Integers
+
+This is a potentially **breaking change**. It is recommended that
+all applications that use this gem and pass date/time values in message
+properties or headers are upgraded at the same time.
+
+GitHub issue: [#64](https://github.com/ruby-amqp/amq-protocol/issues/64).
+
+Contributed by Carl Hoerberg.
 
 
 
