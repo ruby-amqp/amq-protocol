@@ -1,4 +1,10 @@
-## Changes between 2.1.0 and 2.2.0 (unreleased)
+## Changes between 2.2.0 and 2.3.0 (unreleased)
+
+No changes yet.
+
+
+
+## Changes between 2.1.0 and 2.2.0 (May 11th, 2017)
 
 ### Timestamps are Encoded as 64-bit Unsigned Integers
 
