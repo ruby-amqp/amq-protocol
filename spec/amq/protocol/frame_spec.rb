@@ -1,6 +1,3 @@
-# encoding: utf-8
-
-
 module AMQ
   module Protocol
     RSpec.describe Frame do

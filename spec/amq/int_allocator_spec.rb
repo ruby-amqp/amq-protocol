@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require "amq/int_allocator"
 
 RSpec.describe AMQ::IntAllocator do

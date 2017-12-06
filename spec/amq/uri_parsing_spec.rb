@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require "amq/uri"
 
 RSpec.describe AMQ::URI do

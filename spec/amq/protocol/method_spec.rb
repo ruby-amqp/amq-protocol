@@ -1,6 +1,3 @@
-# encoding: binary
-
-
 module AMQ
   module Protocol
     RSpec.describe Method do

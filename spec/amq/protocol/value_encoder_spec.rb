@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 require 'time'
 require "amq/protocol/table_value_encoder"
 require "amq/protocol/float_32bit"

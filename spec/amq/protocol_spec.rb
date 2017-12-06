@@ -1,6 +1,3 @@
-# encoding: binary
-
-
 module AMQ
   RSpec.describe Protocol do
     it "should have PROTOCOL_VERSION constant" do

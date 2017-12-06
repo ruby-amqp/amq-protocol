@@ -1,7 +1,4 @@
-# encoding: utf-8
-
 require "amq/bit_set"
-
 
 # extracted from amqp gem. MK.
 RSpec.describe AMQ::BitSet do
