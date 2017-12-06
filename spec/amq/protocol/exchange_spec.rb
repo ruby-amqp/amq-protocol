@@ -1,10 +1,9 @@
 # encoding: binary
 
-
 module AMQ
   module Protocol
     class Exchange
-      describe Declare do
+      RSpec.describe Declare do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -23,7 +22,7 @@ module AMQ
         end
       end
 
-      describe Declare, "encoded with a symbol name" do
+      RSpec.describe Declare, "encoded with a symbol name" do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -42,7 +41,7 @@ module AMQ
         end
       end
 
-      describe Delete do
+      RSpec.describe Delete do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -56,12 +55,12 @@ module AMQ
         end
       end
 
-      # describe DeleteOk do
+      # RSpec.describe DeleteOk do
       #   describe '.decode' do
       #   end
       # end
 
-      describe Bind do
+      RSpec.describe Bind do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -77,12 +76,12 @@ module AMQ
         end
       end
 
-      # describe BindOk do
+      # RSpec.describe BindOk do
       #   describe '.decode' do
       #   end
       # end
 
-      describe Unbind do
+      RSpec.describe Unbind do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -98,7 +97,7 @@ module AMQ
         end
       end
 
-      # describe UnbindOk do
+      # RSpec.describe UnbindOk do
       #   describe '.decode' do
       #   end
       # end

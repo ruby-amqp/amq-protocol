@@ -6,8 +6,7 @@ require "amq/protocol/float_32bit"
 
 module AMQ
   module Protocol
-    describe TableValueEncoder do
-
+    RSpec.describe TableValueEncoder do
 
       it "calculates size of string field values" do
         expect(described_class.field_value_size("amqp")).to eq(9)

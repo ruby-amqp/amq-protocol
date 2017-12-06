@@ -1,18 +1,17 @@
 # encoding: binary
 
-
 module AMQ
   module Protocol
     class Confirm
-      describe Select do
+      RSpec.describe Select do
         describe '.decode' do
           subject do
             Select.decode("\x01")
           end
-          
+
           its(:nowait) { should be_truthy }
         end
-        
+
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -23,11 +22,11 @@ module AMQ
           end
         end
       end
-      
-      describe SelectOk do
+
+      RSpec.describe SelectOk do
         # describe '.decode' do
         # end
-        
+
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1

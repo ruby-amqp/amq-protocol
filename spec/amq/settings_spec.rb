@@ -2,7 +2,7 @@
 
 require "amq/settings"
 
-describe AMQ::Settings do
+RSpec.describe AMQ::Settings do
   describe ".default" do
     it "should provide some default values" do
       expect(AMQ::Settings.default).to_not be_nil

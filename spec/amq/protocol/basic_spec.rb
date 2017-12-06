@@ -1,40 +1,39 @@
 # encoding: binary
 
-
 module AMQ
   module Protocol
-    describe Basic do
+    RSpec.describe AMQ::Protocol::Basic do
       describe '.encode_timestamp' do
         it 'encodes the timestamp as a 64 byte big endian integer' do
           expect(Basic.encode_timestamp(12345).last).to eq("\x00\x00\x00\x00\x00\x0009")
         end
       end
-      
+
       # describe '.decode_timestamp' do
       #   it 'decodes the timestamp from a 64 byte big endian integer and returns a Time object' do
       #     expect(Basic.decode_timestamp("\x00\x00\x00\x00\x00\x0009")).to eq(Time.at(12345))
       #   end
       # end
-      
+
       describe '.encode_headers' do
         it 'encodes the headers as a table' do
           expect(Basic.encode_headers(:hello => 'world').last).to eq("\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world")
         end
       end
-      
+
       # describe '.decode_headers' do
       #   it 'decodes the headers from a table' do
       #     expect(Basic.decode_headers("\x00\x00\x00\x10\x05helloS\x00\x00\x00\x05world")).to eq({'hello' => 'world'})
       #   end
       # end
-      
+
       describe '.encode_properties' do
         it 'packs the parameters into a byte array using the other encode_* methods' do
           result = Basic.encode_properties(10, {:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream'})
           expect(result).to eq("\x00<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x98\x00\x18application/octet-stream\x02\x00")
         end
       end
-      
+
       describe '.decode_properties' do
         it 'unpacks the properties from a byte array using the decode_* methods' do
           result = Basic.decode_properties("\x98@\x18application/octet-stream\x02\x00\x00\x00\x00\x00\x00\x00\x00{")
@@ -46,7 +45,7 @@ module AMQ
           expect(result).to eq({:priority => 0, :delivery_mode => 2, :content_type => 'application/octet-stream', :timestamp => Time.at(123), :headers => {'hello' => 'world'}})
         end
       end
-      
+
       %w(content_type content_encoding correlation_id reply_to expiration message_id type user_id app_id cluster_id).each do |method|
         describe ".encode_#{method}" do
           it 'encodes the parameter as a Pascal string' do
@@ -61,7 +60,7 @@ module AMQ
         #   end
         # end
       end
-      
+
       %w(delivery_mode priority).each do |method|
         describe ".encode_#{method}" do
           it 'encodes the parameter as a char' do
@@ -76,9 +75,9 @@ module AMQ
         # end
       end
     end
-    
+
     class Basic
-      describe Qos do
+      RSpec.describe Qos do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -92,12 +91,12 @@ module AMQ
         end
       end
 
-      # describe QosOk do
+      # RSpec.describe QosOk do
       #   describe '.decode' do
       #   end
       # end
 
-      describe Consume do
+      RSpec.describe Consume do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -114,18 +113,18 @@ module AMQ
           end
         end
       end
-      
-      describe ConsumeOk do
+
+      RSpec.describe ConsumeOk do
         describe '.decode' do
           subject do
             ConsumeOk.decode("\x03foo")
           end
-          
+
           its(:consumer_tag) { should eq('foo') }
         end
       end
 
-      describe Cancel do
+      RSpec.describe Cancel do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -136,27 +135,27 @@ module AMQ
             expect(method_frame.channel).to eq(1)
           end
         end
-        
+
         describe '.decode' do
           subject do
-            CancelOk.decode("\x03foo\x01")            
+            CancelOk.decode("\x03foo\x01")
           end
 
           its(:consumer_tag) { should eq('foo') }
         end
       end
 
-      describe CancelOk do
+      RSpec.describe CancelOk do
         describe '.decode' do
           subject do
             CancelOk.decode("\x03foo")
           end
-          
+
           its(:consumer_tag) { should eq('foo') }
         end
       end
 
-      describe Publish do
+      RSpec.describe Publish do
         describe '.encode' do
           it 'encodes the parameters into a list of MethodFrames' do
             channel = 1
@@ -179,12 +178,12 @@ module AMQ
         end
       end
 
-      describe Return do
+      RSpec.describe Return do
         describe '.decode' do
           subject do
             Return.decode("\x019\fNO_CONSUMERS\namq.fanout\x00")
           end
-          
+
           its(:reply_code) { should eq(313) }
           its(:reply_text) { should eq('NO_CONSUMERS') }
           its(:exchange) { should eq('amq.fanout') }
@@ -192,12 +191,12 @@ module AMQ
         end
       end
 
-      describe Deliver do
+      RSpec.describe Deliver do
         describe '.decode' do
           subject do
             Deliver.decode("\e-1300560114000-445586772970\x00\x00\x00\x00\x00\x00\x00c\x00\namq.fanout\x00")
           end
-          
+
           its(:consumer_tag) { should eq('-1300560114000-445586772970') }
           its(:delivery_tag) { should eq(99) }
           its(:redelivered) { should eq(false) }
@@ -205,8 +204,8 @@ module AMQ
           its(:routing_key) { should eq('') }
         end
       end
-      
-      describe Get do
+
+      RSpec.describe Get do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -218,13 +217,13 @@ module AMQ
           end
         end
       end
-      
-      describe GetOk do
+
+      RSpec.describe GetOk do
         describe '.decode' do
           subject do
             GetOk.decode("\x00\x00\x00\x00\x00\x00\x00\x06\x00\namq.fanout\x00\x00\x00\x00^")
           end
-          
+
           its(:delivery_tag) { should eq(6) }
           its(:redelivered) { should eq(false) }
           its(:exchange) { should eq('amq.fanout') }
@@ -232,18 +231,18 @@ module AMQ
           its(:message_count) { should eq(94) }
         end
       end
-      
-      describe GetEmpty do
+
+      RSpec.describe GetEmpty do
         describe '.decode' do
           subject do
             GetEmpty.decode("\x03foo")
           end
-          
+
           its(:cluster_id) { should eq('foo') }
         end
       end
 
-      describe Ack do
+      RSpec.describe Ack do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -255,8 +254,8 @@ module AMQ
           end
         end
       end
-      
-      describe Reject do
+
+      RSpec.describe Reject do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -268,8 +267,8 @@ module AMQ
           end
         end
       end
-      
-      describe RecoverAsync do
+
+      RSpec.describe RecoverAsync do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -280,8 +279,8 @@ module AMQ
           end
         end
       end
-      
-      describe Recover do
+
+      RSpec.describe Recover do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -293,22 +292,22 @@ module AMQ
         end
       end
 
-      # describe RecoverOk do
+      # RSpec.describe RecoverOk do
       #   describe '.decode' do
       #   end
       # end
-      
-      describe Nack do
+
+      RSpec.describe Nack do
         describe '.decode' do
           subject do
             Nack.decode("\x00\x00\x00\x00\x00\x00\x00\x09\x03")
           end
-          
+
           its(:delivery_tag) { should eq(9) }
           its(:multiple) { should eq(true) }
           its(:requeue) { should eq(true) }
         end
-        
+
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1

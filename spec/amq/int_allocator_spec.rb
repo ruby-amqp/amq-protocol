@@ -2,7 +2,7 @@
 
 require "amq/int_allocator"
 
-describe AMQ::IntAllocator do
+RSpec.describe AMQ::IntAllocator do
 
   #
   # Environment

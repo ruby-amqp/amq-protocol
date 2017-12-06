@@ -2,7 +2,7 @@
 
 
 module AMQ
-  describe Protocol do
+  RSpec.describe Protocol do
     it "should have PROTOCOL_VERSION constant" do
       expect(Protocol::PROTOCOL_VERSION).to match(/^\d+\.\d+\.\d$/)
     end

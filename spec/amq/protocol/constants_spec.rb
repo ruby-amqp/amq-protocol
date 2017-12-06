@@ -1,6 +1,6 @@
 # encoding: binary
 
-describe "(Some) AMQ::Protocol constants" do
+RSpec.describe "(Some) AMQ::Protocol constants" do
   it "include regular port" do
     expect(AMQ::Protocol::DEFAULT_PORT).to eq(5672)
   end

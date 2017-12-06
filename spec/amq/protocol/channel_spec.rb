@@ -1,10 +1,9 @@
 # encoding: binary
 
-
 module AMQ
   module Protocol
     class Channel
-      describe Open do
+      RSpec.describe Open do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -16,7 +15,7 @@ module AMQ
         end
       end
 
-      describe OpenOk do
+      RSpec.describe OpenOk do
         describe '.decode' do
           subject do
             OpenOk.decode("\x00\x00\x00\x03foo")
@@ -26,7 +25,7 @@ module AMQ
         end
       end
 
-      describe Flow do
+      RSpec.describe Flow do
         describe '.decode' do
           subject do
             Flow.decode("\x01")
@@ -46,7 +45,7 @@ module AMQ
         end
       end
 
-      describe FlowOk do
+      RSpec.describe FlowOk do
         describe '.decode' do
           subject do
             FlowOk.decode("\x00")
@@ -66,7 +65,7 @@ module AMQ
         end
       end
 
-      describe Close do
+      RSpec.describe Close do
         describe '.decode' do
           context 'with code 200' do
             subject do
@@ -113,7 +112,7 @@ module AMQ
         end
       end
 
-      describe CloseOk do
+      RSpec.describe CloseOk do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1

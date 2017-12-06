@@ -1,10 +1,9 @@
 # encoding: binary
 
-
 module AMQ
   module Protocol
     class Tx
-      describe Select do
+      RSpec.describe Select do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -15,12 +14,12 @@ module AMQ
         end
       end
 
-      # describe SelectOk do
+      # RSpec.describe SelectOk do
       #   describe '.decode' do
       #   end
       # end
 
-      describe Commit do
+      RSpec.describe Commit do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -30,13 +29,13 @@ module AMQ
           end
         end
       end
-      
-      # describe CommitOk do
+
+      # RSpec.describe CommitOk do
       #   describe '.decode' do
       #   end
       # end
 
-      describe Rollback do
+      RSpec.describe Rollback do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -47,7 +46,7 @@ module AMQ
         end
       end
 
-      # describe RollbackOk do
+      # RSpec.describe RollbackOk do
       #   describe '.decode' do
       #   end
       # end
