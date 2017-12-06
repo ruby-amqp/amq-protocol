@@ -1,10 +1,7 @@
 # encoding: binary
 
 require 'bundler/setup'
-require 'rspec'
-require 'rspec/its'
-
-require "effin_utf8"
+Bundler.require(:test)
 
 begin
   require 'simplecov'
