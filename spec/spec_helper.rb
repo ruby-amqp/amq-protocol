@@ -24,5 +24,7 @@ puts "Running on #{RUBY_VERSION}"
 RSpec.configure do |config|
   config.include AMQ::Protocol
 
+  config.filter_run_when_matching :focus
+
   config.warnings = true
 end
