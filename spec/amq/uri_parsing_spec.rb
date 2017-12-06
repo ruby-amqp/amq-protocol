@@ -125,7 +125,7 @@ describe AMQ::URI, ".parse" do
             let(:uri) { "amqp://rabbitmq?#{tls_param}=true" }
 
             it "raises ArgumentError" do
-              expect { subject }.to raise_error(ArgumentError, /Only of use for the amqps scheme/)
+              expect { subject }.to raise_error(ArgumentError, /The option '#{tls_param}' can only be used in URIs that use amqps for schema/)
             end
           end
         end

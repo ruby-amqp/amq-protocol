@@ -47,11 +47,11 @@ module AMQ
         opts[:channel_max] = normalized_query_params["channel_max"].to_i
         opts[:auth_mechanism] = normalized_query_params["auth_mechanism"]
 
-        %w(verify fail_if_no_peer_cert cacertfile certfile keyfile).each do |ssl_option|
-          if normalized_query_params[ssl_option] && uri.scheme == "amqp"
-            raise ArgumentError.new("Only of use for the amqps scheme")
+        %w(verify fail_if_no_peer_cert cacertfile certfile keyfile).each do |tls_option|
+          if normalized_query_params[tls_option] && uri.scheme == "amqp"
+            raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps for schema")
           else
-            opts[ssl_option.to_sym] = normalized_query_params[ssl_option]
+            opts[tls_option.to_sym] = normalized_query_params[tls_option]
           end
         end
       end
