@@ -13,6 +13,7 @@ group :test do
   gem "rspec", ">= 3.5.0"
   gem "rspec-its"
   gem "effin_utf8"
+  gem "simplecov"
 end
 
 group :development, :test do
