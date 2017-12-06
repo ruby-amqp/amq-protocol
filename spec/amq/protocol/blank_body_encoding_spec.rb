@@ -1,7 +1,5 @@
 # encoding: binary
 
-require File.expand_path('../../../spec_helper', __FILE__)
-
 
 describe AMQ::Protocol::Method, ".encode_body" do
   it "encodes 1-byte long payload as exactly 1 body frame" do
