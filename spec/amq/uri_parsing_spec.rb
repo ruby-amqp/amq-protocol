@@ -92,4 +92,80 @@ describe AMQ::URI, ".parse" do
       expect(val[:vhost]).to be_nil # in this case, default / will be used
     end
   end
+
+  subject { described_class.parse(uri) }
+
+  context "schema 'amqp'" do
+    context "query parameters" do
+      context "present" do
+        let(:uri) { "amqp://rabbitmq?heartbeat=10&connection_timeout=100&channel_max=1000&auth_mechanism=plain&auth_mechanism=amqplain" }
+
+        specify "parses parameters" do
+          expect(subject[:heartbeat]).to eq(10)
+          expect(subject[:connection_timeout]).to eq(100)
+          expect(subject[:channel_max]).to eq(1000)
+          expect(subject[:auth_mechanism]).to eq(["plain", "amqplain"])
+        end
+      end
+
+      context "absent" do
+        let(:uri) { "amqp://rabbitmq" }
+
+        it "fallbacks to defaults" do
+          expect(subject[:heartbeat]).to be_nil
+          expect(subject[:connection_timeout]).to be_nil
+          expect(subject[:channel_max]).to be_nil
+          expect(subject[:auth_mechanism]).to be_empty
+        end
+      end
+
+      context "tls parameters" do
+        %w(verify fail_if_no_peer_cert cacertfile certfile keyfile).each do |tls_param|
+          describe "'verify'" do
+            let(:uri) { "amqp://rabbitmq?#{tls_param}=true" }
+
+            it "raises ArgumentError" do
+              expect { subject }.to raise_error(ArgumentError, /Only of use for the amqps scheme/)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  context "schema 'amqps'" do
+    context "query parameters" do
+      context "present" do
+        let(:uri) { "amqps://rabbitmq?heartbeat=10&connection_timeout=100&channel_max=1000&auth_mechanism=plain&auth_mechanism=amqplain&verify=true&fail_if_no_peer_cert=true&cacertfile=/examples/tls/cacert.pem&certfile=/examples/tls/client_cert.pem&keyfile=/examples/tls/client_key.pem" }
+
+        it "parses parameters" do
+          expect(subject[:heartbeat]).to eq(10)
+          expect(subject[:connection_timeout]).to eq(100)
+          expect(subject[:channel_max]).to eq(1000)
+          expect(subject[:auth_mechanism]).to eq(["plain", "amqplain"])
+          expect(subject[:verify]).to be_truthy
+          expect(subject[:fail_if_no_peer_cert]).to be_truthy
+          expect(subject[:cacertfile]).to eq("/examples/tls/cacert.pem")
+          expect(subject[:certfile]).to eq("/examples/tls/client_cert.pem")
+          expect(subject[:keyfile]).to eq("/examples/tls/client_key.pem")
+        end
+      end
+
+      context "absent" do
+        let(:uri) { "amqps://rabbitmq" }
+
+        it "fallbacks to defaults" do
+          expect(subject[:heartbeat]).to be_nil
+          expect(subject[:connection_timeout]).to be_nil
+          expect(subject[:channel_max]).to be_nil
+          expect(subject[:auth_mechanism]).to be_empty
+          expect(subject[:verify]).to be_falsey
+          expect(subject[:fail_if_no_peer_cert]).to be_falsey
+          expect(subject[:cacertfile]).to be_nil
+          expect(subject[:certfile]).to be_nil
+          expect(subject[:keyfile]).to be_nil
+        end
+      end
+    end
+  end
 end
