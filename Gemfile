@@ -14,3 +14,7 @@ group :test do
   gem "rspec-its"
   gem "effin_utf8"
 end
+
+group :development, :test do
+  gem "byebug"
+end
