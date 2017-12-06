@@ -1,11 +1,6 @@
-# encoding: utf-8
-
-require File.expand_path('../../../spec_helper', __FILE__)
-
-
 module AMQ
   module Protocol
-    describe Frame do
+    RSpec.describe Frame do
       describe ".encode" do
         it "should raise FrameTypeError if type isn't one of: [:method, :header, :body, :heartbeat]" do
           expect { Frame.encode(nil, "", 0) }.to raise_error(FrameTypeError)

@@ -1,12 +1,9 @@
 # encoding: binary
 
-require File.expand_path('../../../spec_helper', __FILE__)
-
-
 module AMQ
   module Protocol
     class Queue
-      describe Declare do
+      RSpec.describe Declare do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -24,19 +21,19 @@ module AMQ
         end
       end
 
-      describe DeclareOk do
+      RSpec.describe DeclareOk do
         describe '.decode' do
           subject do
             DeclareOk.decode(" amq.gen-KduGSqQrpeUo1otnU0TWSA==\x00\x00\x00\x00\x00\x00\x00\x00")
           end
-          
+
           its(:queue) { should eq('amq.gen-KduGSqQrpeUo1otnU0TWSA==') }
           its(:message_count) { should eq(0) }
           its(:consumer_count) { should eq(0) }
         end
       end
 
-      describe Bind do
+      RSpec.describe Bind do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -52,12 +49,12 @@ module AMQ
         end
       end
 
-      # describe BindOk do
+      # RSpec.describe BindOk do
       #   describe '.decode' do
       #   end
       # end
 
-      describe Purge do
+      RSpec.describe Purge do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -70,17 +67,17 @@ module AMQ
         end
       end
 
-      describe PurgeOk do
+      RSpec.describe PurgeOk do
         describe '.decode' do
           subject do
             PurgeOk.decode("\x00\x00\x00\x02")
           end
-          
+
           its(:message_count) { should eq(2) }
         end
       end
 
-      describe Delete do
+      RSpec.describe Delete do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -95,17 +92,17 @@ module AMQ
         end
       end
 
-      describe DeleteOk do
+      RSpec.describe DeleteOk do
         describe '.decode' do
           subject do
             DeleteOk.decode("\x00\x00\x00\x02")
           end
-          
+
           its(:message_count) { should eq(2) }
         end
       end
 
-      describe Unbind do
+      RSpec.describe Unbind do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel = 1
@@ -120,7 +117,7 @@ module AMQ
         end
       end
 
-      # describe UnbindOk do
+      # RSpec.describe UnbindOk do
       #   describe '.decode' do
       #   end
       # end

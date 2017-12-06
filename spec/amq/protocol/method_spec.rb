@@ -1,11 +1,6 @@
-# encoding: binary
-
-require File.expand_path('../../../spec_helper', __FILE__)
-
-
 module AMQ
   module Protocol
-    describe Method do
+    RSpec.describe Method do
       describe '.split_headers' do
         it 'splits user defined headers into properties and headers' do
           input = {:delivery_mode => 2, :content_type => 'application/octet-stream', :foo => 'bar'}
@@ -14,7 +9,7 @@ module AMQ
           expect(headers).to eq({:foo => 'bar'})
         end
       end
-      
+
       describe '.encode_body' do
         context 'when the body fits in a single frame' do
           it 'encodes a body into a BodyFrame' do

@@ -1,10 +1,7 @@
 # encoding: binary
 
 require 'bundler/setup'
-require 'rspec'
-require 'rspec/its'
-
-require "effin_utf8"
+Bundler.require(:test)
 
 begin
   require 'simplecov'
@@ -23,6 +20,10 @@ puts "Running on #{RUBY_VERSION}"
 
 RSpec.configure do |config|
   config.include AMQ::Protocol
+
+  config.filter_run_when_matching :focus
+
+  config.disable_monkey_patching!
 
   config.warnings = true
 end

@@ -31,7 +31,7 @@ module AMQ
       opts[:pass]   = ::CGI::unescape(uri.password) if uri.password
       opts[:host]   = uri.host if uri.host
       opts[:port]   = uri.port || AMQP_PORTS[uri.scheme]
-      opts[:ssl]    = uri.scheme.to_s.downcase =~ /amqps/i
+      opts[:ssl]    = uri.scheme.to_s.downcase =~ /amqps/i # TODO: rename to tls
       if uri.path =~ %r{^/(.*)}
         raise ArgumentError.new("#{uri} has multiple-segment path; please percent-encode any slashes in the vhost name (e.g. /production => %2Fproduction). Learn more at http://bit.ly/amqp-gem-and-connection-uris") if $1.index('/')
         opts[:vhost] = ::CGI::unescape($1)
@@ -49,7 +49,7 @@ module AMQ
 
         %w(verify fail_if_no_peer_cert cacertfile certfile keyfile).each do |tls_option|
           if normalized_query_params[tls_option] && uri.scheme == "amqp"
-            raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps for schema")
+            raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
           else
             opts[tls_option.to_sym] = normalized_query_params[tls_option]
           end

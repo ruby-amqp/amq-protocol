@@ -1,9 +1,6 @@
-# encoding: utf-8
-
-require 'spec_helper'
 require "amq/int_allocator"
 
-describe AMQ::IntAllocator do
+RSpec.describe AMQ::IntAllocator do
 
   #
   # Environment

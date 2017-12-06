@@ -1,12 +1,9 @@
 # encoding: binary
 
-require File.expand_path('../../../spec_helper', __FILE__)
-
-
 module AMQ
   module Protocol
     class Connection
-      describe Start do
+      RSpec.describe Start do
         describe '.decode' do
           subject do
             Start.decode("\x00\t\x00\x00\x00\xFB\tcopyrightS\x00\x00\x00gCopyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.\vinformationS\x00\x00\x005Licensed under the MPL.  See http://www.rabbitmq.com/\bplatformS\x00\x00\x00\nErlang/OTP\aproductS\x00\x00\x00\bRabbitMQ\aversionS\x00\x00\x00\x052.2.0\x00\x00\x00\x0EPLAIN AMQPLAIN\x00\x00\x00\x05en_US")
@@ -20,7 +17,7 @@ module AMQ
         end
       end
 
-      describe StartOk do
+      RSpec.describe StartOk do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             client_properties = {:platform => 'Ruby 1.9.2', :product => 'AMQ Client', :information => 'http://github.com/ruby-amqp/amq-client', :version => '0.2.0'}
@@ -39,18 +36,18 @@ module AMQ
           end
         end
       end
-      
-      describe Secure do
+
+      RSpec.describe Secure do
         describe '.decode' do
           subject do
             Secure.decode("\x00\x00\x00\x03foo")
           end
-          
+
           its(:challenge) { should eq('foo') }
         end
       end
-    
-      describe SecureOk do
+
+      RSpec.describe SecureOk do
         describe '.encode' do
           it 'encodes the parameters as a MethodFrame' do
             response = 'bar'
@@ -59,8 +56,8 @@ module AMQ
           end
         end
       end
-    
-      describe Tune do
+
+      RSpec.describe Tune do
         describe '.decode' do
           subject do
             Tune.decode("\x00\x00\x00\x02\x00\x00\x00\x00")
@@ -72,7 +69,7 @@ module AMQ
         end
       end
 
-      describe TuneOk do
+      RSpec.describe TuneOk do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             channel_max = 0
@@ -83,8 +80,8 @@ module AMQ
           end
         end
       end
-      
-      describe Open do
+
+      RSpec.describe Open do
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             vhost = '/test'
@@ -93,37 +90,37 @@ module AMQ
           end
         end
       end
-      
-      describe OpenOk do
+
+      RSpec.describe OpenOk do
         describe '.decode' do
           subject do
             OpenOk.decode("\x00")
           end
-          
+
           its(:known_hosts) { should eq('') }
         end
       end
-      
-      describe Close do
+
+      RSpec.describe Close do
         describe '.decode' do
           context 'with code 200' do
             subject do
               Close.decode("\x00\xc8\x07KTHXBAI\x00\x05\x00\x06")
             end
-          
+
             its(:reply_code) { should eq(200) }
             its(:reply_text) { should eq('KTHXBAI') }
             its(:class_id) { should eq(5) }
             its(:method_id) { should eq(6) }
           end
-          
+
           context 'with an error code' do
             it 'returns method frame and lets calling code handle the issue' do
               Close.decode("\x01\x38\x08NO_ROUTE\x00\x00")
             end
           end
         end
-        
+
         describe '.encode' do
           it 'encodes the parameters into a MethodFrame' do
             reply_code = 540
@@ -135,8 +132,8 @@ module AMQ
           end
         end
       end
-      
-      describe CloseOk do
+
+      RSpec.describe CloseOk do
         describe '.encode' do
           it 'encodes a MethodFrame' do
             method_frame = CloseOk.encode

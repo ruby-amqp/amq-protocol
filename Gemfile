@@ -10,7 +10,12 @@ group :development do
 end
 
 group :test do
-  gem "rspec", ">= 3.4.0"
+  gem "rspec", ">= 3.5.0"
   gem "rspec-its"
   gem "effin_utf8"
+  gem "simplecov"
+end
+
+group :development, :test do
+  gem "byebug"
 end

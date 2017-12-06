@@ -1,17 +1,12 @@
-# -*- coding: utf-8 -*-
-
-require File.expand_path('../../../spec_helper', __FILE__)
 require 'bigdecimal'
 require 'time'
 
-
 module AMQ
   module Protocol
-    describe Table do
+    RSpec.describe Table do
       timestamp    = Time.utc(2010, 12, 31, 23, 58, 59)
       bigdecimal_1 = BigDecimal.new("1.0")
       bigdecimal_2 = BigDecimal.new("5E-3")
-
 
       DATA = {
           {}                       => "\x00\x00\x00\x00",

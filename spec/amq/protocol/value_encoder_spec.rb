@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
-require File.expand_path('../../../spec_helper', __FILE__)
-
 require 'time'
 require "amq/protocol/table_value_encoder"
 require "amq/protocol/float_32bit"
 
 module AMQ
   module Protocol
-    describe TableValueEncoder do
-
+    RSpec.describe TableValueEncoder do
 
       it "calculates size of string field values" do
         expect(described_class.field_value_size("amqp")).to eq(9)

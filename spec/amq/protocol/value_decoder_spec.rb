@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-require File.expand_path('../../../spec_helper', __FILE__)
-
 require 'time'
 require "amq/protocol/table_value_decoder"
 
 module AMQ
   module Protocol
-    describe TableValueDecoder do
+    RSpec.describe TableValueDecoder do
 
       it "is capable of decoding basic arrays TableValueEncoder encodes" do
         input1 = [1, 2, 3]

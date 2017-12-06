@@ -1,12 +1,7 @@
-# encoding: utf-8
-
-require 'spec_helper'
-
 require "amq/bit_set"
 
-
 # extracted from amqp gem. MK.
-describe AMQ::BitSet do
+RSpec.describe AMQ::BitSet do
 
   #
   # Environment
