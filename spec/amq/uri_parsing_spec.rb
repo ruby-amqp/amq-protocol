@@ -24,10 +24,10 @@ RSpec.describe AMQ::URI do
           expect(subject[:host]).to eq("rabbitmq")
         end
 
-        context "escaped" do
+        context "%-encoded" do
           let(:uri) { "amqp://r%61bbitmq:5672" }
 
-          it "parses host", pending: "Need to investigate, why URI module doesn't handle escaped host component..." do
+          it "parses host", pending: "Need to investigate, why URI module doesn't handle %-encoded host component..." do
             expect(subject[:host]).to eq("rabbitmq")
           end
         end
@@ -139,7 +139,7 @@ RSpec.describe AMQ::URI do
         end
       end
 
-      context "escaped" do
+      context "%-encoded" do
         let(:uri) { "amqp://%61lpha:bet%61@rabbitmq" }
 
         it "parses user and pass" do
@@ -181,7 +181,7 @@ RSpec.describe AMQ::URI do
           end
         end
 
-        context "with trailing escaped slash" do
+        context "with trailing %-encoded slash" do
           let(:uri) { "amqp://rabbitmq/%2Fstaging" }
 
           it "parses vhost as string with leading slash" do
@@ -189,7 +189,7 @@ RSpec.describe AMQ::URI do
           end
         end
 
-        context "escaped" do
+        context "%-encoded" do
           let(:uri) { "amqp://rabbitmq/%2Fstaging%2Fcritical%2Fsubsystem-a" }
 
           it "parses vhost as string with leading slash" do
