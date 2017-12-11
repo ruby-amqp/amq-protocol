@@ -6,10 +6,12 @@ require "uri"
 module AMQ
   class URI
     # @private
-    AMQP_PORTS = {
+    AMQP_DEFAULT_PORTS = {
       "amqp" => 5672,
       "amqps" => 5671
     }.freeze
+
+    private_constant :AMQP_DEFAULT_PORTS
 
     DEFAULTS = {
       heartbeat: nil,
@@ -33,7 +35,7 @@ module AMQ
       opts[:user]   = ::CGI::unescape(uri.user) if uri.user
       opts[:pass]   = ::CGI::unescape(uri.password) if uri.password
       opts[:host]   = uri.host if uri.host
-      opts[:port]   = uri.port || AMQP_PORTS[uri.scheme]
+      opts[:port]   = uri.port || AMQP_DEFAULT_PORTS[uri.scheme]
       opts[:ssl]    = uri.scheme.to_s.downcase =~ /amqps/i # TODO: rename to tls
       if uri.path =~ %r{^/(.*)}
         raise ArgumentError.new("#{uri} has multiple-segment path; please percent-encode any slashes in the vhost name (e.g. /production => %2Fproduction). Learn more at http://bit.ly/amqp-gem-and-connection-uris") if $1.index('/')
