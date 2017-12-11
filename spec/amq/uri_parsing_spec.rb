@@ -38,7 +38,7 @@ RSpec.describe AMQ::URI do
           let(:uri) { "amqp://" }
 
           # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
-          it "fallbacks to default nil host" do
+          it "falls back to default nil host" do
             expect(subject[:host]).to be_nil
           end
         end
@@ -69,7 +69,7 @@ RSpec.describe AMQ::URI do
         context "schema amqp" do
           let(:uri) { "amqp://rabbitmq" }
 
-          it "fallbacks to 5672 port" do
+          it "falls back to 5672 port" do
             expect(subject[:port]).to eq(5672)
           end
         end
@@ -77,7 +77,7 @@ RSpec.describe AMQ::URI do
         context "schema amqps" do
           let(:uri) { "amqps://rabbitmq" }
 
-          it "fallbacks to 5671 port" do
+          it "falls back to 5671 port" do
             expect(subject[:port]).to eq(5671)
           end
         end
@@ -97,7 +97,7 @@ RSpec.describe AMQ::URI do
       context "only username present" do
         let(:uri) { "amqp://alpha@rabbitmq" }
 
-        it "parses user and fallbacks to nil pass" do
+        it "parses user and falls back to nil pass" do
           expect(subject[:user]).to eq("alpha")
           expect(subject[:pass]).to be_nil
         end
@@ -105,7 +105,7 @@ RSpec.describe AMQ::URI do
         context "with ':'" do
           let(:uri) { "amqp://alpha:@rabbitmq" }
 
-          it "parses user and fallbacks to "" (empty) pass" do
+          it "parses user and falls back to "" (empty) pass" do
             expect(subject[:user]).to eq("alpha")
             expect(subject[:pass]).to eq("")
           end
@@ -115,7 +115,7 @@ RSpec.describe AMQ::URI do
       context "only password present" do
         let(:uri) { "amqp://:beta@rabbitmq" }
 
-        it "parses pass and fallbacks to "" (empty) user" do
+        it "parses pass and falls back to "" (empty) user" do
           expect(subject[:user]).to eq("")
           expect(subject[:pass]).to eq("beta")
         end
@@ -124,7 +124,7 @@ RSpec.describe AMQ::URI do
       context "both absent" do
         let(:uri) { "amqp://rabbitmq" }
 
-        it "fallbacks to nil user and pass" do
+        it "falls back to nil user and pass" do
           expect(subject[:user]).to be_nil
           expect(subject[:pass]).to be_nil
         end
@@ -132,7 +132,7 @@ RSpec.describe AMQ::URI do
         context "with ':'" do
           let(:uri) { "amqp://:@rabbitmq" }
 
-          it "fallbacks to "" (empty) user and "" (empty) pass" do
+          it "falls back to "" (empty) user and "" (empty) pass" do
             expect(subject[:user]).to eq("")
             expect(subject[:pass]).to eq("")
           end
@@ -201,7 +201,7 @@ RSpec.describe AMQ::URI do
       context "absent" do
         let(:uri) { "amqp://rabbitmq" }
 
-        it "fallbacks to default nil vhost" do
+        it "falls back to default nil vhost" do
           expect(subject[:vhost]).to be_nil
         end
       end
@@ -222,7 +222,7 @@ RSpec.describe AMQ::URI do
       context "absent" do
         let(:uri) { "amqp://rabbitmq" }
 
-        it "fallbacks to default client connection parameters" do
+        it "falls back to default client connection parameters" do
           expect(subject[:heartbeat]).to be_nil
           expect(subject[:connection_timeout]).to be_nil
           expect(subject[:channel_max]).to be_nil
@@ -261,7 +261,7 @@ RSpec.describe AMQ::URI do
           context "absent" do
           let(:uri) { "amqps://rabbitmq" }
 
-          it "fallbacks to default tls options" do
+          it "falls back to default tls options" do
             expect(subject[:verify]).to be_falsey
             expect(subject[:fail_if_no_peer_cert]).to be_falsey
             expect(subject[:cacertfile]).to be_nil
