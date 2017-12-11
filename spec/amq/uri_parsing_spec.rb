@@ -27,18 +27,31 @@ RSpec.describe AMQ::URI do
         context "escaped" do
           let(:uri) { "amqp://r%61bbitmq:5672" }
 
-          it "parses host", pending: '?' do
+          it "parses host", pending: "Need to investigate, why URI module doesn't handle escaped host component..." do
             expect(subject[:host]).to eq("rabbitmq")
           end
         end
       end
 
-      context "absent" do
-        let(:uri) { "amqp://" }
+      if RUBY_VERSION >= "2.2"
+        context "absent" do
+          let(:uri) { "amqp://" }
 
-        # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
-        it "fallbacks to default nil host" do
-          expect(subject[:host]).to be_nil
+          # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
+          it "fallbacks to default nil host" do
+            expect(subject[:host]).to be_nil
+          end
+        end
+      end
+
+      if RUBY_VERSION < "2.2"
+        context "absent" do
+          let(:uri) { "amqp://" }
+
+          # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
+          it "raises InvalidURIError" do
+            expect { subject[:host] }.to raise_error(URI::InvalidURIError, /bad URI\(absolute but no path\)/)
+          end
         end
       end
     end
