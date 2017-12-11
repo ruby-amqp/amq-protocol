@@ -6,7 +6,10 @@ require "uri"
 module AMQ
   class URI
     # @private
-    AMQP_PORTS = {"amqp" => 5672, "amqps" => 5671}.freeze
+    AMQP_PORTS = {
+      "amqp" => 5672,
+      "amqps" => 5671
+    }.freeze
 
     DEFAULTS = {
       heartbeat: nil,

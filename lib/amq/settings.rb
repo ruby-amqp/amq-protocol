@@ -14,23 +14,31 @@ module AMQ
       # @see AMQ::Client::Settings.configure
       def self.default
         @default ||= {
-          # server
-          :host  => "127.0.0.1",
-          :port  => AMQ::Protocol::DEFAULT_PORT,
+          # TCP/IP connection parameters
+          host: "127.0.0.1",
+          port: AMQ::Protocol::DEFAULT_PORT,
+          auth_mechanism: [],
 
-          # login
-          :user  => "guest",
-          :pass  => "guest",
-          :vhost => "/",
+          # authentication parameters
+          user: "guest",
+          pass: "guest",
+          vhost: "/",
 
-          # ssl
-          :ssl => false,
+          # client connection parameters
+          frame_max: (128 * 1024),
+          heartbeat: nil,
+          connection_timeout: nil,
+          channel_max: nil,
 
-          :frame_max => (128 * 1024),
-          :heartbeat => 0
-        }
+          # ssl parameters
+          ssl: false,
+          verify: false,
+          fail_if_no_peer_cert: false,
+          cacertfile: nil,
+          certfile: nil,
+          keyfile: nil
+        }.freeze
       end
-
 
       # Merges given configuration parameters with defaults and returns
       # the result.
