@@ -1,5 +1,9 @@
 require "amq/uri"
 
+# https://www.rabbitmq.com/uri-spec.html
+# http://www.ietf.org/rfc/rfc3986.txt
+# https://tools.ietf.org/rfc/rfc5246.txt
+
 RSpec.describe AMQ::URI do
   describe ".parse" do
     subject { described_class.parse(uri) }
@@ -12,7 +16,127 @@ RSpec.describe AMQ::URI do
       end
     end
 
-    context "path" do
+    describe "host" do
+      context "present" do
+        let(:uri) { "amqp://rabbitmq" }
+
+        it "parses host" do
+          expect(subject[:host]).to eq("rabbitmq")
+        end
+
+        context "escaped" do
+          let(:uri) { "amqp://r%61bbitmq:5672" }
+
+          it "parses host", pending: '?' do
+            expect(subject[:host]).to eq("rabbitmq")
+          end
+        end
+      end
+
+      context "absent" do
+        let(:uri) { "amqp://" }
+
+        # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
+        it "fallbacks to default nil host" do
+          expect(subject[:host]).to be_nil
+        end
+      end
+    end
+
+    describe "port" do
+      context "present" do
+        let(:uri) { "amqp://rabbitmq:5672" }
+
+        it "parses port" do
+          expect(subject[:port]).to eq(5672)
+        end
+      end
+
+      context "absent" do
+        context "schema amqp" do
+          let(:uri) { "amqp://rabbitmq" }
+
+          it "fallbacks to 5672 port" do
+            expect(subject[:port]).to eq(5672)
+          end
+        end
+
+        context "schema amqps" do
+          let(:uri) { "amqps://rabbitmq" }
+
+          it "fallbacks to 5671 port" do
+            expect(subject[:port]).to eq(5671)
+          end
+        end
+      end
+    end
+
+    describe "username and passowrd" do
+      context "both present" do
+        let(:uri) { "amqp://alpha:beta@rabbitmq" }
+
+        it "parses user and pass" do
+          expect(subject[:user]).to eq("alpha")
+          expect(subject[:pass]).to eq("beta")
+        end
+      end
+
+      context "only username present" do
+        let(:uri) { "amqp://alpha@rabbitmq" }
+
+        it "parses user and fallbacks to nil pass" do
+          expect(subject[:user]).to eq("alpha")
+          expect(subject[:pass]).to be_nil
+        end
+
+        context "with ':'" do
+          let(:uri) { "amqp://alpha:@rabbitmq" }
+
+          it "parses user and fallbacks to "" (empty) pass" do
+            expect(subject[:user]).to eq("alpha")
+            expect(subject[:pass]).to eq("")
+          end
+        end
+      end
+
+      context "only password present" do
+        let(:uri) { "amqp://:beta@rabbitmq" }
+
+        it "parses pass and fallbacks to "" (empty) user" do
+          expect(subject[:user]).to eq("")
+          expect(subject[:pass]).to eq("beta")
+        end
+      end
+
+      context "both absent" do
+        let(:uri) { "amqp://rabbitmq" }
+
+        it "fallbacks to nil user and pass" do
+          expect(subject[:user]).to be_nil
+          expect(subject[:pass]).to be_nil
+        end
+
+        context "with ':'" do
+          let(:uri) { "amqp://:@rabbitmq" }
+
+          it "fallbacks to "" (empty) user and "" (empty) pass" do
+            expect(subject[:user]).to eq("")
+            expect(subject[:pass]).to eq("")
+          end
+        end
+      end
+
+      context "escaped" do
+        let(:uri) { "amqp://%61lpha:bet%61@rabbitmq" }
+
+        it "parses user and pass" do
+          expect(subject[:user]).to eq("alpha")
+          expect(subject[:pass]).to eq("beta")
+        end
+      end
+    end
+
+    describe "path" do
       context "present" do
         let(:uri) { "amqp://rabbitmq/staging" }
 
@@ -51,6 +175,14 @@ RSpec.describe AMQ::URI do
             expect(subject[:vhost]).to eq("/staging")
           end
         end
+
+        context "escaped" do
+          let(:uri) { "amqp://rabbitmq/%2Fstaging%2Fcritical%2Fsubsystem-a" }
+
+          it "parses vhost as string with leading slash" do
+            expect(subject[:vhost]).to eq("/staging/critical/subsystem-a")
+          end
+        end
       end
 
       context "absent" do
@@ -62,27 +194,7 @@ RSpec.describe AMQ::URI do
       end
     end
 
-    context "username and passowrd" do
-      context "present" do
-        let(:uri) { "amqp://alpha:beta@rabbitmq" }
-
-        it "parses user and pass" do
-          expect(subject[:user]).to eq("alpha")
-          expect(subject[:pass]).to eq("beta")
-        end
-      end
-
-      context "absent" do
-        let(:uri) { "amqp://rabbitmq" }
-
-        it "fallbacks to nil user and pass" do
-          expect(subject[:user]).to be_nil
-          expect(subject[:pass]).to be_nil
-        end
-      end
-    end
-
-    context "query parameters" do
+    describe "query parameters" do
       context "present" do
         let(:uri) { "amqp://rabbitmq?heartbeat=10&connection_timeout=100&channel_max=1000&auth_mechanism=plain&auth_mechanism=amqplain" }
 
