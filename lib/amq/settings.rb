@@ -14,23 +14,31 @@ module AMQ
       # @see AMQ::Client::Settings.configure
       def self.default
         @default ||= {
-          # server
-          :host  => "127.0.0.1",
-          :port  => AMQ::Protocol::DEFAULT_PORT,
+          # TCP/IP connection parameters
+          host: "127.0.0.1",
+          port: AMQ::Protocol::DEFAULT_PORT,
+          auth_mechanism: [],
 
-          # login
-          :user  => "guest",
-          :pass  => "guest",
-          :vhost => "/",
+          # authentication parameters
+          user: "guest",
+          pass: "guest",
+          vhost: "/",
 
-          # ssl
-          :ssl => false,
+          # client connection parameters
+          frame_max: (128 * 1024),
+          heartbeat: nil,
+          connection_timeout: nil,
+          channel_max: nil,
 
-          :frame_max => (128 * 1024),
-          :heartbeat => 0
-        }
+          # ssl parameters
+          ssl: false,
+          verify: false,
+          fail_if_no_peer_cert: false,
+          cacertfile: nil,
+          certfile: nil,
+          keyfile: nil
+        }.freeze
       end
-
 
       # Merges given configuration parameters with defaults and returns
       # the result.
@@ -43,9 +51,18 @@ module AMQ
       # @option settings [String] :user ("guest") Username to use for authentication.
       # @option settings [String] :pass ("guest") Password to use for authentication.
       # @option settings [String] :ssl (false) Should be use TLS (SSL) for connection?
-      # @option settings [String] :timeout (nil) Connection timeout.
-      # @option settings [String] :broker (nil) Broker name (use if you intend to use broker-specific features).
       # @option settings [Fixnum] :frame_max (131072) Maximum frame size to use. If broker cannot support frames this large, broker's maximum value will be used instead.
+      # @option settings [Integer] :heartbeat (nil) Heartbeat timeout value in seconds to negotiate with the server.
+      # @option settings [Integer] :connection_timeout (nil) Time in milliseconds to wait while establishing a TCP connection to the server before giving up.
+      # @option settings [Fixnum] :channel_max (nil) Maximum number of channels to permit on this connection.
+      # @option settings [Array] :auth_mechanism ([]) SASL authentication mechanisms to consider when negotiating a mechanism with the server. This parameter can be specified multiple times to specify multiple mechanisms, e.g. `?auth_mechanism=plain&auth_mechanism=amqplain`.
+      # @option settings [Boolean] :verify (false) Controls peer verification mode.
+      # @option settings [Boolean] :fail_if_no_peer_cert (false) When set to true, TLS connection will be rejected if client fails to provide a certificate.
+      # @option settings [String] :cacertfile (nil) Certificate Authority (CA) certificate file path.
+      # @option settings [String] :certfile (nil) Server certificate file path.
+      # @option settings [String] :keyfile (nil) Server private key file path.
+      #
+      # @option settings [String] :broker (nil) Broker name (use if you intend to use broker-specific features).
       #
       # @return [Hash] Merged configuration parameters.
       def self.configure(settings = nil)
