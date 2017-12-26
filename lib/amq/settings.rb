@@ -37,7 +37,7 @@ module AMQ
           cacertfile: nil,
           certfile: nil,
           keyfile: nil
-        }.freeze
+        }
       end
 
       # Merges given configuration parameters with defaults and returns
