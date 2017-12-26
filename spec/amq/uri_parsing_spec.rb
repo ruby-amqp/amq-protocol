@@ -236,9 +236,9 @@ RSpec.describe AMQ::URI do
         end
       end
 
-      context "schema amqps" do
-        context "tls parameters" do
-          context "present" do
+      context "amqpa schema" do
+        context "TLS parameters in query string" do
+          context "case 1" do
             let(:uri) { "amqps://rabbitmq?verify=true&fail_if_no_peer_cert=true&cacertfile=/examples/tls/cacert.pem&certfile=/examples/tls/client_cert.pem&keyfile=/examples/tls/client_key.pem" }
 
             it "parses tls options" do
@@ -247,6 +247,18 @@ RSpec.describe AMQ::URI do
               expect(subject[:cacertfile]).to eq("/examples/tls/cacert.pem")
               expect(subject[:certfile]).to eq("/examples/tls/client_cert.pem")
               expect(subject[:keyfile]).to eq("/examples/tls/client_key.pem")
+            end
+          end
+
+          context "case 2" do
+            let(:uri) { "amqps://bunny_gem:bunny_password@/bunny_testbed?heartbeat=10&connection_timeout=100&channel_max=1000&verify=false&cacertfile=spec/tls/ca_certificate.pem&certfile=spec/tls/client_certificate.pem&keyfile=spec/tls/client_key.pem" }
+
+            it "parses tls options" do
+              expect(subject[:verify]).to be_falsey
+              expect(subject[:fail_if_no_peer_cert]).to be_falsey
+              expect(subject[:cacertfile]).to eq("spec/tls/ca_certificate.pem")
+              expect(subject[:certfile]).to eq("spec/tls/client_certificate.pem")
+              expect(subject[:keyfile]).to eq("spec/tls/client_key.pem")
             end
           end
 

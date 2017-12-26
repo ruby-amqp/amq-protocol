@@ -52,11 +52,19 @@ module AMQ
         opts[:channel_max] = normalized_query_params["channel_max"].to_i
         opts[:auth_mechanism] = normalized_query_params["auth_mechanism"]
 
-        %w(verify fail_if_no_peer_cert cacertfile certfile keyfile).each do |tls_option|
+        %w(cacertfile certfile keyfile).each do |tls_option|
           if normalized_query_params[tls_option] && uri.scheme == "amqp"
             raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
           else
             opts[tls_option.to_sym] = normalized_query_params[tls_option]
+          end
+        end
+
+        %w(verify fail_if_no_peer_cert).each do |tls_option|
+          if normalized_query_params[tls_option] && uri.scheme == "amqp"
+            raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
+          else
+            opts[tls_option.to_sym] = as_boolean(normalized_query_params[tls_option])
           end
         end
       end
@@ -67,5 +75,26 @@ module AMQ
     def self.parse_amqp_url(s)
       parse(s)
     end
+
+    #
+    # Implementation
+    #
+
+    # Normalizes values returned by CGI.parse.
+    # @private
+    def self.as_boolean(val)
+      case val
+      when true    then true
+      when false   then false
+      when 1       then true
+      when 0       then false
+      when "true"  then true
+      when "false" then false
+      else
+        !!val
+      end
+    end
+
+    private_class_method :as_boolean
   end
 end
