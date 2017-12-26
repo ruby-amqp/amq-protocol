@@ -82,7 +82,7 @@ module AMQ
           settings = self.parse_amqp_url(settings)
           self.default.merge(settings)
         when NilClass then
-          self.default
+          self.default.dup
         end
       end
 
