@@ -23,14 +23,6 @@ RSpec.describe AMQ::URI do
         it "parses host" do
           expect(subject[:host]).to eq("rabbitmq")
         end
-
-        context "%-encoded" do
-          let(:uri) { "amqp://r%61bbitmq:5672" }
-
-          it "parses host", pending: "Need to investigate, why URI module doesn't handle %-encoded host component..." do
-            expect(subject[:host]).to eq("rabbitmq")
-          end
-        end
       end
 
       if RUBY_VERSION >= "2.2"
@@ -181,7 +173,7 @@ RSpec.describe AMQ::URI do
           end
         end
 
-        context "with trailing %-encoded slash" do
+        context "with trailing %-encoded slashes" do
           let(:uri) { "amqp://rabbitmq/%2Fstaging" }
 
           it "parses vhost as string with leading slash" do
