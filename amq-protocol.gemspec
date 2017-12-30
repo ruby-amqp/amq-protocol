@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   DESC
   s.email = ["michael.s.klishin@gmail.com"]
   s.licenses    = ["MIT"]
-  s.required_ruby_version = Gem::Requirement.new(">= 2.0")
+  s.required_ruby_version = Gem::Requirement.new(">= 2.2")
 
   # files
   s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
