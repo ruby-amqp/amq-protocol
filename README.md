@@ -1,16 +1,17 @@
-# What is amq-protocol.
+# What is amq-protocol
 
 amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not an
-AMQP client: amq-protocol only handles serialization and deserialization.
+AMQP 0-9-1 client such as [Bunny](http://rubybunny.info): amq-protocol only handles serialization and deserialization.
 
-If you want to write your own AMQP client, this gem will handle all the serialization
+If you want to write your own AMQP 0-9-1 client, this gem will handle all the serialization
 needs for you, including RabbitMQ extensions to AMQP 0.9.1.
 
 
 ## Supported Ruby Versions
 
-amq-protocol `1.9.2` was the last version to support Ruby 1.8 and 1.9.
-amq-protocol `2.0.0` and later only supports Ruby 2.0+.
+ * amq-protocol `2.3.0` only supports Ruby 2.2+.
+ * amq-protocol `2.0.0` through `2.2.0` and later supports Ruby 2.0+.
+ * amq-protocol `1.9.2` was the last version to support Ruby 1.8 and 1.9.
 
 
 ## Installation
