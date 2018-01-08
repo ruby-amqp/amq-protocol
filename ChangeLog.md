@@ -1,6 +1,11 @@
-## Changes between 2.2.0 and 2.3.0 (unreleased)
+## Changes between 2.2.0 and 2.3.0 (Jan 8th, 2018)
 
-No changes yet.
+### Support for Additional URI Query Parameters
+
+GitHub issue: [#67](https://github.com/ruby-amqp/amq-protocol/issues/67), [#68](https://github.com/ruby-amqp/amq-protocol/issues/68), [#69](https://github.com/ruby-amqp/amq-protocol/issues/69).
+
+Contributed by Andrew Babichev.
+
 
 
 
