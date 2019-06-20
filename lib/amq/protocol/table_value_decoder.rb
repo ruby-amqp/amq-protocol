@@ -125,7 +125,7 @@ module AMQ
       def self.decode_big_decimal(data, offset)
         decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
         offset += 5
-        v = BigDecimal.new(raw.to_s) * (BigDecimal.new(TEN) ** -decimals)
+        v = BigDecimal(raw.to_s) * (BigDecimal(TEN) ** -decimals)
 
         [v, offset]
       end # self.decode_big_decimal(data, offset)

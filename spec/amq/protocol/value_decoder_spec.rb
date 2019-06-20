@@ -8,7 +8,7 @@ module AMQ
       it "is capable of decoding basic arrays TableValueEncoder encodes" do
         input1 = [1, 2, 3]
 
-        value, offset = described_class.decode_array(TableValueEncoder.encode(input1), 1)
+        value, _offset = described_class.decode_array(TableValueEncoder.encode(input1), 1)
         expect(value.size).to eq(3)
         expect(value.first).to eq(1)
         expect(value).to eq(input1)
@@ -17,7 +17,7 @@ module AMQ
 
         input2 = ["one", 2, "three"]
 
-        value, offset = described_class.decode_array(TableValueEncoder.encode(input2), 1)
+        value, _offset = described_class.decode_array(TableValueEncoder.encode(input2), 1)
         expect(value.size).to eq(3)
         expect(value.first).to eq("one")
         expect(value).to eq(input2)
@@ -26,7 +26,7 @@ module AMQ
 
         input3 = ["one", 2, "three", 4.0, 5000000.0]
 
-        value, offset = described_class.decode_array(TableValueEncoder.encode(input3), 1)
+        value, _offset = described_class.decode_array(TableValueEncoder.encode(input3), 1)
         expect(value.size).to eq(5)
         expect(value.last).to eq(5000000.0)
         expect(value).to eq(input3)
@@ -42,7 +42,7 @@ module AMQ
         # puts(TableValueEncoder.encode(input1).inspect)
 
 
-        value, offset = described_class.decode_array(data1, 1)
+        value, _offset = described_class.decode_array(data1, 1)
         expect(value.size).to eq(2)
         expect(value.first).to eq(Hash["one" => 2])
         expect(value).to eq(input1)
@@ -51,7 +51,7 @@ module AMQ
 
         input2 = ["one", 2, { "three" => { "four" => 5.0 } }]
 
-        value, offset = described_class.decode_array(TableValueEncoder.encode(input2), 1)
+        value, _offset = described_class.decode_array(TableValueEncoder.encode(input2), 1)
         expect(value.size).to eq(3)
         expect(value.last["three"]["four"]).to eq(5.0)
         expect(value).to eq(input2)
