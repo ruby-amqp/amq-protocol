@@ -576,6 +576,79 @@ module AMQ
 
       end
 
+      class UpdateSecret < Protocol::Method
+        @name = "connection.update-secret"
+        @method_id = 70
+        @index = 0x000A0046 # 10, 70, 655430
+        @packed_indexes = [10, 70].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          new_secret = data[offset, length]
+          offset += length
+          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset += 1
+          reason = data[offset, length]
+          offset += length
+          self.new(new_secret, reason)
+        end
+
+        attr_reader :new_secret, :reason
+        def initialize(new_secret, reason)
+          @new_secret = new_secret
+          @reason = reason
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # ['new_secret = nil', 'reason = nil']
+        def self.encode(new_secret, reason)
+          channel = 0
+          buffer = @packed_indexes.dup
+          buffer << new_secret.to_s.bytesize.chr
+          buffer << new_secret.to_s
+          buffer << reason.to_s.bytesize.chr
+          buffer << reason.to_s
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
+      class UpdateSecretOk < Protocol::Method
+        @name = "connection.update-secret-ok"
+        @method_id = 71
+        @index = 0x000A0047 # 10, 71, 655431
+        @packed_indexes = [10, 71].pack(PACK_UINT16_X2).freeze
+
+        # @return
+        def self.decode(data)
+          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
+          self.new()
+        end
+
+        def initialize()
+        end
+
+        def self.has_content?
+          false
+        end
+
+        # @return
+        # []
+        def self.encode()
+          channel = 0
+          buffer = @packed_indexes.dup
+          MethodFrame.new(buffer, channel)
+        end
+
+      end
+
     end
 
     class Channel < Protocol::Class
