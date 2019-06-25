@@ -251,7 +251,7 @@ module AMQ
         end
 
         # @return
-        # ['client_properties = nil', "mechanism = 'PLAIN'", 'response = nil', "locale = 'en_US'"]
+        # [u'client_properties = nil', u"mechanism = u'PLAIN'", u'response = nil', u"locale = u'en_US'"]
         def self.encode(client_properties, mechanism, response, locale)
           channel = 0
           buffer = @packed_indexes.dup
@@ -307,7 +307,7 @@ module AMQ
         end
 
         # @return
-        # ['response = nil']
+        # [u'response = nil']
         def self.encode(response)
           channel = 0
           buffer = @packed_indexes.dup
@@ -362,7 +362,7 @@ module AMQ
         end
 
         # @return
-        # ['channel_max = false', 'frame_max = false', 'heartbeat = false']
+        # [u'channel_max = false', u'frame_max = false', u'heartbeat = false']
         def self.encode(channel_max, frame_max, heartbeat)
           channel = 0
           buffer = @packed_indexes.dup
@@ -386,7 +386,7 @@ module AMQ
         end
 
         # @return
-        # ["virtual_host = '/'", 'capabilities = EMPTY_STRING', 'insist = false']
+        # [u"virtual_host = u'/'", u'capabilities = EMPTY_STRING', u'insist = false']
         def self.encode(virtual_host)
           capabilities = EMPTY_STRING
           insist = false
@@ -467,7 +467,7 @@ module AMQ
         end
 
         # @return
-        # ['reply_code = nil', 'reply_text = EMPTY_STRING', 'class_id = nil', 'method_id = nil']
+        # [u'reply_code = nil', u'reply_text = EMPTY_STRING', u'class_id = nil', u'method_id = nil']
         def self.encode(reply_code, reply_text, class_id, method_id)
           channel = 0
           buffer = @packed_indexes.dup
@@ -536,7 +536,7 @@ module AMQ
         end
 
         # @return
-        # ['reason = EMPTY_STRING']
+        # [u'reason = EMPTY_STRING']
         def self.encode(reason)
           channel = 0
           buffer = @packed_indexes.dup
@@ -585,8 +585,8 @@ module AMQ
         # @return
         def self.decode(data)
           offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
-          length = data[offset, 1].unpack(PACK_CHAR).first
-          offset += 1
+          length = data[offset, 4].unpack(PACK_UINT32).first
+          offset += 4
           new_secret = data[offset, length]
           offset += length
           length = data[offset, 1].unpack(PACK_CHAR).first
@@ -607,11 +607,11 @@ module AMQ
         end
 
         # @return
-        # ['new_secret = nil', 'reason = nil']
+        # [u'new_secret = nil', u'reason = nil']
         def self.encode(new_secret, reason)
           channel = 0
           buffer = @packed_indexes.dup
-          buffer << new_secret.to_s.bytesize.chr
+          buffer << [new_secret.to_s.bytesize].pack(PACK_UINT32)
           buffer << new_secret.to_s
           buffer << reason.to_s.bytesize.chr
           buffer << reason.to_s
@@ -669,7 +669,7 @@ module AMQ
         end
 
         # @return
-        # ['out_of_band = EMPTY_STRING']
+        # [u'out_of_band = EMPTY_STRING']
         def self.encode(channel, out_of_band)
           buffer = @packed_indexes.dup
           buffer << out_of_band.to_s.bytesize.chr
@@ -732,7 +732,7 @@ module AMQ
         end
 
         # @return
-        # ['active = nil']
+        # [u'active = nil']
         def self.encode(channel, active)
           buffer = @packed_indexes.dup
           bit_buffer = 0
@@ -768,7 +768,7 @@ module AMQ
         end
 
         # @return
-        # ['active = nil']
+        # [u'active = nil']
         def self.encode(channel, active)
           buffer = @packed_indexes.dup
           bit_buffer = 0
@@ -814,7 +814,7 @@ module AMQ
         end
 
         # @return
-        # ['reply_code = nil', 'reply_text = EMPTY_STRING', 'class_id = nil', 'method_id = nil']
+        # [u'reply_code = nil', u'reply_text = EMPTY_STRING', u'class_id = nil', u'method_id = nil']
         def self.encode(channel, reply_code, reply_text, class_id, method_id)
           buffer = @packed_indexes.dup
           buffer << [reply_code].pack(PACK_UINT16)
@@ -875,7 +875,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'exchange = nil', "type = 'direct'", 'passive = false', 'durable = false', 'auto_delete = false', 'internal = false', 'nowait = false', 'arguments = {}']
+        # [u'ticket = 0', u'exchange = nil', u"type = u'direct'", u'passive = false', u'durable = false', u'auto_delete = false', u'internal = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, exchange, type, passive, durable, auto_delete, internal, nowait, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -931,7 +931,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'exchange = nil', 'if_unused = false', 'nowait = false']
+        # [u'ticket = 0', u'exchange = nil', u'if_unused = false', u'nowait = false']
         def self.encode(channel, exchange, if_unused, nowait)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -981,7 +981,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'destination = nil', 'source = nil', 'routing_key = EMPTY_STRING', 'nowait = false', 'arguments = {}']
+        # [u'ticket = 0', u'destination = nil', u'source = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1035,7 +1035,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'destination = nil', 'source = nil', 'routing_key = EMPTY_STRING', 'nowait = false', 'arguments = {}']
+        # [u'ticket = 0', u'destination = nil', u'source = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, destination, source, routing_key, nowait, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1097,7 +1097,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'passive = false', 'durable = false', 'exclusive = false', 'auto_delete = false', 'nowait = false', 'arguments = {}']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'passive = false', u'durable = false', u'exclusive = false', u'auto_delete = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, passive, durable, exclusive, auto_delete, nowait, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1163,7 +1163,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'exchange = nil', 'routing_key = EMPTY_STRING', 'nowait = false', 'arguments = {}']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'exchange = nil', u'routing_key = EMPTY_STRING', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, exchange, routing_key, nowait, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1217,7 +1217,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'nowait = false']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'nowait = false']
         def self.encode(channel, queue, nowait)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1270,7 +1270,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'if_unused = false', 'if_empty = false', 'nowait = false']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'if_unused = false', u'if_empty = false', u'nowait = false']
         def self.encode(channel, queue, if_unused, if_empty, nowait)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1325,7 +1325,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'exchange = nil', 'routing_key = EMPTY_STRING', 'arguments = {}']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'exchange = nil', u'routing_key = EMPTY_STRING', u'arguments = {}']
         def self.encode(channel, queue, exchange, routing_key, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1613,7 +1613,7 @@ module AMQ
         end
 
         # @return
-        # ['prefetch_size = false', 'prefetch_count = false', 'global = false']
+        # [u'prefetch_size = false', u'prefetch_count = false', u'global = false']
         def self.encode(channel, prefetch_size, prefetch_count, global)
           buffer = @packed_indexes.dup
           buffer << [prefetch_size].pack(PACK_UINT32)
@@ -1660,7 +1660,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'consumer_tag = EMPTY_STRING', 'no_local = false', 'no_ack = false', 'exclusive = false', 'nowait = false', 'arguments = {}']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'consumer_tag = EMPTY_STRING', u'no_local = false', u'no_ack = false', u'exclusive = false', u'nowait = false', u'arguments = {}']
         def self.encode(channel, queue, consumer_tag, no_local, no_ack, exclusive, nowait, arguments)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1739,7 +1739,7 @@ module AMQ
         end
 
         # @return
-        # ['consumer_tag = nil', 'nowait = false']
+        # [u'consumer_tag = nil', u'nowait = false']
         def self.encode(channel, consumer_tag, nowait)
           buffer = @packed_indexes.dup
           buffer << consumer_tag.to_s.bytesize.chr
@@ -1792,7 +1792,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'exchange = EMPTY_STRING', 'routing_key = EMPTY_STRING', 'mandatory = false', 'immediate = false', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
+        # [u'ticket = 0', u'exchange = EMPTY_STRING', u'routing_key = EMPTY_STRING', u'mandatory = false', u'immediate = false', 'user_headers = nil', 'payload = ""', 'frame_size = nil']
         def self.encode(channel, payload, user_headers, exchange, routing_key, mandatory, immediate, frame_size)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -1916,7 +1916,7 @@ module AMQ
         end
 
         # @return
-        # ['ticket = 0', 'queue = EMPTY_STRING', 'no_ack = false']
+        # [u'ticket = 0', u'queue = EMPTY_STRING', u'no_ack = false']
         def self.encode(channel, queue, no_ack)
           ticket = 0
           buffer = @packed_indexes.dup
@@ -2030,7 +2030,7 @@ module AMQ
         end
 
         # @return
-        # ['delivery_tag = false', 'multiple = false']
+        # [u'delivery_tag = false', u'multiple = false']
         def self.encode(channel, delivery_tag, multiple)
           buffer = @packed_indexes.dup
           buffer << AMQ::Pack.pack_uint64_big_endian(delivery_tag)
@@ -2054,7 +2054,7 @@ module AMQ
         end
 
         # @return
-        # ['delivery_tag = nil', 'requeue = true']
+        # [u'delivery_tag = nil', u'requeue = true']
         def self.encode(channel, delivery_tag, requeue)
           buffer = @packed_indexes.dup
           buffer << AMQ::Pack.pack_uint64_big_endian(delivery_tag)
@@ -2078,7 +2078,7 @@ module AMQ
         end
 
         # @return
-        # ['requeue = false']
+        # [u'requeue = false']
         def self.encode(channel, requeue)
           buffer = @packed_indexes.dup
           bit_buffer = 0
@@ -2101,7 +2101,7 @@ module AMQ
         end
 
         # @return
-        # ['requeue = false']
+        # [u'requeue = false']
         def self.encode(channel, requeue)
           buffer = @packed_indexes.dup
           bit_buffer = 0
@@ -2164,7 +2164,7 @@ module AMQ
         end
 
         # @return
-        # ['delivery_tag = false', 'multiple = false', 'requeue = true']
+        # [u'delivery_tag = false', u'multiple = false', u'requeue = true']
         def self.encode(channel, delivery_tag, multiple, requeue)
           buffer = @packed_indexes.dup
           buffer << AMQ::Pack.pack_uint64_big_endian(delivery_tag)
@@ -2344,7 +2344,7 @@ module AMQ
         end
 
         # @return
-        # ['nowait = false']
+        # [u'nowait = false']
         def self.encode(channel, nowait)
           buffer = @packed_indexes.dup
           bit_buffer = 0
