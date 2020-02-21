@@ -24,6 +24,4 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.extra_rdoc_files = ["README.md"] + Dir.glob("doc/*")
-
-  s.rubyforge_project = "amq-protocol"
 end
