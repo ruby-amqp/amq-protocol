@@ -5,6 +5,10 @@ No changes yet.
 
 ## Changes between 2.3.0 and 2.3.1 (April 8th, 2020)
 
+### Support for connection.update-secret
+
+Used together with the `rabbitmq-auth-backend-oauth2` plugin.
+
 ### Squashed a gemspec Warning
 
 GitHub issue: [ruby-amqp/amq-protocol#75](https://github.com/ruby-amqp/amq-protocol/issues/75).
