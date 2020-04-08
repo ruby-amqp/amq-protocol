@@ -1,6 +1,13 @@
-## Changes between 2.3.0 and 2.4.0 (unreleased)
+## Changes between 2.3.1 and 2.3.2 (unreleased)
 
 No changes yet.
+
+
+## Changes between 2.3.0 and 2.3.1 (April 8th, 2020)
+
+### Squashed a gemspec Warning
+
+GitHub issue: [ruby-amqp/amq-protocol#75](https://github.com/ruby-amqp/amq-protocol/issues/75).
 
 
 
