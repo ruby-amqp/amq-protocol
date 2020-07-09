@@ -27,12 +27,12 @@ module AMQ
         when String then
           accumulator << TYPE_STRING
           accumulator << [value.bytesize].pack(PACK_UINT32)
-          accumulator << value
+          accumulator << value.dup.force_encoding(accumulator.encoding)
         when Symbol then
           str = value.to_s
           accumulator << TYPE_STRING
           accumulator << [str.bytesize].pack(PACK_UINT32)
-          accumulator << str
+          accumulator << str.force_encoding(accumulator.encoding)
         when Integer then
           accumulator << TYPE_SIGNED_64BIT
           accumulator << [value].pack(PACK_INT64_BE)
