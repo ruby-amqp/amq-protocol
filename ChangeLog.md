@@ -1,6 +1,14 @@
-## Changes between 2.3.1 and 2.3.2 (unreleased)
+## Changes between 2.3.2 and 2.3.3 (unreleased)
 
 No changes yet.
+
+## Changes between 2.3.1 and 2.3.2 (July 10th, 2020)
+
+### Safer Encoding Handling When Serialising Message Properties and Headers
+
+Contributed by @bbascarevic-tti.
+
+GitHub issue: [ruby-amqp/amq-protocol#76](https://github.com/ruby-amqp/amq-protocol/issues/76)
 
 
 ## Changes between 2.3.0 and 2.3.1 (April 8th, 2020)
