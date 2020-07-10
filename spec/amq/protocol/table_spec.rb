@@ -46,6 +46,16 @@ module AMQ
             to eql("\x00\x00\x00$\vcoordinatesF\x00\x00\x00\x13\tlongituded@2\x11\x11\x16\xA8\xB8\xF1".force_encoding(Encoding::ASCII_8BIT))
         end
 
+        it "should serialize long UTF-8 strings and symbols" do
+          long_utf8 = "à" * 192
+          long_ascii8 = long_utf8.dup.force_encoding(::Encoding::ASCII_8BIT)
+
+          input = { "utf8_string" => long_utf8, "utf8_symbol" => long_utf8.to_sym }
+          output = { "utf8_string" => long_ascii8, "utf8_symbol" => long_ascii8 }
+
+          expect(Table.decode(Table.encode(input))).to eq(output)
+        end
+
         DATA.each do |data, encoded|
           it "should return #{encoded.inspect} for #{data.inspect}" do
             expect(Table.encode(data)).to eql(encoded.force_encoding(Encoding::ASCII_8BIT))
@@ -204,7 +214,7 @@ module AMQ
                 "rev"   => 1.0,
                 "spec"  => {
                   "url"  => "http://bit.ly/hw2ELX",
-                  "utf8" => "à bientôt".force_encoding(::Encoding::ASCII_8BIT)
+                  "utf8" => "à bientôt"
                 }
               },
               "true"     => true,
@@ -212,7 +222,7 @@ module AMQ
               "nil"      => nil
             }
           }
-          expect(Table.decode(Table.encode(input))).to eq(input)
+          expect(Table.decode(Table.encode(input))).to eq(input.tap { |r| r["hashval"]["protocol"]["spec"]["utf8"].force_encoding(::Encoding::ASCII_8BIT) })
         end
 
 
