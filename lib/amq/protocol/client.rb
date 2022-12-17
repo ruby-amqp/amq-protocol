@@ -174,7 +174,7 @@ module AMQ
 
         # Otherwise String#slice on 1.9 will operate with code points,
         # and we need bytes. MK.
-        body.force_encoding("ASCII-8BIT") if RUBY_VERSION.to_f >= 1.9
+        body.force_encoding("ASCII-8BIT") if RUBY_VERSION.to_f >= 1.9 && body.encoding != Encoding::BINARY
 
         array = Array.new
         while body && !body.empty?
