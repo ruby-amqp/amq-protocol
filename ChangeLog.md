@@ -1,3 +1,8 @@
+## Changes between 2.3.3 and 2.3.4 (unreleased)
+
+No changes yet.
+
+
 ## Changes between 2.3.2 and 2.3.3 (February 17, 2025)
 
 ### Improved Compatibility with Ruby 3.4
