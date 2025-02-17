@@ -1,6 +1,17 @@
-## Changes between 2.3.2 and 2.3.3 (unreleased)
+## Changes between 2.3.2 and 2.3.3 (February 17, 2025)
 
-No changes yet.
+### Improved Compatibility with Ruby 3.4
+
+Contribiuted by @BenTalagan.
+
+GitHub issue: [#79](https://github.com/ruby-amqp/amq-protocol/pull/79)
+
+### Support Binary-Encoded Frozen Strings for Payloads
+
+Contribiuted by @djrodgerspryor.
+
+GitHub issue: [#78](https://github.com/ruby-amqp/amq-protocol/pull/78)
+
 
 ## Changes between 2.3.1 and 2.3.2 (July 10th, 2020)
 
