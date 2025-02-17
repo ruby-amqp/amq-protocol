@@ -34,7 +34,7 @@ module AMQ
       opts[:scheme] = uri.scheme
       opts[:user]   = ::CGI::unescape(uri.user) if uri.user
       opts[:pass]   = ::CGI::unescape(uri.password) if uri.password
-      opts[:host]   = uri.host if uri.host
+      opts[:host]   = uri.host if uri.host and uri.host != ""
       opts[:port]   = uri.port || AMQP_DEFAULT_PORTS[uri.scheme]
       opts[:ssl]    = uri.scheme.to_s.downcase =~ /amqps/i # TODO: rename to tls
       if uri.path =~ %r{^/(.*)}

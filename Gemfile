@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
+
 group :development do
   # excludes Windows, Rubinius and JRuby
   gem "ruby-prof", :platforms => [:mri_19, :mri_20, :mri_21]
@@ -13,6 +14,7 @@ group :test do
   gem "rspec", ">= 3.8.0"
   gem "rspec-its"
   gem "simplecov"
+  gem 'bigdecimal'
 end
 
 group :development, :test do

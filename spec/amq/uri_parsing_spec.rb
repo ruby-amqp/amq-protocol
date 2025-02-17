@@ -30,7 +30,7 @@ RSpec.describe AMQ::URI do
           let(:uri) { "amqp://" }
 
           # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
-          it "falls back to default nil host" do
+          it "falls back to a blank value" do
             expect(subject[:host]).to be_nil
           end
         end
