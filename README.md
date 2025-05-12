@@ -47,20 +47,13 @@ To run tests, use
 amq-protocol is maintained by [Michael Klishin](https://github.com/michaelklishin).
 
 
-## CI Status
-
-[![Build Status](https://secure.travis-ci.org/ruby-amqp/amq-protocol.svg)](https://travis-ci.org/ruby-amqp/amq-protocol)
-
-
 ## Issues
 
 Please report any issues you may find to our [Issue tracker](http://github.com/ruby-amqp/amq-protocol/issues) on GitHub.
 
-
 ## Mailing List
 
 Any questions you may have should be sent to the [Ruby AMQP mailing list](http://groups.google.com/group/ruby-amqp).
-
 
 ## License
 
