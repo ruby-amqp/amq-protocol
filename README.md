@@ -9,6 +9,8 @@ needs for you, including RabbitMQ extensions to AMQP 0.9.1.
 
 ## Supported Ruby Versions
 
+ * amq-protocol `2.3.4` has fixes for Ruby 3.5 compatibility
+ * amq-protocol `2.3.3` has fixes for Ruby 3.4 compatibility
  * amq-protocol `2.3.0` only supports Ruby 2.2+.
  * amq-protocol `2.0.0` through `2.2.0` and later supports Ruby 2.0+.
  * amq-protocol `1.9.2` was the last version to support Ruby 1.8 and 1.9.
