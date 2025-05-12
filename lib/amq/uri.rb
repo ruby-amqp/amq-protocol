@@ -1,6 +1,10 @@
 # encoding: utf-8
 
-require "cgi"
+if RUBY_VERSION < "3.5"
+  require "cgi/util"
+else
+  require "cgi/escape"
+end
 require "uri"
 
 module AMQ
@@ -43,28 +47,33 @@ module AMQ
       end
 
       if uri.query
-        query_params = CGI::parse(uri.query)
+        query_params = Hash.new { |hash, key| hash[key] = [] }
+        ::URI.decode_www_form(uri.query).each do |key, value|
+          query_params[key] << value
+        end
+        query_params.each do |key, value|
+          query_params[key] = value.one? ? value.first : value
+        end
+        query_params.default = nil
 
-        normalized_query_params = Hash[query_params.map { |param, value| [param, value.one? ? value.first : value] }]
-
-        opts[:heartbeat] = normalized_query_params["heartbeat"].to_i
-        opts[:connection_timeout] = normalized_query_params["connection_timeout"].to_i
-        opts[:channel_max] = normalized_query_params["channel_max"].to_i
-        opts[:auth_mechanism] = normalized_query_params["auth_mechanism"]
+        opts[:heartbeat] = query_params["heartbeat"].to_i
+        opts[:connection_timeout] = query_params["connection_timeout"].to_i
+        opts[:channel_max] = query_params["channel_max"].to_i
+        opts[:auth_mechanism] = query_params["auth_mechanism"]
 
         %w(cacertfile certfile keyfile).each do |tls_option|
-          if normalized_query_params[tls_option] && uri.scheme == "amqp"
+          if query_params[tls_option] && uri.scheme == "amqp"
             raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
           else
-            opts[tls_option.to_sym] = normalized_query_params[tls_option]
+            opts[tls_option.to_sym] = query_params[tls_option]
           end
         end
 
         %w(verify fail_if_no_peer_cert).each do |tls_option|
-          if normalized_query_params[tls_option] && uri.scheme == "amqp"
+          if query_params[tls_option] && uri.scheme == "amqp"
             raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
           else
-            opts[tls_option.to_sym] = as_boolean(normalized_query_params[tls_option])
+            opts[tls_option.to_sym] = as_boolean(query_params[tls_option])
           end
         end
       end
@@ -80,7 +89,7 @@ module AMQ
     # Implementation
     #
 
-    # Normalizes values returned by CGI.parse.
+    # Normalizes values returned by URI.decode_www_form.
     # @private
     def self.as_boolean(val)
       case val
