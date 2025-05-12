@@ -1,6 +1,15 @@
-## Changes between 2.3.3 and 2.3.4 (unreleased)
+## Changes between 2.3.4 and 2.3.5 (in development)
 
 No changes yet.
+
+
+## Changes between 2.3.3 and 2.3.4 (May 12, 2025)
+
+### (Forward) Compatibility with Ruby 3.5
+
+Contributed by @Earlopain.
+
+GitHub issue: [#80](https://github.com/ruby-amqp/amq-protocol/pull/80)
 
 
 ## Changes between 2.3.2 and 2.3.3 (February 17, 2025)
