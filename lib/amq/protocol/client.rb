@@ -2136,15 +2136,13 @@ module AMQ
         @index = 0x003C0078 # 60, 120, 3932280
         @packed_indexes = [60, 120].pack(PACK_UINT16_X2).freeze
 
+        # Optimized decode using unpack1 and getbyte
         # @return
         def self.decode(data)
-          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
-          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
-          offset += 8
-          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
-          offset += 1
-          multiple = (bit_buffer & (1 << 0)) != 0
-          requeue = (bit_buffer & (1 << 1)) != 0
+          delivery_tag = data.byteslice(0, 8).unpack1(PACK_UINT64_BE)
+          bit_buffer = data.getbyte(8)
+          multiple = (bit_buffer & 1) != 0
+          requeue = (bit_buffer & 2) != 0
           self.new(delivery_tag, multiple, requeue)
         end
 

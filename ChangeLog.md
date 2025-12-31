@@ -1,6 +1,14 @@
 ## Changes between 2.4.0 and 2.5.0 (in development)
 
-No changes yet.
+### Additional Consumer Hot Path Optimizations
+
+Further decode method optimizations for consumer delivery paths:
+
+ * `Basic::Deliver.decode`: uses `getbyte` and `unpack1` for faster field extraction
+ * `Basic::ConsumeOk.decode`: simplified using `getbyte` and `byteslice`
+ * `Basic::Ack.decode`: uses `unpack1` and `getbyte` for compact decoding
+ * `Basic::Nack.decode`: uses `unpack1` and `getbyte` for compact decoding
+ * `Basic.decode_properties`: uses `getbyte` for shortstr lengths and `unpack1` throughout
 
 ## Changes between 2.3.4 and 2.4.0 (Dec 30, 2025)
 
