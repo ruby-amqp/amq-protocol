@@ -60,9 +60,11 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
         EOF
       end
 
+      # Optimized header decode using unpack1 for single values where appropriate
       def self.decode_header(header)
         raise EmptyResponseError if header == nil || header.empty?
 
+        # Use unpack for multiple values - this is the optimal approach
         type_id, channel, size = header.unpack(PACK_CHAR_UINT16_UINT32)
         type = TYPES_REVERSE[type_id]
         raise FrameTypeError.new(TYPES_OPTIONS) unless type

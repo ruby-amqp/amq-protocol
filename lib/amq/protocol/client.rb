@@ -1569,30 +1569,31 @@ module AMQ
         0x0004,
       ]
 
+      # Optimized decode_properties using getbyte and unpack1
       def self.decode_properties(data)
         offset, data_length, properties = 0, data.bytesize, {}
 
-        compressed_index = data[offset, 2].unpack(PACK_UINT16)[0]
+        compressed_index = data.byteslice(offset, 2).unpack1(PACK_UINT16)
         offset += 2
         while data_length > offset
           DECODE_PROPERTIES_KEYS.each do |key|
             next unless compressed_index >= key
             compressed_index -= key
-            name = DECODE_PROPERTIES[key] || raise(RuntimeError.new("No property found for index #{index.inspect}!"))
+            name = DECODE_PROPERTIES[key] || raise(RuntimeError.new("No property found for index #{key.inspect}!"))
             case DECODE_PROPERTIES_TYPE[key]
             when :shortstr
-              size = data[offset, 1].unpack(PACK_CHAR)[0]
+              size = data.getbyte(offset)
               offset += 1
-              result = data[offset, size]
+              result = data.byteslice(offset, size)
             when :octet
               size = 1
-              result = data[offset, size].unpack(PACK_CHAR).first
+              result = data.getbyte(offset)
             when :timestamp
               size = 8
-              result = Time.at(data[offset, size].unpack(PACK_UINT64_BE).last)
+              result = Time.at(data.byteslice(offset, 8).unpack1(PACK_UINT64_BE))
             when :table
-              size = 4 + data[offset, 4].unpack(PACK_UINT32)[0]
-              result = Table.decode(data[offset, size])
+              size = 4 + data.byteslice(offset, 4).unpack1(PACK_UINT32)
+              result = Table.decode(data.byteslice(offset, size))
             end
             properties[name] = result
             offset += size
@@ -1688,13 +1689,11 @@ module AMQ
         @index = 0x003C0015 # 60, 21, 3932181
         @packed_indexes = [60, 21].pack(PACK_UINT16_X2).freeze
 
+        # Optimized decode using getbyte
         # @return
         def self.decode(data)
-          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
-          length = data[offset, 1].unpack(PACK_CHAR).first
-          offset += 1
-          consumer_tag = data[offset, length]
-          offset += length
+          length = data.getbyte(0)
+          consumer_tag = data.byteslice(1, length)
           self.new(consumer_tag)
         end
 
@@ -1866,26 +1865,25 @@ module AMQ
         @index = 0x003C003C # 60, 60, 3932220
         @packed_indexes = [60, 60].pack(PACK_UINT16_X2).freeze
 
+        # Optimized decode using getbyte and unpack1 for better performance
         # @return
         def self.decode(data)
-          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
-          length = data[offset, 1].unpack(PACK_CHAR).first
+          offset = 0
+          length = data.getbyte(offset)
           offset += 1
-          consumer_tag = data[offset, length]
+          consumer_tag = data.byteslice(offset, length)
           offset += length
-          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
+          delivery_tag = data.byteslice(offset, 8).unpack1(PACK_UINT64_BE)
           offset += 8
-          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
+          redelivered = (data.getbyte(offset) & 1) != 0
           offset += 1
-          redelivered = (bit_buffer & (1 << 0)) != 0
-          length = data[offset, 1].unpack(PACK_CHAR).first
+          length = data.getbyte(offset)
           offset += 1
-          exchange = data[offset, length]
+          exchange = data.byteslice(offset, length)
           offset += length
-          length = data[offset, 1].unpack(PACK_CHAR).first
+          length = data.getbyte(offset)
           offset += 1
-          routing_key = data[offset, length]
-          offset += length
+          routing_key = data.byteslice(offset, length)
           self.new(consumer_tag, delivery_tag, redelivered, exchange, routing_key)
         end
 
@@ -2009,14 +2007,11 @@ module AMQ
         @index = 0x003C0050 # 60, 80, 3932240
         @packed_indexes = [60, 80].pack(PACK_UINT16_X2).freeze
 
+        # Optimized decode using unpack1 and getbyte
         # @return
         def self.decode(data)
-          offset = offset = 0 # self-assigning offset to eliminate "assigned but unused variable" warning even if offset is not used in this method
-          delivery_tag = AMQ::Pack.unpack_uint64_big_endian(data[offset, 8]).first
-          offset += 8
-          bit_buffer = data[offset, 1].unpack(PACK_CHAR).first
-          offset += 1
-          multiple = (bit_buffer & (1 << 0)) != 0
+          delivery_tag = data.byteslice(0, 8).unpack1(PACK_UINT64_BE)
+          multiple = (data.getbyte(8) & 1) != 0
           self.new(delivery_tag, multiple)
         end
 
