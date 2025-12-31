@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AMQ
   module Protocol
     # Allows distinguishing between 32-bit and 64-bit floats in Ruby.

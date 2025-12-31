@@ -254,6 +254,38 @@ module AMQ
         end
 
       end # describe
+
+      describe ".length" do
+        it "returns the table length from binary data" do
+          encoded = Table.encode({"test" => 1})
+          expect(Table.length(encoded)).to eq(14)
+        end
+
+        it "returns 0 for empty table" do
+          encoded = Table.encode({})
+          expect(Table.length(encoded)).to eq(0)
+        end
+      end
+
+      describe ".hash_size" do
+        it "calculates size for simple hash" do
+          size = Table.hash_size({"key" => "value"})
+          expect(size).to be > 0
+        end
+
+        it "returns 0 for empty hash" do
+          size = Table.hash_size({})
+          expect(size).to eq(0)
+        end
+      end
+
+      describe "Table::InvalidTableError" do
+        it "formats error message with key and value" do
+          error = Table::InvalidTableError.new("mykey", Object.new)
+          expect(error.message).to include("mykey")
+          expect(error.message).to include("Object")
+        end
+      end
     end
   end
 end

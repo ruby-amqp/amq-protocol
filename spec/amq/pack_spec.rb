@@ -4,9 +4,17 @@ RSpec.describe AMQ::Pack do
   context "16-bit big-endian packing / unpacking" do
     let(:examples_16bit) {
       {
-          0x068D => "\x06\x8D" # 1677
+        0x068D => "\x06\x8D",  # 1677
+        0x0000 => "\x00\x00",  # 0
+        0x7FFF => "\x7F\xFF"   # 32767 (max positive signed 16-bit)
       }
     }
+
+    it "packs signed integers into a big-endian string" do
+      examples_16bit.each do |key, value|
+        expect(described_class.pack_int16_big_endian(key)).to eq(value)
+      end
+    end
 
     it "unpacks signed integers from a string to a number" do
       examples_16bit.each do |key, value|
@@ -35,34 +43,16 @@ RSpec.describe AMQ::Pack do
       end
     end
 
-    it "should unpack string representation into integer" do
+    it "unpacks string representation into integer" do
       examples.each do |key, value|
         expect(described_class.unpack_uint64_big_endian(value)[0]).to eq(key)
       end
     end
+  end
 
-    if RUBY_VERSION < '1.9'
-      describe "with utf encoding" do
-        before do
-          $KCODE = 'u'
-        end
-
-        after do
-          $KCODE = 'NONE'
-        end
-
-        it "packs integers into big-endian string" do
-          examples.each do |key, value|
-            expect(described_class.pack_uint64_big_endian(key)).to eq(value)
-          end
-        end
-
-        it "should unpack string representation into integer" do
-          examples.each do |key, value|
-            expect(described_class.unpack_uint64_big_endian(value)[0]).to eq(key)
-          end
-        end
-      end
+  describe "AMQ::Hacks alias" do
+    it "is an alias for AMQ::Pack (backwards compatibility)" do
+      expect(AMQ::Hacks).to eq(AMQ::Pack)
     end
   end
 end

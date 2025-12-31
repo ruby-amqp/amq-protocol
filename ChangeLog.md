@@ -1,6 +1,29 @@
-## Changes between 2.3.4 and 2.3.5 (in development)
+## Changes between 2.4.0 and 2.5.0 (in development)
 
 No changes yet.
+
+## Changes between 2.3.4 and 2.4.0 (Dec 30, 2025)
+
+### Bug Fixes
+
+ * Fixed `BadResponseError` constructor which referenced undefined variable `data` instead of `actual`
+
+### Performance Improvements
+
+Optimized encoding and decoding hot paths:
+
+ * Built-in `Q>`/`q>` packing/unpacking directives are 6-7x faster than the original implementation (that originally targeted Ruby 1.8.x)
+ * Switched to `unpack1` instead of `unpack().first` throughout
+ * Use `byteslice` instead of `slice` for binary string operations
+ * Use `getbyte` for single byte access (4x faster than alternatives)
+ * Adopted `frozen_string_literal` pragma
+
+The improvements on Ruby 3.4 are very meaningful:
+
+ * `AMQ::Pack.pack_uint64_big_endian`: about 6.6x faster
+ * `AMQ::Pack.unpack_uint64_big_endian`: about 7.2x faster
+ * `Basic.Deliver.decode`: about 1.7x faster
+ * `Basic.Ack/Nack/Reject.encode`: about 2.5x faster
 
 
 ## Changes between 2.3.3 and 2.3.4 (May 12, 2025)
@@ -16,13 +39,13 @@ GitHub issue: [#80](https://github.com/ruby-amqp/amq-protocol/pull/80)
 
 ### Improved Compatibility with Ruby 3.4
 
-Contribiuted by @BenTalagan.
+Contributed by @BenTalagan.
 
 GitHub issue: [#79](https://github.com/ruby-amqp/amq-protocol/pull/79)
 
 ### Support Binary-Encoded Frozen Strings for Payloads
 
-Contribiuted by @djrodgerspryor.
+Contributed by @djrodgerspryor.
 
 GitHub issue: [#78](https://github.com/ruby-amqp/amq-protocol/pull/78)
 

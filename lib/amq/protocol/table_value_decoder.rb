@@ -1,6 +1,6 @@
 # encoding: binary
+# frozen_string_literal: true
 
-require "amq/endianness"
 require "amq/protocol/type_constants"
 require "amq/protocol/float_32bit"
 
@@ -15,15 +15,23 @@ module AMQ
 
       include TypeConstants
 
+      # Pack format strings use explicit endianness (available as of Ruby 1.9.3)
+      PACK_UINT32_BE   = 'N'.freeze
+      PACK_INT64_BE    = 'q>'.freeze
+      PACK_INT16_BE    = 's>'.freeze
+      PACK_UINT64_BE   = 'Q>'.freeze
+      PACK_FLOAT32     = 'f'.freeze  # single precision float (native endian, matches encoder)
+      PACK_FLOAT64     = 'G'.freeze  # big-endian double precision float
+      PACK_UCHAR_UINT32 = 'CN'.freeze
 
       #
       # API
       #
 
       def self.decode_array(data, initial_offset)
-        array_length = data.slice(initial_offset, 4).unpack(PACK_UINT32).first
+        array_length = data.byteslice(initial_offset, 4).unpack1(PACK_UINT32_BE)
 
-        ary    = Array.new
+        ary    = []
         offset = initial_offset + 4
 
         while offset <= (initial_offset + array_length)
@@ -54,25 +62,25 @@ module AMQ
               when TYPE_BOOLEAN
                 v, offset = decode_boolean(data, offset)
                 v
-              when TYPE_BYTE then
+              when TYPE_BYTE
                 v, offset = decode_byte(data, offset)
                 v
-              when TYPE_SIGNED_16BIT then
+              when TYPE_SIGNED_16BIT
                 v, offset = decode_short(data, offset)
                 v
-              when TYPE_SIGNED_64BIT then
+              when TYPE_SIGNED_64BIT
                 v, offset = decode_long(data, offset)
                 v
-              when TYPE_32BIT_FLOAT then
+              when TYPE_32BIT_FLOAT
                 v, offset = decode_32bit_float(data, offset)
                 v
-              when TYPE_64BIT_FLOAT then
+              when TYPE_64BIT_FLOAT
                 v, offset = decode_64bit_float(data, offset)
                 v
               when TYPE_VOID
                 nil
               when TYPE_ARRAY
-                v, offset = TableValueDecoder.decode_array(data, offset)
+                v, offset = decode_array(data, offset)
                 v
               else
                 raise ArgumentError.new("unsupported type in a table value: #{type.inspect}, do not know how to decode!")
@@ -83,113 +91,101 @@ module AMQ
 
 
         [ary, initial_offset + array_length + 4]
-      end # self.decode_array(data, initial_offset)
+      end
 
 
       def self.decode_string(data, offset)
-        length = data.slice(offset, 4).unpack(PACK_UINT32).first
+        length = data.byteslice(offset, 4).unpack1(PACK_UINT32_BE)
         offset += 4
-        v = data.slice(offset, length)
+        v = data.byteslice(offset, length)
         offset += length
 
         [v, offset]
-      end # self.decode_string(data, offset)
+      end
 
 
       def self.decode_integer(data, offset)
-        v = data.slice(offset, 4).unpack(PACK_UINT32).first
+        v = data.byteslice(offset, 4).unpack1(PACK_UINT32_BE)
         offset += 4
 
         [v, offset]
-      end # self.decode_integer(data, offset)
+      end
 
 
-      if AMQ::Endianness.big_endian?
-        def self.decode_long(data, offset)
-          v    = data.slice(offset, 8).unpack(PACK_INT64)
-
-          offset += 8
-          [v, offset]
-        end
-      else
-        def self.decode_long(data, offset)
-          slice = data.slice(offset, 8).bytes.to_a.reverse.map(&:chr).join
-          v     = slice.unpack(PACK_INT64).first
-
-          offset += 8
-          [v, offset]
-        end
+      def self.decode_long(data, offset)
+        v = data.byteslice(offset, 8).unpack1(PACK_INT64_BE)
+        offset += 8
+        [v, offset]
       end
 
 
       def self.decode_big_decimal(data, offset)
-        decimals, raw = data.slice(offset, 5).unpack(PACK_UCHAR_UINT32)
+        decimals, raw = data.byteslice(offset, 5).unpack(PACK_UCHAR_UINT32)
         offset += 5
         v = BigDecimal(raw.to_s) * (BigDecimal(TEN) ** -decimals)
 
         [v, offset]
-      end # self.decode_big_decimal(data, offset)
+      end
 
 
       def self.decode_time(data, offset)
-        timestamp = data.slice(offset, 8).unpack(PACK_UINT64_BE).last
+        timestamp = data.byteslice(offset, 8).unpack1(PACK_UINT64_BE)
         v = Time.at(timestamp)
         offset += 8
 
         [v, offset]
-      end # self.decode_time(data, offset)
+      end
 
 
       def self.decode_boolean(data, offset)
-        integer = data.slice(offset, 2).unpack(PACK_CHAR).first # 0 or 1
+        byte = data.getbyte(offset)
         offset += 1
-        [(integer == 1), offset]
-      end # self.decode_boolean(data, offset)
+        [(byte == 1), offset]
+      end
 
 
       def self.decode_32bit_float(data, offset)
-        v = data.slice(offset, 4).unpack(PACK_32BIT_FLOAT).first
+        v = data.byteslice(offset, 4).unpack1(PACK_FLOAT32)
         offset += 4
 
         [v, offset]
-      end # self.decode_32bit_float(data, offset)
+      end
 
 
       def self.decode_64bit_float(data, offset)
-        v = data.slice(offset, 8).unpack(PACK_64BIT_FLOAT).first
+        v = data.byteslice(offset, 8).unpack1(PACK_FLOAT64)
         offset += 8
 
         [v, offset]
-      end # self.decode_64bit_float(data, offset)
+      end
 
 
       def self.decode_value_type(data, offset)
-        [data.slice(offset, 1), offset + 1]
-      end # self.decode_value_type(data, offset)
-
+        [data.byteslice(offset, 1), offset + 1]
+      end
 
 
       def self.decode_hash(data, offset)
-        length = data.slice(offset, 4).unpack(PACK_UINT32).first
-        v = Table.decode(data.slice(offset, length + 4))
+        length = data.byteslice(offset, 4).unpack1(PACK_UINT32_BE)
+        v = Table.decode(data.byteslice(offset, length + 4))
         offset += 4 + length
 
         [v, offset]
-      end # self.decode_hash(data, offset)
+      end
 
 
       # Decodes/Converts a byte value from the data at the provided offset.
       #
-      # @param [Array] data - A big-endian ordered array of bytes.
-      # @param [Fixnum] offset - The offset which bytes the byte is consumed.
-      # @return [Array] - The Fixnum value and new offset pair.
+      # @param [String] data - Binary data string
+      # @param [Integer] offset - The offset from which to read the byte
+      # @return [Array] - The Integer value and new offset pair
       def self.decode_byte(data, offset)
-        [data.slice(offset, 1).unpack(PACK_CHAR).first, offset += 1]
+        [data.getbyte(offset), offset + 1]
       end
 
 
       def self.decode_short(data, offset)
-        v = AMQ::Hacks.unpack_int16_big_endian(data.slice(offset, 2)).first
+        v = data.byteslice(offset, 2).unpack1(PACK_INT16_BE)
         offset += 2
         [v, offset]
       end

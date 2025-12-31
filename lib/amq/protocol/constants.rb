@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AMQ
   module Protocol
     TLS_PORT         = 5671

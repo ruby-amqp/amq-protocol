@@ -11,12 +11,16 @@ RSpec.describe AMQ::IntAllocator do
   end
 
 
-  # ...
-
-
   #
   # Examples
   #
+
+  describe "#initialize" do
+    it "raises ArgumentError when hi <= lo" do
+      expect { described_class.new(5, 5) }.to raise_error(ArgumentError)
+      expect { described_class.new(10, 5) }.to raise_error(ArgumentError)
+    end
+  end
 
   describe "#number_of_bits" do
     it "returns number of bits available for allocation" do
@@ -108,6 +112,25 @@ RSpec.describe AMQ::IntAllocator do
         expect(subject.allocated?(3)).to be_falsey
         expect(subject.allocated?(4)).to be_falsey
       end
+    end
+  end
+
+  describe "#release" do
+    it "is an alias for #free" do
+      subject.allocate
+      expect(subject.allocated?(1)).to be_truthy
+      subject.release(1)
+      expect(subject.allocated?(1)).to be_falsey
+    end
+  end
+
+  describe "#reset" do
+    it "releases all allocations" do
+      4.times { subject.allocate }
+      expect(subject.allocate).to eq(-1)
+
+      subject.reset
+      expect(subject.allocate).to eq(1)
     end
   end
 end

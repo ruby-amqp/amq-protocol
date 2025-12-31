@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AMQ
   module Endianness
     BIG_ENDIAN = ([1].pack("s") == "\x00\x01")

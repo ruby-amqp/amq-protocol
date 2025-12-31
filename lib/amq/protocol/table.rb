@@ -1,4 +1,5 @@
 # encoding: binary
+# frozen_string_literal: true
 
 require "amq/protocol/type_constants"
 require "amq/protocol/table_value_encoder"
@@ -14,6 +15,8 @@ module AMQ
 
       include TypeConstants
 
+      # Pack format string
+      PACK_UINT32_BE = 'N'.freeze
 
       #
       # API
@@ -27,16 +30,16 @@ module AMQ
 
 
       def self.encode(table)
-        buffer = String.new
+        buffer = +''
 
         table ||= {}
 
         table.each do |key, value|
           key = key.to_s # it can be a symbol as well
-          buffer << key.bytesize.chr + key
+          buffer << key.bytesize.chr << key
 
           case value
-          when Hash then
+          when Hash
             buffer << TYPE_HASH
             buffer << self.encode(value)
           else
@@ -44,15 +47,15 @@ module AMQ
           end
         end
 
-        [buffer.bytesize].pack(PACK_UINT32).force_encoding(buffer.encoding) + buffer
+        [buffer.bytesize].pack(PACK_UINT32_BE) << buffer
       end
 
 
 
 
       def self.decode(data)
-        table        = Hash.new
-        table_length = data.unpack(PACK_UINT32).first
+        table        = {}
+        table_length = data.unpack1(PACK_UINT32_BE)
 
         return table if table_length.zero?
 
@@ -86,19 +89,19 @@ module AMQ
                        when TYPE_BOOLEAN
                          v, offset = TableValueDecoder.decode_boolean(data, offset)
                          v
-                      when TYPE_BYTE  then
+                       when TYPE_BYTE
                          v, offset = TableValueDecoder.decode_byte(data, offset)
                          v
-                       when TYPE_SIGNED_16BIT then
+                       when TYPE_SIGNED_16BIT
                          v, offset = TableValueDecoder.decode_short(data, offset)
                          v
-                       when TYPE_SIGNED_64BIT then
+                       when TYPE_SIGNED_64BIT
                          v, offset = TableValueDecoder.decode_long(data, offset)
                          v
-                       when TYPE_32BIT_FLOAT then
+                       when TYPE_32BIT_FLOAT
                          v, offset = TableValueDecoder.decode_32bit_float(data, offset)
                          v
-                       when TYPE_64BIT_FLOAT then
+                       when TYPE_64BIT_FLOAT
                          v, offset = TableValueDecoder.decode_64bit_float(data, offset)
                          v
                        when TYPE_VOID
@@ -112,11 +115,11 @@ module AMQ
         end
 
         table
-      end # self.decode
+      end
 
 
       def self.length(data)
-        data.unpack(PACK_UINT32).first
+        data.unpack1(PACK_UINT32_BE)
       end
 
 
@@ -128,17 +131,17 @@ module AMQ
         end
 
         acc
-      end # self.hash_size(value)
+      end
 
 
       def self.decode_table_key(data, offset)
-        key_length = data.slice(offset, 1).unpack(PACK_CHAR).first
+        key_length = data.getbyte(offset)
         offset += 1
-        key = data.slice(offset, key_length)
+        key = data.byteslice(offset, key_length)
         offset += key_length
 
         [key, offset]
-      end # self.decode_table_key(data, offset)
+      end
 
 
 

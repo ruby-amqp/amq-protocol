@@ -1,4 +1,5 @@
 # encoding: binary
+# frozen_string_literal: true
 
 module AMQ
   module Protocol
@@ -8,6 +9,9 @@ module AMQ
       TYPES_OPTIONS = TYPES.keys.freeze
       CHANNEL_RANGE = (0..65535).freeze
       FINAL_OCTET   = "\xCE".freeze # 206
+
+      # Pack format for 64-bit unsigned big-endian
+      PACK_UINT64_BE = 'Q>'.freeze
 
       def self.encoded_payload(payload)
         if payload.respond_to?(:force_encoding) && payload.encoding.name != 'BINARY'
@@ -130,7 +134,7 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
       end # final?
 
       def decode_payload
-        self.method_class.decode(@payload[4..-1])
+        self.method_class.decode(@payload.byteslice(4..-1))
       end
     end
 
@@ -167,8 +171,8 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
                                # the total size of the content body, that is, the sum of the body sizes for the
                                # following content body frames. Zero indicates that there are no content body frames.
                                # So this is NOT related to this very header frame!
-                               @body_size         = AMQ::Hacks.unpack_uint64_big_endian(@payload[4..11]).first
-                               @data              = @payload[12..-1]
+                               @body_size         = @payload.byteslice(4, 8).unpack1(PACK_UINT64_BE)
+                               @data              = @payload.byteslice(12..-1)
                                @properties        = Basic.decode_properties(@data)
                              end
       end

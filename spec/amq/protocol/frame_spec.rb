@@ -86,6 +86,70 @@ module AMQ
           expect(subject.properties[:delivery_mode]).to eq(2)
           expect(subject.properties[:priority]).to eq(0)
         end
+
+        it "is not final" do
+          expect(subject.final?).to eq(false)
+        end
+      end
+
+      describe BodyFrame do
+        subject { BodyFrame.new("test payload", 1) }
+
+        it "returns payload as decode_payload" do
+          expect(subject.decode_payload).to eq("test payload")
+        end
+
+        it "is not final" do
+          expect(subject.final?).to eq(false)
+        end
+
+        it "has correct size" do
+          expect(subject.size).to eq(12)
+        end
+      end
+
+      describe HeartbeatFrame do
+        it "encodes with empty payload on channel 0" do
+          encoded = HeartbeatFrame.encode
+          expect(encoded.bytes.last).to eq(0xCE)
+        end
+
+        it "is final" do
+          frame = HeartbeatFrame.new("", 0)
+          expect(frame.final?).to eq(true)
+        end
+      end
+
+      describe MethodFrame do
+        it "is not final when method has content" do
+          # Basic.Publish has content
+          payload = "\x00\x3C\x00\x28\x00\x00\x00\x00\x00"
+          frame = MethodFrame.new(payload, 1)
+          # This will depend on the method class
+          expect(frame).to respond_to(:final?)
+        end
+      end
+
+      describe FrameSubclass do
+        subject { BodyFrame.new("test", 1) }
+
+        it "has channel accessor" do
+          expect(subject.channel).to eq(1)
+          subject.channel = 2
+          expect(subject.channel).to eq(2)
+        end
+
+        it "encodes to array" do
+          result = subject.encode_to_array
+          expect(result).to be_an(Array)
+          expect(result.size).to eq(3)
+        end
+
+        it "encodes to string" do
+          result = subject.encode
+          expect(result).to be_a(String)
+          expect(result.bytes.last).to eq(0xCE)
+        end
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AMQ
   module Protocol
     class Error < StandardError
@@ -41,7 +43,7 @@ module AMQ
 
     class BadResponseError < Protocol::Error
       def initialize(argument, expected, actual)
-        super("Argument #{argument} has to be #{expected.inspect}, was #{data.inspect}")
+        super("Argument #{argument} has to be #{expected.inspect}, was #{actual.inspect}")
       end
     end
 

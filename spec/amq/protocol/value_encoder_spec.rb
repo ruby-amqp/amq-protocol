@@ -134,6 +134,27 @@ module AMQ
         expect(described_class.encode(input4).bytesize).to eq(69)
       end
 
+      it "encodes symbols as strings" do
+        encoded = described_class.encode(:test_symbol)
+        expect(encoded).to start_with("S")
+        expect(encoded).to include("test_symbol")
+      end
+
+      it "encodes BigDecimal values" do
+        bd = BigDecimal("123.45")
+        encoded = described_class.encode(bd)
+        expect(encoded).to start_with("D")
+      end
+
+      it "encodes BigDecimal with zero exponent" do
+        bd = BigDecimal("100")
+        encoded = described_class.encode(bd)
+        expect(encoded).to start_with("D")
+      end
+
+      it "raises ArgumentError for unsupported types" do
+        expect { described_class.encode(Object.new) }.to raise_error(ArgumentError)
+      end
 
     end # TableValueEncoder
   end # Protocol

@@ -277,4 +277,11 @@ RSpec.describe AMQ::URI do
       end
     end
   end
+
+  describe ".parse_amqp_url" do
+    it "is an alias for .parse" do
+      result = described_class.parse_amqp_url("amqp://localhost")
+      expect(result[:host]).to eq("localhost")
+    end
+  end
 end

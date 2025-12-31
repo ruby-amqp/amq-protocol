@@ -223,5 +223,27 @@ RSpec.describe AMQ::BitSet do
       subject.unset(254)
       expect(subject.get(254)).to be_falsey
     end # it
+
+    it "returns -1 when all bits are set" do
+      bs = described_class.new(64)
+      0.upto(63) { |i| bs.set(i) }
+      expect(bs.next_clear_bit).to eq(-1)
+    end
+  end # describe
+
+  describe "#to_s" do
+    it "returns a string representation of the bit set" do
+      bs = described_class.new(64)
+      result = bs.to_s
+      expect(result).to be_a(String)
+      expect(result).to include(":")
+    end
+
+    it "shows set bits" do
+      bs = described_class.new(64)
+      bs.set(0)
+      result = bs.to_s
+      expect(result).to end_with("1:")
+    end
   end # describe
 end

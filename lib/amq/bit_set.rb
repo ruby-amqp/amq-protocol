@@ -1,4 +1,5 @@
 # encoding: utf-8
+# frozen_string_literal: true
 
 module AMQ
   # Very minimalistic, pure Ruby implementation of bit set. Inspired by java.util.BitSet,
