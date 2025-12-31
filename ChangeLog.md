@@ -4,10 +4,6 @@ No changes yet.
 
 ## Changes between 2.3.4 and 2.4.0 (Dec 30, 2025)
 
-### Bug Fixes
-
- * Fixed `BadResponseError` constructor which referenced undefined variable `data` instead of `actual`
-
 ### Performance Improvements
 
 Optimized encoding and decoding hot paths:
