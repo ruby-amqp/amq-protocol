@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a pure Ruby implementation of the AMQP 0-9-1 protocol parser
+This is a pure Ruby implementation of a AMQP 0-9-1 protocol parser
 (more specifically% serialization, deserialization, framing) used by
 [Bunny](https://github.com/ruby-amqp/bunny), a Ruby AMQP 0-9-1 client for RabbitMQ.
 
