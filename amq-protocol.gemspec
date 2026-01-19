@@ -1,8 +1,6 @@
 #!/usr/bin/env gem build
 # encoding: utf-8
 
-require "base64"
-
 require File.expand_path("../lib/amq/protocol/version", __FILE__)
 
 Gem::Specification.new do |s|
@@ -20,7 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 2.2")
 
   # files
-  s.files = `git ls-files`.split("\n").reject { |file| file =~ /^vendor\// }
+  s.files = Dir.glob("lib/**/*.rb") + %w[LICENSE README.md ChangeLog.md]
   s.require_paths = ["lib"]
 
   s.extra_rdoc_files = ["README.md"] + Dir.glob("doc/*")
