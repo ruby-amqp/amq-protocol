@@ -1,6 +1,9 @@
-## Changes between 2.5.0 and 2.6.0 (in development)
+## Changes between 2.5.0 and 2.5.1 (Jan 1, 2026)
 
-No changes yet.
+### Windows Installation Fixes
+
+`2.4.0` and `2.5.0` versions unintentionally included files that were
+symlinks, which caused installation on Windows to fail.
 
 
 ## Changes between 2.4.0 and 2.5.0 (Dec 31, 2025)
