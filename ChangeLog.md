@@ -1,4 +1,9 @@
-## Changes between 2.5.0 and 2.5.1 (Jan 1, 2026)
+## Changes between 2.5.1 and 2.6.0 (in development)
+
+No changes yet.
+
+
+## Changes between 2.5.0 and 2.5.1 (Jan 19, 2026)
 
 ### Windows Installation Fixes
 
