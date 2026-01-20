@@ -21,5 +21,5 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("lib/**/*.rb") + %w[LICENSE README.md ChangeLog.md]
   s.require_paths = ["lib"]
 
-  s.extra_rdoc_files = ["README.md"] + Dir.glob("doc/*")
+  s.extra_rdoc_files = ["README.md"]
 end
