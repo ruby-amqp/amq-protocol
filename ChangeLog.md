@@ -1,6 +1,18 @@
-## Changes between 2.5.1 and 2.6.0 (in development)
+## Changes between 2.6.0 and 2.7.0 (unreleased)
 
 No changes yet.
+
+
+## Changes between 2.5.1 and 2.6.0 (Mar 30, 2026)
+
+### Channel.Close Predicate Methods
+
+`Channel::Close` now provides predicate methods for identifying common
+channel closure reasons by reply code and text:
+
+ * `#delivery_ack_timeout?`: consumer [delivery acknowledgement timeout](https://www.rabbitmq.com/docs/consumers#acknowledgement-timeout)
+ * `#unknown_delivery_tag?`: unknown delivery tag (e.g. [double ack](https://www.rabbitmq.com/docs/channels#error-handling))
+ * `#message_too_large?`: message exceeded the configured max size
 
 
 ## Changes between 2.5.0 and 2.5.1 (Jan 19, 2026)
