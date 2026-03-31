@@ -15,9 +15,10 @@ jobs:
     strategy:
       matrix:
         ruby-version:
-          - "3.4.2"
-          - "3.3.7"
-          - "3.2.7"
+          - "4.0"
+          - "3.4"
+          - "3.3"
+          - "3.2"
 
     steps:
       - uses: actions/checkout@v4
