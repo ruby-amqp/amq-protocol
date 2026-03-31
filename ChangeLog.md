@@ -1,4 +1,4 @@
-## Changes between 2.6.0 and 2.7.0 (unreleased)
+## Changes between 2.6.0 and 2.7.0 (Mar 31, 2026)
 
 ### Channel.Close Predicates Now Return True Boolean
 
