@@ -1,6 +1,8 @@
 ## Changes between 2.6.0 and 2.7.0 (unreleased)
 
-No changes yet.
+### Channel.Close Predicates Now Return True Boolean
+
+And not just truthy values (values that are not `nil` or `false`).
 
 
 ## Changes between 2.5.1 and 2.6.0 (Mar 30, 2026)
