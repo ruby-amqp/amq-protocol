@@ -47,7 +47,7 @@ Optimized encoding and decoding hot paths:
  * Switched to `unpack1` instead of `unpack().first` throughout
  * Use `byteslice` instead of `slice` for binary string operations
  * Use `getbyte` for single byte access (4x faster than alternatives)
- * Adopted `frozen_string_literal` pragma
+ * Adopted the `frozen_string_literal` pragma
 
 The improvements on Ruby 3.4 are very meaningful:
 
