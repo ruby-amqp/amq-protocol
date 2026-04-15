@@ -178,6 +178,77 @@ module AMQ
           expect(value).to eq({"nested" => "value"})
         end
       end
+
+      describe ".decode_array type dispatch" do
+        # Builds binary for decode_array(data, 1):
+        # byte 0 = dummy (TYPE_ARRAY tag), bytes 1-4 = content length, bytes 5+ = elements.
+        def array_binary(element_bytes)
+          "\x00" + [element_bytes.bytesize].pack("N") + element_bytes
+        end
+
+        it "decodes TYPE_INTEGER (32-bit unsigned)" do
+          data = array_binary("I" + [99].pack("N"))
+          result, _ = described_class.decode_array(data, 1)
+          expect(result).to eq([99])
+        end
+
+        it "decodes TYPE_DECIMAL" do
+          data = array_binary("D" + "\x02" + [314].pack("N"))
+          result, _ = described_class.decode_array(data, 1)
+          expect(result.first).to be_a(BigDecimal)
+          expect(result.first).to eq(BigDecimal("3.14"))
+        end
+
+        it "decodes TYPE_TIME" do
+          ts = 1_700_000_000
+          data = array_binary("T" + [ts].pack("Q>"))
+          result, _ = described_class.decode_array(data, 1)
+          expect(result.first.to_i).to eq(ts)
+        end
+
+        it "decodes TYPE_BYTE_ARRAY" do
+          data = array_binary("x" + [3].pack("N") + "foo")
+          result, _ = described_class.decode_array(data, 1)
+          expect(result).to eq(["foo"])
+        end
+
+        it "decodes TYPE_32BIT_FLOAT" do
+          data = array_binary("f" + [1.5].pack("f"))
+          result, _ = described_class.decode_array(data, 1)
+          expect(result.first).to be_within(0.001).of(1.5)
+        end
+
+        it "decodes TYPE_BOOLEAN" do
+          # Two booleans make content length 4, enough for the loop to enter once
+          data = array_binary("t\x01t\x00")
+          result, _ = described_class.decode_array(data, 1)
+          expect(result).to include(true)
+        end
+
+        it "decodes TYPE_BYTE" do
+          data = array_binary("b\xFFb\x01")
+          result, _ = described_class.decode_array(data, 1)
+          expect(result).to include(255)
+        end
+
+        it "decodes TYPE_SIGNED_16BIT" do
+          data = array_binary("s" + [1000].pack("s>") + "s" + [2000].pack("s>"))
+          result, _ = described_class.decode_array(data, 1)
+          expect(result).to include(1000)
+        end
+
+        it "decodes TYPE_VOID as nil" do
+          data = array_binary("VVVV")
+          result, _ = described_class.decode_array(data, 1)
+          expect(result).to include(nil)
+        end
+
+        it "raises ArgumentError for unsupported types" do
+          data = array_binary("?\x00\x00\x00")
+          expect { described_class.decode_array(data, 1) }
+            .to raise_error(ArgumentError, /unsupported type/)
+        end
+      end
     end
   end
 end
