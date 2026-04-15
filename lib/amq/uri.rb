@@ -31,7 +31,9 @@ module AMQ
 
     def self.parse(connection_string)
       uri = ::URI.parse(connection_string)
-      raise ArgumentError.new("Connection URI must use amqp or amqps schema (example: amqp://bus.megacorp.internal:5766), learn more at http://bit.ly/ks8MXK") unless %w{amqp amqps}.include?(uri.scheme)
+      unless %w{amqp amqps}.include?(uri.scheme)
+        raise ArgumentError, "Connection URI must use amqp or amqps schema (example: amqp://bus.megacorp.internal:5766), learn more at http://bit.ly/ks8MXK"
+      end
 
       opts = DEFAULTS.dup
 
@@ -42,7 +44,9 @@ module AMQ
       opts[:port]   = uri.port || AMQP_DEFAULT_PORTS[uri.scheme]
       opts[:ssl]    = uri.scheme.to_s.downcase =~ /amqps/i # TODO: rename to tls
       if uri.path =~ %r{^/(.*)}
-        raise ArgumentError.new("#{uri} has multiple-segment path; please percent-encode any slashes in the vhost name (e.g. /production => %2Fproduction). Learn more at http://bit.ly/amqp-gem-and-connection-uris") if $1.index('/')
+        if $1.index('/')
+          raise ArgumentError, "#{uri} has multiple-segment path; please percent-encode any slashes in the vhost name (e.g. /production => %2Fproduction). Learn more at http://bit.ly/amqp-gem-and-connection-uris"
+        end
         opts[:vhost] = ::CGI::unescape($1)
       end
 
@@ -63,7 +67,7 @@ module AMQ
 
         %w(cacertfile certfile keyfile).each do |tls_option|
           if query_params[tls_option] && uri.scheme == "amqp"
-            raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
+            raise ArgumentError, "The option '#{tls_option}' can only be used in URIs that use amqps schema"
           else
             opts[tls_option.to_sym] = query_params[tls_option]
           end
@@ -71,7 +75,7 @@ module AMQ
 
         %w(verify fail_if_no_peer_cert).each do |tls_option|
           if query_params[tls_option] && uri.scheme == "amqp"
-            raise ArgumentError.new("The option '#{tls_option}' can only be used in URIs that use amqps schema")
+            raise ArgumentError, "The option '#{tls_option}' can only be used in URIs that use amqps schema"
           else
             opts[tls_option.to_sym] = as_boolean(query_params[tls_option])
           end

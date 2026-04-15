@@ -83,7 +83,7 @@ module AMQ
                 v, offset = decode_array(data, offset)
                 v
               else
-                raise ArgumentError.new("unsupported type in a table value: #{type.inspect}, do not know how to decode!")
+                raise ArgumentError, "unsupported type in a table value: #{type.inspect}, do not know how to decode!"
               end
 
           ary << i

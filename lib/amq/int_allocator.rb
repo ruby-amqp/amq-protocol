@@ -26,7 +26,7 @@ module AMQ
     # @param [Integer] hi    Upper boundary of the integer range available for allocation
     # @raise [ArgumentError] if upper boundary is not greater than the lower one
     def initialize(lo, hi)
-      raise ArgumentError.new "upper boundary must be greater than the lower one (given: hi = #{hi}, lo = #{lo})" unless hi > lo
+      raise ArgumentError, "upper boundary must be greater than the lower one (given: hi = #{hi}, lo = #{lo})" unless hi > lo
 
       @hi = hi
       @lo = lo
