@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.name = "amq-protocol"
   s.version = AMQ::Protocol::VERSION
   s.authors = ["Jakub Stastny", "Michael S. Klishin", "Theo Hultberg", "Mark Abramov"]
-  s.homepage = "http://github.com/ruby-amqp/amq-protocol"
+  s.homepage = "https://github.com/ruby-amqp/amq-protocol"
   s.summary = "AMQP 0.9.1 encoding & decoding library."
   s.description = <<-DESC
   amq-protocol is an AMQP 0.9.1 serialization library for Ruby. It is not a
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   DESC
   s.email = ["michael.s.klishin@gmail.com"]
   s.licenses    = ["MIT"]
-  s.required_ruby_version = Gem::Requirement.new(">= 2.2")
+  s.required_ruby_version = ">= 3.0"
 
   # files
   s.files = Dir.glob("lib/**/*.rb") + %w[LICENSE README.md ChangeLog.md]

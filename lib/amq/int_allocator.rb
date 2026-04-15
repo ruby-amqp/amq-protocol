@@ -32,7 +32,6 @@ module AMQ
       @lo = lo
 
       @number_of_bits = hi - lo
-      @range          = Range.new(1, @number_of_bits)
       @free_set       = BitSet.new(@number_of_bits)
     end # initialize(hi, lo)
 
@@ -47,7 +46,7 @@ module AMQ
 
       if n = @free_set.next_clear_bit
 
-        if n < @hi - 1 then
+        if n < @hi - 1
           @free_set.set(n)
           n + 1
         else
