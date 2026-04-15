@@ -72,7 +72,7 @@ module AMQ
               accumulator << [0, value.to_i].pack(PACK_UCHAR_UINT32)
             end
           else
-            raise ArgumentError.new("Unsupported value #{value.inspect} of type #{value.class.name}")
+            raise ArgumentError, "Unsupported value #{value.inspect} of type #{value.class.name}"
           end # if
         end # case
 

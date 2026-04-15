@@ -25,25 +25,12 @@ RSpec.describe AMQ::URI do
         end
       end
 
-      if RUBY_VERSION >= "2.2"
-        context "absent" do
-          let(:uri) { "amqp://" }
+      context "absent" do
+        let(:uri) { "amqp://" }
 
-          # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
-          it "falls back to a blank value" do
-            expect(subject[:host]).to be_nil
-          end
-        end
-      end
-
-      if RUBY_VERSION < "2.2"
-        context "absent" do
-          let(:uri) { "amqp://" }
-
-          # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
-          it "raises InvalidURIError" do
-            expect { subject[:host] }.to raise_error(URI::InvalidURIError, /bad URI\(absolute but no path\)/)
-          end
+        # Note that according to the ABNF, the host component may not be absent, but it may be zero-length.
+        it "falls back to a blank value" do
+          expect(subject[:host]).to be_nil
         end
       end
     end

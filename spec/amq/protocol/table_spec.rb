@@ -188,6 +188,35 @@ module AMQ
           expect(output).to eq(1677)
         end
 
+        it "decodes TYPE_INTEGER (32-bit unsigned) from raw binary" do
+          # "\x03key" = 1-byte key length + "key", then 'I' type + 4-byte uint32
+          binary = [9].pack("N") + "\x03keyI" + [42].pack("N")
+          expect(Table.decode(binary.force_encoding("BINARY"))).to eq("key" => 42)
+        end
+
+        it "decodes TYPE_BYTE from raw binary" do
+          # "\x01k" = 1-byte key length + "k", then 'b' type + 1-byte value
+          binary = [4].pack("N") + "\x01kb\xFF"
+          expect(Table.decode(binary.force_encoding("BINARY"))).to eq("k" => 255)
+        end
+
+        it "decodes TYPE_SIGNED_16BIT from raw binary" do
+          binary = [5].pack("N") + "\x01ks" + [1000].pack("s>")
+          expect(Table.decode(binary.force_encoding("BINARY"))).to eq("k" => 1000)
+        end
+
+        it "decodes TYPE_32BIT_FLOAT from raw binary" do
+          binary = [7].pack("N") + "\x01kf" + [1.5].pack("f")
+          result = Table.decode(binary.force_encoding("BINARY"))
+          expect(result["k"]).to be_within(0.001).of(1.5)
+        end
+
+        it "raises ArgumentError for unknown type bytes" do
+          # "\x03key" key + unknown type '?'
+          binary = [5].pack("N") + "\x03key?"
+          expect { Table.decode(binary.force_encoding("BINARY")) }.to raise_error(ArgumentError, /Not a valid type/)
+        end
+
         it "is capable of decoding tables" do
           input   = {
             "boolval"      => true,

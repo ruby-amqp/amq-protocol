@@ -55,6 +55,17 @@ module AMQ
         it "should raise FrameTypeError if the type is not one of the accepted" do
           expect { Frame.new(10) }.to raise_error(FrameTypeError)
         end
+
+        it "returns the correct subclass for a valid type" do
+          frame = Frame.new(:body, "test", 1)
+          expect(frame).to be_a(BodyFrame)
+        end
+      end
+
+      describe ".decode" do
+        it "raises NotImplementedError" do
+          expect { Frame.decode("anything") }.to raise_error(NotImplementedError)
+        end
       end
 
       describe '#decode_header' do
@@ -64,6 +75,14 @@ module AMQ
 
         it 'raises EmptyResponseError if the header is nil' do
           expect { Frame.decode_header(nil) }.to raise_error(EmptyResponseError)
+        end
+
+        it "returns type, channel and size for a valid header" do
+          header = "\x03\x00\x01\x00\x00\x00\x04"
+          type, channel, size = Frame.decode_header(header)
+          expect(type).to eq(:body)
+          expect(channel).to eq(1)
+          expect(size).to eq(4)
         end
       end
 
@@ -121,12 +140,14 @@ module AMQ
       end
 
       describe MethodFrame do
+        subject { MethodFrame.new("\x00\x3C\x00\x28\x00\x00\x00\x00\x00", 1) }
+
+        it "resolves method_class from payload" do
+          expect(subject.method_class).to eq(AMQ::Protocol::Basic::Publish)
+        end
+
         it "is not final when method has content" do
-          # Basic.Publish has content
-          payload = "\x00\x3C\x00\x28\x00\x00\x00\x00\x00"
-          frame = MethodFrame.new(payload, 1)
-          # This will depend on the method class
-          expect(frame).to respond_to(:final?)
+          expect(subject.final?).to eq(false)
         end
       end
 

@@ -26,13 +26,12 @@ module AMQ
     # @param [Integer] hi    Upper boundary of the integer range available for allocation
     # @raise [ArgumentError] if upper boundary is not greater than the lower one
     def initialize(lo, hi)
-      raise ArgumentError.new "upper boundary must be greater than the lower one (given: hi = #{hi}, lo = #{lo})" unless hi > lo
+      raise ArgumentError, "upper boundary must be greater than the lower one (given: hi = #{hi}, lo = #{lo})" unless hi > lo
 
       @hi = hi
       @lo = lo
 
       @number_of_bits = hi - lo
-      @range          = Range.new(1, @number_of_bits)
       @free_set       = BitSet.new(@number_of_bits)
     end # initialize(hi, lo)
 
@@ -47,7 +46,7 @@ module AMQ
 
       if n = @free_set.next_clear_bit
 
-        if n < @hi - 1 then
+        if n < @hi - 1
           @free_set.set(n)
           n + 1
         else

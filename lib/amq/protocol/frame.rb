@@ -23,8 +23,8 @@ module AMQ
 
       # The channel number is 0 for all frames which are global to the connection and 1-65535 for frames that refer to specific channels.
       def self.encode_to_array(type, payload, channel)
-        raise RuntimeError.new("Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}") unless CHANNEL_RANGE.include?(channel)
-        raise RuntimeError.new("Payload can't be nil") if payload.nil?
+        raise RuntimeError, "Channel has to be 0 or an integer in range 1..65535 but was #{channel.inspect}" unless CHANNEL_RANGE.include?(channel)
+        raise RuntimeError, "Payload can't be nil" if payload.nil?
         components = []
         components << [find_type(type), channel, payload.bytesize].pack(PACK_CHAR_UINT16_UINT32)
         components << encoded_payload(payload)
@@ -47,13 +47,13 @@ module AMQ
       end
 
       def self.find_type(type)
-        type_id = if Symbol === type then TYPES[type] else type end
-        raise FrameTypeError.new(TYPES_OPTIONS) if type == nil || !TYPES_REVERSE.has_key?(type_id)
+        type_id = type.is_a?(Symbol) ? TYPES[type] : type
+        raise FrameTypeError, TYPES_OPTIONS if type.nil? || !TYPES_REVERSE.key?(type_id)
         type_id
       end
 
       def self.decode(*)
-        raise NotImplementedError.new <<-EOF
+        raise NotImplementedError, <<-EOF
 You are supposed to redefine this method, because it's dependent on used IO adapter.
 
 This functionality is part of the https://github.com/ruby-amqp/amq-client library.
@@ -62,12 +62,12 @@ This functionality is part of the https://github.com/ruby-amqp/amq-client librar
 
       # Optimized header decode using unpack1 for single values where appropriate
       def self.decode_header(header)
-        raise EmptyResponseError if header == nil || header.empty?
+        raise EmptyResponseError if header.nil? || header.empty?
 
         # Use unpack for multiple values - this is the optimal approach
         type_id, channel, size = header.unpack(PACK_CHAR_UINT16_UINT32)
         type = TYPES_REVERSE[type_id]
-        raise FrameTypeError.new(TYPES_OPTIONS) unless type
+        raise FrameTypeError, TYPES_OPTIONS unless type
         [type, channel, size]
       end
 

@@ -113,7 +113,7 @@ module AMQ
 
     def check_range(i)
       if i < 0 || i >= @nbits
-        raise IndexError.new("Cannot access bit #{i} from a BitSet with #{@nbits} bits")
+        raise IndexError, "Cannot access bit #{i} from a BitSet with #{@nbits} bits"
       end
     end # check_range
   end # BitSet
