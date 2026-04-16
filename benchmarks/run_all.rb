@@ -46,7 +46,7 @@ File.open(results_file, 'w') do |f|
       puts "\n>>> Running #{benchmark}..."
       puts
 
-      output = `ruby #{benchmark_path} 2>&1`
+      output = `#{RbConfig.ruby} #{benchmark_path} 2>&1`
       puts output
 
       f.puts ">>> #{benchmark}"
