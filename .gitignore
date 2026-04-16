@@ -16,3 +16,4 @@ bin/*
 *.bundle
 Makefile
 profiling/dumps/*
+benchmarks/results/*
