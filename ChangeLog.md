@@ -1,6 +1,13 @@
 ## Changes between 2.7.0 and 2.8.0 (unreleased)
 
-No changes yet.
+### Performance Improvements in Frame Decoding and Encoding
+
+Replacing `x == nil` with `x.nil?` in the frame layer hot path yields a
+consistent **+15–18% throughput improvement** in `Frame.decode_header`
+(called on every received frame) and **+12–14%** in `HeartbeatFrame.encode`,
+across Ruby 3.3, 3.4, and 4.0.
+
+See benchmarks/BENCHMARKS.md for instructions on how to reproduce these numbers on your machine.
 
 
 ## Changes between 2.6.0 and 2.7.0 (Mar 31, 2026)
