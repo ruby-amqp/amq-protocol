@@ -1,4 +1,8 @@
-## Changes between 2.7.0 and 2.8.0 (unreleased)
+## Changes between 2.8.0 and 2.9.0 (unreleased)
+
+No changes yet.
+
+## Changes between 2.7.0 and 2.8.0 (Apr 25, 2026)
 
 ### Performance Improvements in Frame Decoding and Encoding
 
