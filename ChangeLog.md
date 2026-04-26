@@ -13,6 +13,10 @@ across Ruby 3.3, 3.4, and 4.0.
 
 See benchmarks/BENCHMARKS.md for instructions on how to reproduce these numbers on your machine.
 
+Contributed by @eglitobias.
+
+GitHub issue: [#86](https://github.com/ruby-amqp/amq-protocol/pull/86)
+
 
 ## Changes between 2.6.0 and 2.7.0 (Mar 31, 2026)
 
