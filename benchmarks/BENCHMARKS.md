@@ -1,6 +1,6 @@
 # Benchmarking
 
-## Running the suite
+## Running the Suite
 
 ```bash
 ruby benchmarks/run_all.rb
@@ -8,7 +8,7 @@ ruby benchmarks/run_all.rb
 
 Results are saved to `benchmarks/results/` with a timestamp.
 
-## Comparing two commits
+## Comparing Two Commits
 
 `benchmark_compare.sh` runs the full suite on both commits and prints a colour-coded delta summary. The after-sha defaults to `HEAD`.
 
@@ -21,7 +21,8 @@ With the current ruby only:
 bash benchmarks/benchmark_compare.sh 6d857de
 ```
 
-With multiple rubies (asdf example):
+With multiple Rubies using `asdf`:
+
 ```bash
 bash benchmarks/benchmark_compare.sh 6d857de HEAD \
   $(asdf where ruby 3.3.11)/bin/ruby \
@@ -29,7 +30,8 @@ bash benchmarks/benchmark_compare.sh 6d857de HEAD \
   $(asdf where ruby 4.0.2)/bin/ruby
 ```
 
-With rbenv:
+An `rbenv` equivalent:
+
 ```bash
 bash benchmarks/benchmark_compare.sh 6d857de HEAD \
   $(rbenv prefix 3.3.11)/bin/ruby \
@@ -41,15 +43,15 @@ You can also diff any two saved result files directly:
 ruby benchmarks/compare_results.rb benchmarks/results/before_3_4_9.txt benchmarks/results/after_3_4_9.txt
 ```
 
-## Getting reliable results
+## Getting Reliable Results
 
-Benchmark results are sensitive to system load. For trustworthy numbers:
+Benchmark results are sensitive to system load. For more trustworthy numbers:
 
-- Run on an otherwise idle machine (close browsers, pause background processes)
-- Results within ±5% of each other between runs are noise — `compare_results.rb` filters these out automatically
-- If a benchmark shows a large error margin (e.g. `±10%` in the raw output), discard that result and re-run
+ * Run benchmark on an otherwise idle machine
+ * Results within ±5% of each other between runs are statistical noise, so `compare_results.rb` filters these out automatically
+ * If a benchmark shows a large error margin (e.g. `±10%` in the raw output), discard that result and re-run
 
-## Individual benchmarks
+## Individual Benchmarks
 
 | Script | What it covers |
 |---|---|
