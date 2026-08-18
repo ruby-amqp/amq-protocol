@@ -7,16 +7,16 @@ module AMQ
       bigdecimal_1 = BigDecimal("1.0")
       bigdecimal_2 = BigDecimal("5E-3")
 
-      DATA = {
-          {}                       => "\x00\x00\x00\x00",
-          {"test" => 1}            => "\x00\x00\x00\x0E\x04testl\x00\x00\x00\x00\x00\x00\x00\x01",
-          {"float" => 1.92}        => "\x00\x00\x00\x0F\x05floatd?\xFE\xB8Q\xEB\x85\x1E\xB8",
-          {"test" => "string"}     => "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string",
-          {"test" => {}}           => "\x00\x00\x00\n\x04testF\x00\x00\x00\x00",
-          {"test" => bigdecimal_1} => "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01",
-          {"test" => bigdecimal_2} => "\x00\x00\x00\v\x04testD\x03\x00\x00\x00\x05",
-          {"test" => timestamp}    => "\x00\x00\x00\x0e\x04testT\x00\x00\x00\x00M\x1enC"
-      }
+      DATA = [
+          [{},                       "\x00\x00\x00\x00"],
+          [{"test" => 1},            "\x00\x00\x00\x0E\x04testl\x00\x00\x00\x00\x00\x00\x00\x01"],
+          [{"float" => 1.92},        "\x00\x00\x00\x0F\x05floatd?\xFE\xB8Q\xEB\x85\x1E\xB8"],
+          [{"test" => "string"},     "\x00\x00\x00\x10\x04testS\x00\x00\x00\x06string"],
+          [{"test" => {}},           "\x00\x00\x00\n\x04testF\x00\x00\x00\x00"],
+          [{"test" => bigdecimal_1}, "\x00\x00\x00\v\x04testD\x00\x00\x00\x00\x01"],
+          [{"test" => bigdecimal_2}, "\x00\x00\x00\v\x04testD\x03\x00\x00\x00\x05"],
+          [{"test" => timestamp},    "\x00\x00\x00\x0e\x04testT\x00\x00\x00\x00M\x1enC"]
+      ]
 
       describe ".encode" do
         it "should return \"\x00\x00\x00\x00\" for nil" do
