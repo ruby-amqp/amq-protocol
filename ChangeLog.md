@@ -1,6 +1,10 @@
 ## Changes between 2.8.0 and 2.9.0 (unreleased)
 
-No changes yet.
+### amq-protocol Now Requires Ruby 3.2
+
+Ruby 3.0 and 3.1 are end of life. The URI parser now uses
+`URI.decode_uri_component`, which Ruby 3.2 provides.
+
 
 ## Changes between 2.7.0 and 2.8.0 (Apr 25, 2026)
 

@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   DESC
   s.email = ["michael.s.klishin@gmail.com"]
   s.licenses    = ["MIT"]
-  s.required_ruby_version = ">= 3.0"
+  s.required_ruby_version = ">= 3.2"
 
   # files
   s.files = Dir.glob("lib/**/*.rb") + %w[LICENSE README.md ChangeLog.md]
