@@ -1,10 +1,5 @@
 # encoding: utf-8
 
-if RUBY_VERSION < "3.5"
-  require "cgi/util"
-else
-  require "cgi/escape"
-end
 require "uri"
 
 module AMQ
@@ -38,8 +33,8 @@ module AMQ
       opts = DEFAULTS.dup
 
       opts[:scheme] = uri.scheme
-      opts[:user]   = ::CGI::unescape(uri.user) if uri.user
-      opts[:pass]   = ::CGI::unescape(uri.password) if uri.password
+      opts[:user]   = ::URI.decode_uri_component(uri.user) if uri.user
+      opts[:pass]   = ::URI.decode_uri_component(uri.password) if uri.password
       opts[:host]   = uri.host if uri.host and uri.host != ""
       opts[:port]   = uri.port || AMQP_DEFAULT_PORTS[uri.scheme]
       opts[:ssl]    = uri.scheme.to_s.downcase =~ /amqps/i # TODO: rename to tls
@@ -47,7 +42,7 @@ module AMQ
         if $1.index('/')
           raise ArgumentError, "#{uri} has multiple-segment path; please percent-encode any slashes in the vhost name (e.g. /production => %2Fproduction). Learn more at http://bit.ly/amqp-gem-and-connection-uris"
         end
-        opts[:vhost] = ::CGI::unescape($1)
+        opts[:vhost] = ::URI.decode_uri_component($1)
       end
 
       if uri.query

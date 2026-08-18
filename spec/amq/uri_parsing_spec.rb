@@ -125,6 +125,33 @@ RSpec.describe AMQ::URI do
           expect(subject[:user]).to eq("alpha")
           expect(subject[:pass]).to eq("beta")
         end
+
+        context "reserved characters" do
+          let(:uri) { "amqp://al%23pha:be%20ta@rabbitmq" }
+
+          it "decodes user and pass" do
+            expect(subject[:user]).to eq("al#pha")
+            expect(subject[:pass]).to eq("be ta")
+          end
+        end
+
+        context "plus sign" do
+          let(:uri) { "amqp://al%2Bpha:be%2Bta@rabbitmq" }
+
+          it "decodes user and pass" do
+            expect(subject[:user]).to eq("al+pha")
+            expect(subject[:pass]).to eq("be+ta")
+          end
+        end
+      end
+
+      context "containing a plus sign" do
+        let(:uri) { "amqp://al+pha:be+ta@rabbitmq" }
+
+        it "keeps the plus sign" do
+          expect(subject[:user]).to eq("al+pha")
+          expect(subject[:pass]).to eq("be+ta")
+        end
       end
     end
 
@@ -175,6 +202,22 @@ RSpec.describe AMQ::URI do
             expect(subject[:vhost]).to eq("/staging/critical/subsystem-a")
           end
         end
+
+        context "with a %-encoded plus sign" do
+          let(:uri) { "amqp://rabbitmq/stag%2Bing" }
+
+          it "parses vhost with a plus sign" do
+            expect(subject[:vhost]).to eq("stag+ing")
+          end
+        end
+
+        context "containing a plus sign" do
+          let(:uri) { "amqp://rabbitmq/stag+ing" }
+
+          it "keeps the plus sign" do
+            expect(subject[:vhost]).to eq("stag+ing")
+          end
+        end
       end
 
       context "absent" do
@@ -206,6 +249,14 @@ RSpec.describe AMQ::URI do
           expect(subject[:connection_timeout]).to be_nil
           expect(subject[:channel_max]).to be_nil
           expect(subject[:auth_mechanism]).to be_empty
+        end
+      end
+
+      context "containing a plus sign" do
+        let(:uri) { "amqps://rabbitmq?cacertfile=/etc/ssl/ca+cert.pem" }
+
+        it "decodes it as a space, unlike the other components" do
+          expect(subject[:cacertfile]).to eq("/etc/ssl/ca cert.pem")
         end
       end
 
