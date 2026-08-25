@@ -1,6 +1,22 @@
 ## Changes between 2.8.0 and 2.9.0 (unreleased)
 
-No changes yet.
+### amq-protocol Now Requires Ruby 3.2
+
+Ruby 3.0 and 3.1 are end of life. The URI parser now uses
+`URI.decode_uri_component`, which Ruby 3.2 provides.
+
+
+### URI Components Are Percent-Decoded, Not Form-Decoded
+
+`AMQ::URI.parse` decoded the username, password and virtual host with
+`CGI.unescape`, so a password such as `pa+ss` was parsed as `pa ss` and failed
+to authenticate. They are now percent-decoded; use `%20` where a `+` used to
+mean a space.
+
+Contributed by @eglitobias.
+
+GitHub issue: [#89](https://github.com/ruby-amqp/amq-protocol/pull/89)
+
 
 ## Changes between 2.7.0 and 2.8.0 (Apr 25, 2026)
 
