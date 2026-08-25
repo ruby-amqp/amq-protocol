@@ -17,3 +17,4 @@ bin/*
 Makefile
 profiling/dumps/*
 benchmarks/results/*
+pkg/

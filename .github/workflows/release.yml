@@ -1,0 +1,47 @@
+name: Push gem
+
+on:
+  push:
+    tags:
+      - "v[0-9]*"
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    name: Push amq-protocol to RubyGems.org
+    # Tags pushed in a fork must not attempt a release
+    if: github.repository == 'ruby-amqp/amq-protocol'
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: push-gem
+      cancel-in-progress: false
+
+    environment:
+      name: release
+      url: https://rubygems.org/gems/amq-protocol
+
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+
+      - name: Verify the tag matches AMQ::Protocol::VERSION
+        env:
+          TAG: ${{ github.ref_name }}
+        run: test "$TAG" = "v$(ruby -Ilib -ramq/protocol/version -e 'print AMQ::Protocol::VERSION')"
+
+      - name: Push to RubyGems.org
+        uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
