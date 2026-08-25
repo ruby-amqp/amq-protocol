@@ -22,6 +22,12 @@ existing writing style.
 
 ## Releases
 
+Releases are published by `.github/workflows/release.yml`, which reacts to a
+pushed `v*` tag and pushes the gem to RubyGems.org using
+[trusted publishing](https://guides.rubygems.org/trusted-publishing/), so no
+RubyGems credentials are needed locally. The workflow refuses to publish unless
+the tag is `v` plus `AMQ::Protocol::VERSION`.
+
 ### How to Roll (Produce) a New Release
 
 Suppose the current development version in `ChangeLog.md` has
@@ -36,6 +42,7 @@ To produce a new release:
  5. Bump the dev version: add a new `## Changes between X.(Y+1).0 and X.(Y+2).0 (unreleased)` section to `ChangeLog.md` with `No changes yet.` underneath, and update `lib/amq/protocol/version.rb` to the next dev version
  6. Commit with the message `Bump dev version`
  7. Push: `git push && git push origin vX.(Y+1).0`
+ 8. Watch the release: `gh run watch --workflow=release.yml`
 
 
 ## Git Instructions

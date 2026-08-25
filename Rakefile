@@ -2,19 +2,11 @@ require "bundler"
 Bundler.setup
 
 require "rake"
+require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "amq/protocol/version"
-
-task :gem => :build
-task :build do
-  system "gem build amq-protocol.gemspec"
-end
-
-task :install => :build do
-  system "gem install amq-protocol-#{AMQ::Protocol::VERSION}.gem"
-end
 
 def extension
   RUBY_PLATFORM =~ /darwin/ ? "bundle" : "so"
