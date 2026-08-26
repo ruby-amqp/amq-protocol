@@ -8,7 +8,7 @@ This is a pure Ruby implementation of a AMQP 0-9-1 protocol parser
 
 ## Target Ruby Version
 
-This library targets Ruby 3.0 and later versions.
+This library targets Ruby 3.2 and later versions.
 
 ## Comments
 
