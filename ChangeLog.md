@@ -1,4 +1,4 @@
-## Changes between 2.8.0 and 2.9.0 (unreleased)
+## Changes between 2.8.0 and 2.9.0 (Aug 26, 2026)
 
 ### amq-protocol Now Requires Ruby 3.2
 
