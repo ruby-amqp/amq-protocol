@@ -17,8 +17,8 @@ module AMQ
       connection_timeout: nil,
       channel_max: nil,
       auth_mechanism: [],
-      verify: false,
-      fail_if_no_peer_cert: false,
+      verify: nil,
+      fail_if_no_peer_cert: nil,
       cacertfile: nil,
       certfile: nil,
       keyfile: nil
@@ -69,11 +69,13 @@ module AMQ
         end
 
         %w(verify fail_if_no_peer_cert).each do |tls_option|
-          if query_params[tls_option] && uri.scheme == "amqp"
+          # absent means "not specified" so that clients can apply their own (secure) defaults
+          next if query_params[tls_option].nil?
+
+          if uri.scheme == "amqp"
             raise ArgumentError, "The option '#{tls_option}' can only be used in URIs that use amqps schema"
-          else
-            opts[tls_option.to_sym] = as_boolean(query_params[tls_option])
           end
+          opts[tls_option.to_sym] = as_boolean(query_params[tls_option])
         end
       end
 

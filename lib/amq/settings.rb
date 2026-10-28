@@ -33,8 +33,8 @@ module AMQ
 
           # ssl parameters
           ssl: false,
-          verify: false,
-          fail_if_no_peer_cert: false,
+          verify: nil,
+          fail_if_no_peer_cert: nil,
           cacertfile: nil,
           certfile: nil,
           keyfile: nil
@@ -57,8 +57,8 @@ module AMQ
       # @option settings [Integer] :connection_timeout (nil) Time in milliseconds to wait while establishing a TCP connection to the server before giving up.
       # @option settings [Fixnum] :channel_max (nil) Maximum number of channels to permit on this connection.
       # @option settings [Array] :auth_mechanism ([]) SASL authentication mechanisms to consider when negotiating a mechanism with the server. This parameter can be specified multiple times to specify multiple mechanisms, e.g. `?auth_mechanism=plain&auth_mechanism=amqplain`.
-      # @option settings [Boolean] :verify (false) Controls peer verification mode.
-      # @option settings [Boolean] :fail_if_no_peer_cert (false) When set to true, TLS connection will be rejected if client fails to provide a certificate.
+      # @option settings [Boolean] :verify (nil) Controls peer verification mode. nil means "not specified", leaving the default to the client.
+      # @option settings [Boolean] :fail_if_no_peer_cert (nil) When set to true, TLS connection will be rejected if client fails to provide a certificate.
       # @option settings [String] :cacertfile (nil) Certificate Authority (CA) certificate file path.
       # @option settings [String] :certfile (nil) Server certificate file path.
       # @option settings [String] :keyfile (nil) Server private key file path.

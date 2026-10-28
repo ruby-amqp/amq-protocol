@@ -292,8 +292,8 @@ RSpec.describe AMQ::URI do
             let(:uri) { "amqps://bunny_gem:bunny_password@/bunny_testbed?heartbeat=10&connection_timeout=100&channel_max=1000&verify=false&cacertfile=spec/tls/ca_certificate.pem&certfile=spec/tls/client_certificate.pem&keyfile=spec/tls/client_key.pem" }
 
             it "parses tls options" do
-              expect(subject[:verify]).to be_falsey
-              expect(subject[:fail_if_no_peer_cert]).to be_falsey
+              expect(subject[:verify]).to eq(false)
+              expect(subject[:fail_if_no_peer_cert]).to be_nil
               expect(subject[:cacertfile]).to eq("spec/tls/ca_certificate.pem")
               expect(subject[:certfile]).to eq("spec/tls/client_certificate.pem")
               expect(subject[:keyfile]).to eq("spec/tls/client_key.pem")
@@ -303,14 +303,23 @@ RSpec.describe AMQ::URI do
           context "absent" do
           let(:uri) { "amqps://rabbitmq" }
 
-          it "falls back to default tls options" do
-            expect(subject[:verify]).to be_falsey
-            expect(subject[:fail_if_no_peer_cert]).to be_falsey
+          it "leaves peer verification unspecified" do
+            expect(subject[:verify]).to be_nil
+            expect(subject[:fail_if_no_peer_cert]).to be_nil
             expect(subject[:cacertfile]).to be_nil
             expect(subject[:certfile]).to be_nil
             expect(subject[:keyfile]).to be_nil
           end
         end
+
+          context "only cacertfile" do
+            let(:uri) { "amqps://rabbitmq?cacertfile=/examples/tls/cacert.pem" }
+
+            it "leaves peer verification unspecified" do
+              expect(subject[:verify]).to be_nil
+              expect(subject[:fail_if_no_peer_cert]).to be_nil
+            end
+          end
         end
       end
     end

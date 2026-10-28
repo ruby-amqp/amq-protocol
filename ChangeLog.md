@@ -1,6 +1,17 @@
 ## Changes between 2.9.0 and 2.10.0 (unreleased)
 
-No changes yet.
+### TLS Peer Verification Is No Longer Disabled by Default
+
+An `amqps://` URI without `?verify=` no longer disables peer verification,
+so clients such as Bunny apply their own default (`verify_peer: true` in Bunny's case).
+Use `?verify=false` to opt out.
+
+Brokers with self-signed or private-CA certificates now need `?cacertfile=`
+in the URI.
+
+Reported by Matthew Mongeau (Ruby Central).
+
+GitHub advisory: [GHSA-499w-x7r4-fw7p](https://github.com/ruby-amqp/amq-protocol/security/advisories/GHSA-499w-x7r4-fw7p)
 
 
 ## Changes between 2.8.0 and 2.9.0 (Aug 26, 2026)
