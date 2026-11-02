@@ -1,3 +1,8 @@
+## Changes between 2.10.0 and 2.11.0 (unreleased)
+
+No changes yet.
+
+
 ## Changes between 2.9.0 and 2.10.0 (Nov 2, 2026)
 
 ### TLS Peer Verification Is No Longer Disabled by Default
