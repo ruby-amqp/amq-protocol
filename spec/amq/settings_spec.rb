@@ -28,6 +28,12 @@ RSpec.describe AMQ::Settings do
       expect(settings[:host]).to eql("tagadab")
     end
 
+    it "leaves peer verification unspecified for amqps URLs without a verify parameter" do
+      settings = AMQ::Settings.configure("amqps://tagadab")
+      expect(settings[:verify]).to be_nil
+      expect(settings[:fail_if_no_peer_cert]).to be_nil
+    end
+
     it "returns default when passed nil" do
       settings = AMQ::Settings.configure(nil)
       expect(settings).to eq(AMQ::Settings.default)
